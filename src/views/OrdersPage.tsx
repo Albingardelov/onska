@@ -78,19 +78,29 @@ export function OrdersPage() {
         <Tab label="Skickade" />
       </Tabs>
 
-      <Box p={2} display="flex" flexDirection="column" gap={2}>
-        {loading ? [1,2,3].map(i => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 3 }} />)
+      <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
+        {loading ? [1,2,3].map(i => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 2 }} />)
         : orders.length === 0 ? (
-          <Paper elevation={0} sx={{ p: 5, border: 1, borderColor: 'divider', borderRadius: 3, textAlign: 'center' }}>
-            <Typography color="text.secondary">
+          <Box sx={{ p: 5, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center', mt: 1 }}>
+            <Typography color="text.secondary" variant="body2">
               Inga {tab === 0 ? 'inkommande' : 'utgående'} beställningar
             </Typography>
-          </Paper>
+          </Box>
         ) : orders.map(order => {
           const isAccepting = acceptingId === order.id
+          const borderLeft = order.status === 'pending' ? 'warning.main'
+            : order.status === 'accepted' ? 'success.main'
+            : order.status === 'declined' ? 'error.main' : 'text.disabled'
           return (
-            <Paper key={order.id} elevation={0}
-              sx={{ p: 2.5, border: 2, borderRadius: 3, borderColor: isAccepting ? 'primary.main' : 'divider' }}>
+            <Box key={order.id}
+              sx={{
+                borderRadius: 2, overflow: 'hidden',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
+                bgcolor: 'background.paper',
+                position: 'relative',
+              }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, bgcolor: borderLeft }} />
+            <Box sx={{ p: 2.5, pl: 3 }}>
               <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                 <Box display="flex" gap={0.8} flexWrap="wrap">
                   <Chip size="small" label={order.mode === 'fint' ? '🌸 Fint' : '🔥 Snusk'} variant="outlined" color="primary" />
@@ -145,7 +155,8 @@ export function OrdersPage() {
                   startIcon={<DoneAllIcon />} sx={{ mt: 1.5 }}
                   onClick={() => updateStatus(order.id, 'completed')}>Markera som klar</Button>
               )}
-            </Paper>
+            </Box>
+            </Box>
           )
         })}
       </Box>

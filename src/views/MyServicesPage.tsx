@@ -73,45 +73,39 @@ export function MyServicesPage() {
     <Box flex={1} display="flex" flexDirection="column">
       <Header title="Mina tjänster" />
 
-      <Box p={2} display="flex" flexDirection="column" gap={2}>
+      <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={2.5} maxWidth={560} width="100%" mx="auto">
 
-        <Box display="flex" alignItems="center" gap={1}>
-          <Chip
-            label={mode === 'fint' ? '🌸 Fint-läge' : '🔥 Snusk-läge'}
-            color="primary" size="small" variant="outlined"
-          />
-          <Typography variant="caption" color="text.secondary">
-            {services.length} tjänst{services.length !== 1 ? 'er' : ''}
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="body2" color="text.secondary">
+            {services.length} tjänst{services.length !== 1 ? 'er' : ''} · {mode === 'fint' ? '🌸 fint' : '🔥 snusk'}
           </Typography>
         </Box>
 
         {notifStatus === 'granted' && (
-          <Alert severity="success" sx={{ borderRadius: 3 }}>Notiser är aktiverade</Alert>
+          <Alert severity="success" sx={{ borderRadius: 2 }}>Notiser är aktiverade</Alert>
         )}
         {notifStatus === 'denied' && (
-          <Alert severity="error" sx={{ borderRadius: 3 }}>Notiser är blockerade – tillåt dem i webbläsarens inställningar</Alert>
+          <Alert severity="error" sx={{ borderRadius: 2 }}>Notiser är blockerade – tillåt dem i webbläsarens inställningar</Alert>
         )}
         {notifStatus === 'unknown' && (
-          <Button variant="outlined" startIcon={<NotificationsIcon />} onClick={enableNotifications}
-            disabled={activating} sx={{ borderRadius: 3 }}>
+          <Button variant="outlined" startIcon={<NotificationsIcon />} onClick={enableNotifications} disabled={activating}>
             {activating ? 'Aktiverar...' : 'Aktivera notiser'}
           </Button>
         )}
         {notifStatus === 'unsupported' && (
-          <Alert severity="warning" sx={{ borderRadius: 3 }}>Den här enheten stöder inte notiser</Alert>
+          <Alert severity="warning" sx={{ borderRadius: 2 }}>Den här enheten stöder inte notiser</Alert>
         )}
 
         {/* Add form */}
         {showForm ? (
-          <Paper elevation={0} sx={{ p: 2.5, border: 2, borderColor: 'primary.main', borderRadius: 3 }}>
+          <Box sx={{ p: 2.5, borderRadius: 2, border: '1.5px solid', borderColor: 'primary.main', bgcolor: 'background.paper' }}>
             <Box component="form" onSubmit={addService} display="flex" flexDirection="column" gap={2}>
               <TextField
                 label="Namn på tjänst"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder={mode === 'fint' ? 'T.ex. Ryggmassage' : '...'}
-                required
-                autoFocus
+                required autoFocus
               />
               <TextField
                 label="Beskrivning (valfritt)"
@@ -128,45 +122,45 @@ export function MyServicesPage() {
                 </Button>
               </Box>
             </Box>
-          </Paper>
+          </Box>
         ) : (
-          <Button
-            onClick={() => setShowForm(true)}
-            variant="outlined"
-            startIcon={<AddIcon />}
-            size="large"
-            sx={{ borderStyle: 'dashed', borderRadius: 3, py: 1.8 }}
-          >
+          <Button onClick={() => setShowForm(true)} variant="outlined" startIcon={<AddIcon />} size="large"
+            sx={{ borderStyle: 'dashed', py: 1.8, color: 'text.secondary', borderColor: 'divider',
+              '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}>
             Lägg till tjänst
           </Button>
         )}
 
         {/* List */}
         {loading ? (
-          <Box display="flex" flexDirection="column" gap={1}>
-            {[1,2].map(i => <Skeleton key={i} variant="rounded" height={64} sx={{ borderRadius: 3 }} />)}
+          <Box display="flex" flexDirection="column" gap={1.5}>
+            {[1,2].map(i => <Skeleton key={i} variant="rounded" height={64} sx={{ borderRadius: 2 }} />)}
           </Box>
         ) : services.length === 0 && !showForm ? (
-          <Paper elevation={0} sx={{ p: 4, border: 1, borderColor: 'divider', borderRadius: 3, textAlign: 'center' }}>
+          <Box sx={{ p: 5, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Inga {mode === 'fint' ? 'fina' : 'snuskiga'} tjänster ännu.
+              Inga tjänster ännu — lägg till din första ovan
             </Typography>
-          </Paper>
+          </Box>
         ) : (
           <Box display="flex" flexDirection="column" gap={1}>
             {services.map(service => (
-              <Paper key={service.id} elevation={0}
-                sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box key={service.id} sx={{
+                p: 2, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2,
+                bgcolor: 'background.paper',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.05)',
+              }}>
                 <Box flex={1}>
-                  <Typography fontWeight={600}>{service.title}</Typography>
+                  <Typography fontWeight={600} letterSpacing="-0.01em">{service.title}</Typography>
                   {service.description && (
-                    <Typography variant="body2" color="text.secondary">{service.description}</Typography>
+                    <Typography variant="body2" color="text.secondary" mt={0.2}>{service.description}</Typography>
                   )}
                 </Box>
-                <IconButton onClick={() => deleteService(service.id)} color="error" size="small">
+                <IconButton onClick={() => deleteService(service.id)} size="small"
+                  sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
                   <DeleteIcon fontSize="small" />
                 </IconButton>
-              </Paper>
+              </Box>
             ))}
           </Box>
         )}
