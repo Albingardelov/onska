@@ -44,14 +44,16 @@ function AppRoutes() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box display="flex" flexDirection="column" minHeight="100dvh" bgcolor="background.default">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/bestallningar" element={<OrdersPage />} />
-          <Route path="/kalender" element={<CalendarPage />} />
-          <Route path="/mina-tjanster" element={<MyServicesPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+      <Box display="flex" flexDirection="column" height="100dvh" bgcolor="background.default">
+        <Box flex={1} overflow="auto">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/bestallningar" element={<OrdersPage />} />
+            <Route path="/kalender" element={<CalendarPage />} />
+            <Route path="/mina-tjanster" element={<MyServicesPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Box>
         <Navbar />
       </Box>
     </ThemeProvider>

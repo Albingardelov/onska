@@ -70,7 +70,7 @@ export function OrdersPage() {
   }
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" pb={10}>
+    <Box flex={1} display="flex" flexDirection="column">
       <Header title="Beställningar" />
       <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth"
         sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>

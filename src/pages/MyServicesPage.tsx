@@ -70,7 +70,7 @@ export function MyServicesPage() {
   }
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" pb={10}>
+    <Box flex={1} display="flex" flexDirection="column">
       <Header title="Mina tjänster" />
 
       <Box p={2} display="flex" flexDirection="column" gap={2}>

@@ -96,7 +96,7 @@ export function HomePage() {
   }
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" pb={10}>
+    <Box flex={1} display="flex" flexDirection="column">
       <Header title={mode === 'fint' ? '🌸 Önska' : '🔥 Önska'} />
       <Box p={2} display="flex" flexDirection="column" gap={3}>
 

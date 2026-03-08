@@ -47,7 +47,7 @@ export function CalendarPage() {
   const today = format(new Date(), 'yyyy-MM-dd')
 
   return (
-    <Box flex={1} display="flex" flexDirection="column" pb={10}>
+    <Box flex={1} display="flex" flexDirection="column">
       <Header title="Min kalender" />
       <Box p={2}>
         <Paper elevation={0} sx={{ p: 2, mb: 2, border: 1, borderColor: 'divider', borderRadius: 3 }}>
