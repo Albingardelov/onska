@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { Providers } from '@/src/components/Providers'
 import { ServiceWorkerRegistration } from '@/src/components/ServiceWorkerRegistration'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Önska',
   description: 'Boka och beställ av varandra',
