@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/src/contexts/AuthContext'
-import { LoginPage } from '@/src/pages/LoginPage'
+import { LoginPage } from '@/src/views/LoginPage'
 
 export default function LoginRoute() {
   const { user, profile, loading } = useAuth()

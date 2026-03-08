@@ -1,3 +1,3 @@
 'use client'
-import { MyServicesPage } from '@/src/pages/MyServicesPage'
+import { MyServicesPage } from '@/src/views/MyServicesPage'
 export default function MinaTjanster() { return <MyServicesPage /> }
