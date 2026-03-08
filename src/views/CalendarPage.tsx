@@ -49,7 +49,7 @@ export function CalendarPage() {
   return (
     <Box flex={1} display="flex" flexDirection="column">
       <Header title="Min kalender" />
-      <Box p={2}>
+      <Box p={2} maxWidth={480} width="100%" mx="auto">
         <Paper elevation={0} sx={{ p: 2, mb: 2, border: 1, borderColor: 'divider', borderRadius: 3 }}>
           <Typography variant="body2" color="text.secondary">
             Tryck på en dag för att markera den som <strong>inte ledig</strong>. Alla dagar är lediga om inget annat anges.
