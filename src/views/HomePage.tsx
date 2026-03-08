@@ -100,42 +100,50 @@ export function HomePage() {
       <Header title={mode === 'fint' ? '🌸 Önska' : '🔥 Önska'} />
       <Box p={2} display="flex" flexDirection="column" gap={3}>
 
-        {/* Active accepted orders */}
-        {activeOrders.length > 0 && (
+        {/* Kommande bokningar */}
+        {activeOrders.filter(o => o.from_user_id === profile!.id).length > 0 && (
           <Box>
             <Typography variant="overline" color="text.secondary" fontWeight={700}>
-              Aktiva beställningar
+              Kommande bokningar
             </Typography>
-            <Box mt={1} display="flex" flexDirection="column" gap={1}>
-              {activeOrders.map(order => {
-                const isIncoming = order.to_user_id === profile!.id
-                return (
-                  <Paper key={order.id} elevation={0} sx={{
-                    p: 2, border: 2, borderRadius: 3,
-                    borderColor: isIncoming ? 'success.main' : 'primary.main',
-                    bgcolor: isIncoming ? 'success.50' : 'primary.50',
-                  }}>
-                    <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                      {isIncoming
-                        ? <CheckCircleIcon fontSize="small" color="success" />
-                        : <HourglassEmptyIcon fontSize="small" color="primary" />}
-                      <Typography variant="caption" fontWeight={700} color={isIncoming ? 'success.main' : 'primary.main'}>
-                        {isIncoming ? 'Du ska utföra' : 'Väntar på ' + partner.name}
+            <Box mt={1} display="flex" flexDirection="column" gap={1.5}>
+              {activeOrders.filter(o => o.from_user_id === profile!.id).map(order => (
+                <Paper key={order.id} elevation={0} sx={{
+                  p: 2.5, borderRadius: 4,
+                  background: order.mode === 'snusk'
+                    ? 'linear-gradient(135deg, #ff6b6b18 0%, #ff8e5318 100%)'
+                    : 'linear-gradient(135deg, #f857a618 0%, #ff585818 100%)',
+                  border: 2,
+                  borderColor: order.mode === 'snusk' ? 'error.light' : 'primary.light',
+                }}>
+                  <Box display="flex" alignItems="flex-start" justifyContent="space-between">
+                    <Box>
+                      <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
+                        <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                        <Typography variant="caption" fontWeight={700} color="success.main" textTransform="uppercase" letterSpacing={0.5}>
+                          Accepterad
+                        </Typography>
+                      </Box>
+                      <Typography fontWeight={700} fontSize="1.05rem">
+                        {order.service?.title ?? 'Okänd tjänst'}
                       </Typography>
-                      <Chip size="small" label={order.mode === 'snusk' ? '🔥' : '🌸'} variant="outlined" sx={{ ml: 'auto' }} />
+                      {order.date && (
+                        <Typography variant="body2" color="text.secondary" mt={0.3}>
+                          📅 {format(new Date(order.date), 'EEEE d MMMM', { locale: sv })}
+                        </Typography>
+                      )}
+                      {order.response_note && (
+                        <Typography variant="body2" color="text.secondary" mt={0.3}>
+                          💬 {order.response_note}
+                        </Typography>
+                      )}
                     </Box>
-                    <Typography fontWeight={600}>{order.service?.title ?? 'Okänd tjänst'}</Typography>
-                    {order.date && (
-                      <Typography variant="body2" color="text.secondary">
-                        {format(new Date(order.date), 'd MMMM', { locale: sv })}
-                      </Typography>
-                    )}
-                    {order.response_note && (
-                      <Typography variant="body2" color="text.secondary" mt={0.3}>⏰ {order.response_note}</Typography>
-                    )}
-                  </Paper>
-                )
-              })}
+                    <Typography fontSize="1.6rem" lineHeight={1}>
+                      {order.mode === 'snusk' ? '🔥' : '🌸'}
+                    </Typography>
+                  </Box>
+                </Paper>
+              ))}
             </Box>
           </Box>
         )}
