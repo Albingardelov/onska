@@ -112,13 +112,14 @@ export function HomePage() {
                 <Box key={order.id} sx={{
                   p: 2.5,
                   borderRadius: 2,
-                  bgcolor: 'primary.light',
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(46,155,95,0.2)',
                   position: 'relative',
                   overflow: 'hidden',
                 }}>
                   <Box sx={{
                     position: 'absolute', left: 0, top: 0, bottom: 0, width: 4,
-                    bgcolor: 'primary.main', borderRadius: '2px 0 0 2px',
+                    bgcolor: 'success.main',
                   }} />
                   <Box display="flex" alignItems="flex-start" justifyContent="space-between" pl={0.5}>
                     <Box>
