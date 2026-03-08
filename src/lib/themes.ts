@@ -11,7 +11,7 @@ export const fintTheme = createTheme({
     success: { main: '#2E9B5F' },
     divider: '#F0DDE3',
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 4 },
   typography: {
     fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     h4: { fontWeight: 800, letterSpacing: '-0.03em' },
@@ -27,7 +27,7 @@ export const fintTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 10, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
+        root: { borderRadius: 8, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
         containedPrimary: { color: '#fff' },
       },
     },
@@ -37,7 +37,7 @@ export const fintTheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 10,
+          borderRadius: 8,
           '& fieldset': { borderColor: '#F0DDE3' },
           '&:hover fieldset': { borderColor: '#FF6B8A' },
         },
@@ -51,6 +51,11 @@ export const fintTheme = createTheme({
           borderBottom: '1px solid #F0DDE3',
           boxShadow: 'none',
         },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: 8 },
       },
     },
     MuiBottomNavigation: {
@@ -75,7 +80,7 @@ export const snuskTheme = createTheme({
     success: { main: '#4CAF7D' },
     divider: '#2D1540',
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 4 },
   typography: {
     fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     h4: { fontWeight: 800, letterSpacing: '-0.03em' },
@@ -91,7 +96,7 @@ export const snuskTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 10, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
+        root: { borderRadius: 8, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
       },
     },
     MuiPaper: {
@@ -100,7 +105,7 @@ export const snuskTheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 10,
+          borderRadius: 8,
           '& fieldset': { borderColor: '#2D1540' },
           '&:hover fieldset': { borderColor: '#C026D3' },
         },
@@ -114,6 +119,11 @@ export const snuskTheme = createTheme({
           borderBottom: '1px solid #2D1540',
           boxShadow: 'none',
         },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: 8 },
       },
     },
     MuiBottomNavigation: {

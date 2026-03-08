@@ -109,7 +109,7 @@ export function HomePage() {
             <Box mt={1} display="flex" flexDirection="column" gap={1.5}>
               {activeOrders.filter(o => o.from_user_id === profile!.id).map(order => (
                 <Paper key={order.id} elevation={0} sx={{
-                  p: 2.5, borderRadius: 4,
+                  p: 2.5, borderRadius: 2,
                   background: order.mode === 'snusk'
                     ? 'linear-gradient(135deg, #ff6b6b18 0%, #ff8e5318 100%)'
                     : 'linear-gradient(135deg, #f857a618 0%, #ff585818 100%)',
@@ -155,10 +155,10 @@ export function HomePage() {
           </Typography>
           {loading ? (
             <Box mt={1} display="flex" flexDirection="column" gap={1}>
-              {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={64} sx={{ borderRadius: 3 }} />)}
+              {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={64} sx={{ borderRadius: 2 }} />)}
             </Box>
           ) : services.length === 0 ? (
-            <Paper elevation={0} sx={{ p: 3, mt: 1, border: 1, borderColor: 'divider', borderRadius: 3, textAlign: 'center' }}>
+            <Paper elevation={0} sx={{ p: 3, mt: 1, border: 1, borderColor: 'divider', borderRadius: 2, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
                 {partner.name} har inga {mode === 'fint' ? 'fina' : 'snuskiga'} tjänster ännu
               </Typography>
@@ -168,7 +168,7 @@ export function HomePage() {
               {services.map(service => (
                 <Paper key={service.id} elevation={0} onClick={() => setSelectedService(service)}
                   sx={{
-                    p: 2, border: 2, borderRadius: 3, cursor: 'pointer',
+                    p: 2, border: 2, borderRadius: 2, cursor: 'pointer',
                     borderColor: selectedService?.id === service.id ? 'primary.main' : 'divider',
                     bgcolor: selectedService?.id === service.id ? 'action.selected' : 'background.paper',
                     transition: 'all 0.15s',
@@ -197,7 +197,7 @@ export function HomePage() {
                   <Box key={dateStr} onClick={() => setSelectedDate(prev => prev === dateStr ? null : dateStr)}
                     sx={{
                       flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                      px: 1.5, py: 1.2, borderRadius: 3, cursor: 'pointer', minWidth: 52, border: 2,
+                      px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52, border: 2,
                       borderColor: selected ? 'primary.main' : 'divider',
                       bgcolor: selected ? 'primary.main' : 'background.paper',
                       color: selected ? 'primary.contrastText' : 'text.primary',
@@ -219,12 +219,12 @@ export function HomePage() {
 
         {selectedService && (
           <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
-            startIcon={<ShoppingBagIcon />} sx={{ py: 1.8, borderRadius: 3, fontSize: '1rem' }}>
+            startIcon={<ShoppingBagIcon />} sx={{ py: 1.8, borderRadius: 2, fontSize: '1rem' }}>
             Beställ {selectedService.title}
           </Button>
         )}
 
-        {success && <Alert severity="success" sx={{ borderRadius: 3 }}>Beställning skickad!</Alert>}
+        {success && <Alert severity="success" sx={{ borderRadius: 2 }}>Beställning skickad!</Alert>}
       </Box>
     </Box>
   )
