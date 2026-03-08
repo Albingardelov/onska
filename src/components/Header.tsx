@@ -15,19 +15,22 @@ interface HeaderProps {
 export function Header({ title }: HeaderProps) {
   const { partner, signOut } = useAuth()
   return (
-    <AppBar position="sticky" color="inherit" elevation={0}
-      sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 56 }}>
+    <AppBar position="sticky" color="inherit" elevation={0}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 60, px: 2.5 }}>
         <Box>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>{title}</Typography>
+          <Typography variant="h6" fontWeight={700} letterSpacing="-0.02em" lineHeight={1.2}>
+            {title}
+          </Typography>
           {partner && (
-            <Typography variant="caption" color="text.secondary">med {partner.name}</Typography>
+            <Typography variant="caption" color="text.secondary" letterSpacing="0.01em">
+              med {partner.name}
+            </Typography>
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <ModeToggle />
           <Tooltip title="Logga ut">
-            <IconButton onClick={signOut} size="small" color="inherit">
+            <IconButton onClick={signOut} size="small" color="inherit" sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}>
               <LogoutIcon fontSize="small" />
             </IconButton>
           </Tooltip>

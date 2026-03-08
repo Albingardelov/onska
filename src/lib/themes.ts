@@ -5,15 +5,20 @@ export const fintTheme = createTheme({
     mode: 'light',
     primary: { main: '#FF6B8A', dark: '#E8536F', light: '#FFD6DF', contrastText: '#fff' },
     secondary: { main: '#FFB3C1' },
-    background: { default: '#FFF5F7', paper: '#FFFFFF' },
-    text: { primary: '#2D1B1E', secondary: '#8A6370' },
+    background: { default: '#FDF6F8', paper: '#FFFFFF' },
+    text: { primary: '#1A1018', secondary: '#7A5663' },
     error: { main: '#E53935' },
-    success: { main: '#43A047' },
+    success: { main: '#2E9B5F' },
+    divider: '#F0DDE3',
   },
-  shape: { borderRadius: 16 },
+  shape: { borderRadius: 12 },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    button: { textTransform: 'none', fontWeight: 600 },
+    fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    h4: { fontWeight: 800, letterSpacing: '-0.03em' },
+    h5: { fontWeight: 700, letterSpacing: '-0.02em' },
+    h6: { fontWeight: 700, letterSpacing: '-0.02em' },
+    button: { textTransform: 'none', fontWeight: 600, letterSpacing: '-0.01em' },
+    overline: { letterSpacing: '0.08em', fontSize: '0.7rem' },
   },
   components: {
     MuiTextField: {
@@ -22,15 +27,39 @@ export const fintTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 12, padding: '12px 20px', fontSize: '0.95rem' },
+        root: { borderRadius: 10, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
         containedPrimary: { color: '#fff' },
       },
     },
     MuiPaper: {
       styleOverrides: { root: { backgroundImage: 'none' } },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 10,
+          '& fieldset': { borderColor: '#F0DDE3' },
+          '&:hover fieldset': { borderColor: '#FF6B8A' },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(12px)',
+          backgroundColor: 'rgba(255,255,255,0.85)',
+          borderBottom: '1px solid #F0DDE3',
+          boxShadow: 'none',
+        },
+      },
+    },
     MuiBottomNavigation: {
-      styleOverrides: { root: { height: 64, borderTop: '1px solid #FFD6DF' } },
+      styleOverrides: { root: { height: 64, borderTop: '1px solid #F0DDE3', backgroundColor: '#FFFFFF' } },
+    },
+    MuiBottomNavigationAction: {
+      styleOverrides: {
+        root: { color: '#C4A0AC', minWidth: 0, '&.Mui-selected': { color: '#FF6B8A' } },
+      },
     },
   },
 })
@@ -40,16 +69,20 @@ export const snuskTheme = createTheme({
     mode: 'dark',
     primary: { main: '#C026D3', dark: '#A21CAF', light: '#7C3AED', contrastText: '#fff' },
     secondary: { main: '#7C3AED' },
-    background: { default: '#130818', paper: '#1E0F24' },
-    text: { primary: '#F5E6FF', secondary: '#B07EC4' },
+    background: { default: '#0D0612', paper: '#170D1E' },
+    text: { primary: '#F0E6FF', secondary: '#9B7AB0' },
     error: { main: '#F44336' },
-    success: { main: '#66BB6A' },
-    divider: '#3D1A50',
+    success: { main: '#4CAF7D' },
+    divider: '#2D1540',
   },
-  shape: { borderRadius: 16 },
+  shape: { borderRadius: 12 },
   typography: {
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    button: { textTransform: 'none', fontWeight: 600 },
+    fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    h4: { fontWeight: 800, letterSpacing: '-0.03em' },
+    h5: { fontWeight: 700, letterSpacing: '-0.02em' },
+    h6: { fontWeight: 700, letterSpacing: '-0.02em' },
+    button: { textTransform: 'none', fontWeight: 600, letterSpacing: '-0.01em' },
+    overline: { letterSpacing: '0.08em', fontSize: '0.7rem' },
   },
   components: {
     MuiTextField: {
@@ -58,7 +91,7 @@ export const snuskTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 12, padding: '12px 20px', fontSize: '0.95rem' },
+        root: { borderRadius: 10, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
       },
     },
     MuiPaper: {
@@ -66,14 +99,30 @@ export const snuskTheme = createTheme({
     },
     MuiOutlinedInput: {
       styleOverrides: {
-        root: { '& fieldset': { borderColor: '#3D1A50' } },
+        root: {
+          borderRadius: 10,
+          '& fieldset': { borderColor: '#2D1540' },
+          '&:hover fieldset': { borderColor: '#C026D3' },
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(12px)',
+          backgroundColor: 'rgba(13,6,18,0.85)',
+          borderBottom: '1px solid #2D1540',
+          boxShadow: 'none',
+        },
       },
     },
     MuiBottomNavigation: {
-      styleOverrides: { root: { height: 64, borderTop: '1px solid #3D1A50', backgroundColor: '#1A0B21' } },
+      styleOverrides: { root: { height: 64, borderTop: '1px solid #2D1540', backgroundColor: '#120919' } },
     },
     MuiBottomNavigationAction: {
-      styleOverrides: { root: { color: '#B07EC4', '&.Mui-selected': { color: '#C026D3' } } },
+      styleOverrides: {
+        root: { color: '#6B4880', minWidth: 0, '&.Mui-selected': { color: '#C026D3' } },
+      },
     },
   },
 })
