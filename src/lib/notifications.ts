@@ -17,7 +17,7 @@ export async function subscribeToPush(userId: string) {
   let subscription = await registration.pushManager.getSubscription()
 
   if (!subscription) {
-    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidKey).buffer as ArrayBuffer,

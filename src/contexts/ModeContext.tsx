@@ -15,6 +15,7 @@ const ModeContext = createContext<ModeContextType | null>(null)
 
 export function ModeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<Mode>(() => {
+    if (typeof window === 'undefined') return 'fint'
     return (localStorage.getItem('onska-mode') as Mode) ?? 'fint'
   })
 
