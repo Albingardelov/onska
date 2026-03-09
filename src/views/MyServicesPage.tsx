@@ -77,7 +77,7 @@ export function MyServicesPage() {
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" color="text.secondary">
-            {services.length} tjänst{services.length !== 1 ? 'er' : ''} · {mode === 'light' ? 'Light' : 'Dark'}
+            {services.length} tjänst{services.length !== 1 ? 'er' : ''} · {mode === 'fint' ? 'Light' : 'Dark'}
           </Typography>
         </Box>
 

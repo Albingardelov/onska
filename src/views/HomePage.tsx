@@ -146,7 +146,7 @@ export function HomePage() {
                       )}
                     </Box>
                     <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', mt: 0.2 }}>
-                      {order.mode === 'dark' ? <DarkModeRoundedIcon /> : <WbSunnyRoundedIcon />}
+                      {order.mode === 'snusk' ? <DarkModeRoundedIcon /> : <WbSunnyRoundedIcon />}
                     </Box>
                   </Box>
                 </Box>

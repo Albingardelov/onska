@@ -103,7 +103,7 @@ export function OrdersPage() {
             <Box sx={{ p: 2.5, pl: 3 }}>
               <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                 <Box display="flex" gap={0.8} flexWrap="wrap">
-                  <Chip size="small" label={order.mode === 'light' ? 'Light' : 'Dark'} variant="outlined" color="primary" />
+                  <Chip size="small" label={order.mode === 'fint' ? 'Light' : 'Dark'} variant="outlined" color="primary" />
                   <Chip size="small" label={statusLabel[order.status]} color={statusColor[order.status]} />
                 </Box>
                 <Typography variant="caption" color="text.secondary">
