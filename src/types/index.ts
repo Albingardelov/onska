@@ -1,4 +1,4 @@
-export type Mode = 'fint' | 'snusk'
+export type Mode = 'light' | 'dark'
 export type OrderStatus = 'pending' | 'accepted' | 'declined' | 'completed'
 
 export interface Profile {

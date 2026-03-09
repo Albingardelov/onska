@@ -6,6 +6,7 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import { useAuth } from '../contexts/AuthContext'
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 
 export function LoginPage() {
   const { signIn, signUp } = useAuth()
@@ -30,7 +31,7 @@ export function LoginPage() {
       justifyContent="center" p={3} bgcolor="background.default">
       <Box width="100%" maxWidth={380}>
         <Box textAlign="center" mb={5}>
-          <Typography fontSize={52} lineHeight={1}>🌸</Typography>
+          <AutoAwesomeRoundedIcon sx={{ fontSize: 52, color: 'primary.main' }} />
           <Typography variant="h4" fontWeight={800} color="primary" mt={1.5} letterSpacing="-0.03em">Önska</Typography>
           <Typography variant="body2" color="text.secondary" mt={0.8} letterSpacing="0.01em">
             Boka och beställ av varandra

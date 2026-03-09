@@ -30,14 +30,13 @@ export async function POST(req: NextRequest) {
 
   if (!profile?.push_subscription) return NextResponse.json({ message: 'No subscription' })
 
-  const emoji = record.mode === 'snusk' ? '🔥' : '🌸'
   const isAccepted = record.status === 'accepted'
 
   try {
     await webpush.sendNotification(
       JSON.parse(profile.push_subscription),
       JSON.stringify({
-        title: isAccepted ? `Beställning accepterad! ${emoji}` : `Ny beställning! ${emoji}`,
+        title: isAccepted ? 'Beställning accepterad!' : 'Ny beställning!',
         body: isAccepted
           ? `${sender?.name ?? 'Din partner'} har accepterat ${service?.title ?? 'din beställning'}`
           : `${sender?.name ?? 'Din partner'} vill ha ${service?.title ?? 'något'}`,

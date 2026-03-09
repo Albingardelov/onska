@@ -16,6 +16,8 @@ import { format, addDays } from 'date-fns'
 import { sv } from 'date-fns/locale'
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded'
+import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -100,7 +102,7 @@ export function HomePage() {
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
-      <Header title={mode === 'fint' ? '🌸 Önska' : '🔥 Önska'} />
+      <Header title="Önska" />
       <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={3.5} maxWidth={560} width="100%" mx="auto">
 
         {/* Kommande bokningar */}
@@ -143,9 +145,9 @@ export function HomePage() {
                         </Typography>
                       )}
                     </Box>
-                    <Typography fontSize="1.5rem" lineHeight={1} mt={0.2}>
-                      {order.mode === 'snusk' ? '🔥' : '🌸'}
-                    </Typography>
+                    <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', mt: 0.2 }}>
+                      {order.mode === 'dark' ? <DarkModeRoundedIcon /> : <WbSunnyRoundedIcon />}
+                    </Box>
                   </Box>
                 </Box>
               ))}

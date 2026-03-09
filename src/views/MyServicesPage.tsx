@@ -77,7 +77,7 @@ export function MyServicesPage() {
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" color="text.secondary">
-            {services.length} tjänst{services.length !== 1 ? 'er' : ''} · {mode === 'fint' ? '🌸 fint' : '🔥 snusk'}
+            {services.length} tjänst{services.length !== 1 ? 'er' : ''} · {mode === 'light' ? 'Light' : 'Dark'}
           </Typography>
         </Box>
 
@@ -104,7 +104,7 @@ export function MyServicesPage() {
                 label="Namn på tjänst"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                placeholder={mode === 'fint' ? 'T.ex. Ryggmassage' : '...'}
+                placeholder="T.ex. Ryggmassage"
                 required autoFocus
               />
               <TextField
