@@ -12,13 +12,13 @@ const inter = Inter({
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Önska',
-  description: 'Boka och beställ av varandra',
+  title: 'Couply',
+  description: 'Turn wishes into moments',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Önska',
+    title: 'Couply',
   },
 }
 
