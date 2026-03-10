@@ -61,7 +61,7 @@ export function LoginPage() {
       >
         <FavoriteIcon sx={{ fontSize: 56, color: 'primary.main', mb: 2 }} />
         <Typography variant="h3" fontWeight={900} color="primary" letterSpacing="-1px">
-          WishMate
+          Couply
         </Typography>
         <Typography variant="h6" color="text.secondary" fontWeight={400} mt={1} mb={4}>
           Turn wishes into moments
