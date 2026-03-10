@@ -109,13 +109,15 @@ export function LoginPage() {
       {/* Login/Register form */}
       {showForm && (
         <Box
-          position="fixed"
-          inset={0}
-          bgcolor="rgba(0,0,0,0.45)"
-          display="flex"
-          alignItems="flex-end"
-          justifyContent="center"
-          sx={{ zIndex: 1300 }}
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            bgcolor: 'rgba(0,0,0,0.45)',
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            zIndex: 1300,
+          }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false) }}
         >
           <Paper
