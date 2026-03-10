@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
     gap: 10,
-    paddingBottom: 32,
+    paddingBottom: 100,
   },
   subtitle: {
     marginBottom: 4,

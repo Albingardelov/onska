@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { View, ScrollView, StyleSheet, Pressable } from 'react-native'
+import { View, ScrollView, StyleSheet, Pressable, useWindowDimensions } from 'react-native'
 import { Text, useTheme, IconButton, Surface } from 'react-native-paper'
 import * as Haptics from 'expo-haptics'
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns'
@@ -12,6 +12,9 @@ const WEEK_DAYS = ['Mån', 'Tis', 'Ons', 'Tor', 'Fre', 'Lör', 'Sön']
 export default function CalendarScreen() {
   const { profile } = useAuth()
   const theme = useTheme()
+  const { width } = useWindowDimensions()
+  const cellSize = Math.floor((width - 32 - 24) / 7)
+
   const [availability, setAvailability] = useState<Map<string, boolean>>(new Map())
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [saving, setSaving] = useState<string | null>(null)
@@ -77,19 +80,17 @@ export default function CalendarScreen() {
       {/* Day headers */}
       <View style={styles.grid}>
         {WEEK_DAYS.map(d => (
-          <View key={d} style={styles.dayHeader}>
+          <View key={d} style={[styles.cell, { width: cellSize }]}>
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, fontWeight: '700' }}>
               {d}
             </Text>
           </View>
         ))}
 
-        {/* Empty offset cells */}
         {Array.from({ length: firstDayOffset }, (_, i) => (
-          <View key={`empty-${i}`} style={styles.dayCell} />
+          <View key={`empty-${i}`} style={[styles.cell, { width: cellSize, height: cellSize }]} />
         ))}
 
-        {/* Day cells */}
         {days.map(day => {
           const dateStr = format(day, 'yyyy-MM-dd')
           const isAvailable = availability.get(dateStr) ?? true
@@ -121,12 +122,15 @@ export default function CalendarScreen() {
               onPress={() => toggleDay(dateStr)}
               disabled={isPast}
               style={[
-                styles.dayCell,
+                styles.cell,
                 {
+                  width: cellSize,
+                  height: cellSize,
                   backgroundColor: bgColor,
                   borderColor,
                   borderWidth: isToday || !isAvailable ? 2 : 1,
                   opacity: isPast ? 0.35 : 1,
+                  borderRadius: 8,
                 }
               ]}
             >
@@ -159,7 +163,7 @@ export default function CalendarScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 100,
   },
   infoCard: {
     borderRadius: 12,
@@ -177,17 +181,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 4,
   },
-  dayHeader: {
-    width: `${100 / 7}%`,
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  dayCell: {
-    width: `${100 / 7 - 1}%`,
-    aspectRatio: 1,
+  cell: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
+    paddingVertical: 4,
   },
   legend: {
     flexDirection: 'row',

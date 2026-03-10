@@ -1,6 +1,33 @@
 import { Tabs } from 'expo-router'
 import { useTheme } from 'react-native-paper'
+import { TouchableOpacity } from 'react-native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
+import { useMode } from '@/contexts/ModeContext'
+import { useAuth } from '@/contexts/AuthContext'
+
+function ModeToggleButton() {
+  const { mode, toggleMode } = useMode()
+  const theme = useTheme()
+  return (
+    <TouchableOpacity onPress={toggleMode} style={{ marginRight: 8, padding: 6 }}>
+      <MaterialCommunityIcons
+        name={mode === 'fint' ? 'weather-sunny' : 'weather-night'}
+        size={22}
+        color={theme.colors.onSurface}
+      />
+    </TouchableOpacity>
+  )
+}
+
+function LogoutButton() {
+  const { signOut } = useAuth()
+  const theme = useTheme()
+  return (
+    <TouchableOpacity onPress={signOut} style={{ marginRight: 16, padding: 6 }}>
+      <MaterialCommunityIcons name="logout" size={20} color={theme.colors.onSurfaceVariant} />
+    </TouchableOpacity>
+  )
+}
 
 export default function AppLayout() {
   const theme = useTheme()
@@ -17,13 +44,16 @@ export default function AppLayout() {
           height: 80,
           paddingBottom: 20,
         },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
         headerStyle: { backgroundColor: theme.colors.surface },
         headerTitleStyle: { fontWeight: '700', color: theme.colors.onSurface },
         headerShadowVisible: false,
+        headerRight: () => (
+          <>
+            <ModeToggleButton />
+            <LogoutButton />
+          </>
+        ),
       }}
     >
       <Tabs.Screen

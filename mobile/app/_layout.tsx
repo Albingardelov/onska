@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
-import { useColorScheme } from 'react-native'
 import { Slot, useRouter, useSegments } from 'expo-router'
 import { PaperProvider } from 'react-native-paper'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { StatusBar } from 'expo-status-bar'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
+import { ModeProvider, useMode } from '@/contexts/ModeContext'
 import { lightTheme, darkTheme } from '@/theme'
 
 function RootGuard() {
@@ -14,7 +14,6 @@ function RootGuard() {
 
   useEffect(() => {
     if (loading) return
-
     const inApp = segments[0] === '(app)'
     const inAuth = segments[0] === '(auth)'
 
@@ -30,18 +29,26 @@ function RootGuard() {
   return <Slot />
 }
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme()
-  const theme = colorScheme === 'dark' ? darkTheme : lightTheme
+function ThemedApp() {
+  const { mode } = useMode()
+  const theme = mode === 'fint' ? lightTheme : darkTheme
 
   return (
+    <PaperProvider theme={theme}>
+      <StatusBar style={mode === 'fint' ? 'dark' : 'light'} />
+      <AuthProvider>
+        <RootGuard />
+      </AuthProvider>
+    </PaperProvider>
+  )
+}
+
+export default function RootLayout() {
+  return (
     <SafeAreaProvider>
-      <PaperProvider theme={theme}>
-        <AuthProvider>
-          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-          <RootGuard />
-        </AuthProvider>
-      </PaperProvider>
+      <ModeProvider>
+        <ThemedApp />
+      </ModeProvider>
     </SafeAreaProvider>
   )
 }
