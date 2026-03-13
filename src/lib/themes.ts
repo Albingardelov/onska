@@ -63,7 +63,7 @@ export const fintTheme = createTheme({
     },
     MuiBottomNavigationAction: {
       styleOverrides: {
-        root: { color: '#C4A0AC', minWidth: 0, '&.Mui-selected': { color: '#FF6B8A' } },
+        root: { color: '#7A5663', minWidth: 0, '&.Mui-selected': { color: '#B5213E' } },
       },
     },
   },
@@ -131,7 +131,7 @@ export const snuskTheme = createTheme({
     },
     MuiBottomNavigationAction: {
       styleOverrides: {
-        root: { color: '#6B4880', minWidth: 0, '&.Mui-selected': { color: '#C026D3' } },
+        root: { color: '#9D7BB5', minWidth: 0, '&.Mui-selected': { color: '#D46EE2' } },
       },
     },
   },

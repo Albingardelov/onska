@@ -33,7 +33,7 @@ export function PairingPage() {
   }
 
   return (
-    <Box minHeight="100dvh" display="flex" flexDirection="column" alignItems="center"
+    <Box component="main" minHeight="100dvh" display="flex" flexDirection="column" alignItems="center"
       justifyContent="center" p={3} bgcolor="background.default">
       <Box width="100%" maxWidth={400}>
         <Box textAlign="center" mb={4}>

@@ -74,7 +74,7 @@ export function SettingsPage() {
         {/* Account info */}
         <Box>
           <Typography variant="caption" color="text.secondary" fontWeight={700}
-            sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.7rem', opacity: 0.6 }}>
+            sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.7rem' }}>
             Konto
           </Typography>
           <Box mt={1} p={2} borderRadius={2} bgcolor="background.paper"

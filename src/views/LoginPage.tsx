@@ -37,7 +37,7 @@ export function LoginPage() {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100dvh', flexDirection: { xs: 'column', md: 'row' } }}>
+    <Box component="main" sx={{ display: 'flex', minHeight: '100dvh', flexDirection: { xs: 'column', md: 'row' } }}>
 
       {/* Left: Form */}
       <Box sx={{
