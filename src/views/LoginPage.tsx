@@ -109,7 +109,7 @@ export function LoginPage() {
         px: { xs: 3, md: 8 },
         py: { xs: 6, md: 0 },
         bgcolor: 'background.default',
-        background: 'linear-gradient(160deg, #ff6b8a18 0%, #ff9a3c0a 100%)',
+        background: 'linear-gradient(160deg, #cc2e6a14 0%, #ff9a3c0a 100%)',
       }}>
         <Box sx={{ maxWidth: 520 }}>
           <Typography

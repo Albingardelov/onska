@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material/styles'
 export const fintTheme = createTheme({
   palette: {
     mode: 'light',
-    primary: { main: '#FF6B8A', dark: '#E8536F', light: '#FFD6DF', contrastText: '#fff' },
+    primary: { main: '#CC2E6A', dark: '#A82158', light: '#FFD6DF', contrastText: '#fff' },
     secondary: { main: '#FFB3C1' },
     background: { default: '#FDF6F8', paper: '#FFFFFF' },
     text: { primary: '#1A1018', secondary: '#7A5663' },
@@ -39,7 +39,7 @@ export const fintTheme = createTheme({
         root: {
           borderRadius: 8,
           '& fieldset': { borderColor: '#F0DDE3' },
-          '&:hover fieldset': { borderColor: '#FF6B8A' },
+          '&:hover fieldset': { borderColor: '#CC2E6A' },
         },
       },
     },
