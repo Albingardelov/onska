@@ -8,8 +8,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns'
 import { sv } from 'date-fns/locale'
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import { Icon } from '@iconify/react'
 
 export function CalendarPage() {
   const { profile } = useAuth()
@@ -57,14 +56,14 @@ export function CalendarPage() {
         </Paper>
 
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-          <IconButton onClick={() => setCurrentMonth(m => addDays(startOfMonth(m), -1))}>
-            <ChevronLeftIcon />
+          <IconButton onClick={() => setCurrentMonth(m => addDays(startOfMonth(m), -1))} aria-label="Föregående månad">
+            <Icon icon="mdi:chevron-left" />
           </IconButton>
           <Typography variant="h6" fontWeight={700} textTransform="capitalize">
             {format(currentMonth, 'MMMM yyyy', { locale: sv })}
           </Typography>
-          <IconButton onClick={() => setCurrentMonth(m => addDays(endOfMonth(m), 1))}>
-            <ChevronRightIcon />
+          <IconButton onClick={() => setCurrentMonth(m => addDays(endOfMonth(m), 1))} aria-label="Nästa månad">
+            <Icon icon="mdi:chevron-right" />
           </IconButton>
         </Box>
 

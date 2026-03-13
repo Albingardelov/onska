@@ -14,9 +14,7 @@ import { supabase } from '../lib/supabase'
 import type { Order } from '../types'
 import { format } from 'date-fns'
 import { sv } from 'date-fns/locale'
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
-import DoneAllIcon from '@mui/icons-material/DoneAll'
+import { Icon } from '@iconify/react'
 
 const statusLabel: Record<Order['status'], string> = {
   pending: 'Väntar', accepted: 'Accepterad', declined: 'Nekad', completed: 'Klar',
@@ -137,22 +135,22 @@ export function OrdersPage() {
                         <Button variant="outlined" color="inherit" size="small" fullWidth
                           onClick={() => { setAcceptingId(null); setResponseNote('') }}>Avbryt</Button>
                         <Button variant="contained" color="success" size="small" fullWidth
-                          startIcon={<CheckIcon />} onClick={() => acceptOrder(order.id)}>Bekräfta</Button>
+                          startIcon={<Icon icon="mdi:check" />} onClick={() => acceptOrder(order.id)}>Bekräfta</Button>
                       </Box>
                     </Box>
                   ) : (
                     <Box display="flex" gap={1} mt={1}>
                       <Button variant="outlined" color="error" size="small" fullWidth
-                        startIcon={<CloseIcon />} onClick={() => updateStatus(order.id, 'declined')}>Neka</Button>
+                        startIcon={<Icon icon="mdi:close" />} onClick={() => updateStatus(order.id, 'declined')}>Neka</Button>
                       <Button variant="contained" color="success" size="small" fullWidth
-                        startIcon={<CheckIcon />} onClick={() => setAcceptingId(order.id)}>Acceptera</Button>
+                        startIcon={<Icon icon="mdi:check" />} onClick={() => setAcceptingId(order.id)}>Acceptera</Button>
                     </Box>
                   )}
                 </Box>
               )}
               {tab === 0 && order.status === 'accepted' && (
                 <Button variant="outlined" color="secondary" size="small" fullWidth
-                  startIcon={<DoneAllIcon />} sx={{ mt: 1.5 }}
+                  startIcon={<Icon icon="mdi:check-all" />} sx={{ mt: 1.5 }}
                   onClick={() => updateStatus(order.id, 'completed')}>Markera som klar</Button>
               )}
             </Box>

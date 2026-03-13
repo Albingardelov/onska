@@ -14,9 +14,7 @@ import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
 import { subscribeToPush } from '../lib/notifications'
 import type { Service } from '../types'
-import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
-import NotificationsIcon from '@mui/icons-material/Notifications'
+import { Icon } from '@iconify/react'
 
 export function MyServicesPage() {
   const { profile, user } = useAuth()
@@ -88,7 +86,7 @@ export function MyServicesPage() {
           <Alert severity="error" sx={{ borderRadius: 2 }}>Notiser är blockerade – tillåt dem i webbläsarens inställningar</Alert>
         )}
         {notifStatus === 'unknown' && (
-          <Button variant="outlined" startIcon={<NotificationsIcon />} onClick={enableNotifications} disabled={activating}>
+          <Button variant="outlined" startIcon={<Icon icon="mdi:bell" />} onClick={enableNotifications} disabled={activating}>
             {activating ? 'Aktiverar...' : 'Aktivera notiser'}
           </Button>
         )}
@@ -124,7 +122,7 @@ export function MyServicesPage() {
             </Box>
           </Box>
         ) : (
-          <Button onClick={() => setShowForm(true)} variant="outlined" startIcon={<AddIcon />} size="large"
+          <Button onClick={() => setShowForm(true)} variant="outlined" startIcon={<Icon icon="mdi:plus" />} size="large"
             sx={{ borderStyle: 'dashed', py: 1.8, color: 'text.secondary', borderColor: 'divider',
               '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}>
             Lägg till tjänst
@@ -157,8 +155,9 @@ export function MyServicesPage() {
                   )}
                 </Box>
                 <IconButton onClick={() => deleteService(service.id)} size="small"
+                  aria-label={`Radera ${service.title}`}
                   sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
-                  <DeleteIcon fontSize="small" />
+                  <Icon icon="mdi:delete" />
                 </IconButton>
               </Box>
             ))}

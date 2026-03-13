@@ -14,10 +14,7 @@ import { supabase } from '../lib/supabase'
 import type { Service, Availability, Order } from '../types'
 import { format, addDays } from 'date-fns'
 import { sv } from 'date-fns/locale'
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag'
-import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded'
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
+import { Icon } from '@iconify/react'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -126,7 +123,7 @@ export function HomePage() {
                   <Box display="flex" alignItems="flex-start" justifyContent="space-between" pl={0.5}>
                     <Box>
                       <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
-                        <CheckCircleIcon sx={{ fontSize: 14, color: 'success.main' }} />
+                        <Box component="span" sx={{ fontSize: 14, color: 'success.main', display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
                         <Typography variant="caption" fontWeight={700} color="success.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.65rem' }}>
                           Accepterad
                         </Typography>
@@ -146,7 +143,7 @@ export function HomePage() {
                       )}
                     </Box>
                     <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', mt: 0.2 }}>
-                      {order.mode === 'snusk' ? <DarkModeRoundedIcon /> : <WbSunnyRoundedIcon />}
+                      <Icon icon={order.mode === 'snusk' ? 'mdi:weather-night' : 'mdi:weather-sunny'} />
                     </Box>
                   </Box>
                 </Box>
@@ -191,7 +188,7 @@ export function HomePage() {
                         )}
                       </Box>
                       {selected && (
-                        <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 20, flexShrink: 0 }} />
+                        <Box component="span" sx={{ fontSize: 20, color: 'primary.main', flexShrink: 0, display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
                       )}
                     </Box>
                   </Box>
@@ -238,7 +235,7 @@ export function HomePage() {
 
         {selectedService && (
           <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
-            startIcon={<ShoppingBagIcon />}
+            startIcon={<Icon icon="mdi:shopping" />}
             sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
             {ordering ? 'Skickar...' : `Beställ ${selectedService.title}`}
           </Button>

@@ -2,16 +2,13 @@ import { usePathname, useRouter } from 'next/navigation'
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import Paper from '@mui/material/Paper'
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded'
-import InboxRoundedIcon from '@mui/icons-material/InboxRounded'
-import CalendarTodayRoundedIcon from '@mui/icons-material/CalendarTodayRounded'
-import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded'
+import { Icon } from '@iconify/react'
 
 const tabs = [
-  { to: '/', icon: <HomeRoundedIcon />, label: 'Hem' },
-  { to: '/bestallningar', icon: <InboxRoundedIcon />, label: 'Beställningar' },
-  { to: '/kalender', icon: <CalendarTodayRoundedIcon />, label: 'Kalender' },
-  { to: '/mina-tjanster', icon: <FavoriteBorderRoundedIcon />, label: 'Tjänster' },
+  { to: '/', icon: <Icon icon="mdi:home" width={28} />, label: 'Hem' },
+  { to: '/bestallningar', icon: <Icon icon="mdi:inbox" width={28} />, label: 'Beställningar' },
+  { to: '/kalender', icon: <Icon icon="mdi:calendar-today" width={28} />, label: 'Kalender' },
+  { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: 'Tjänster' },
 ]
 
 export function Navbar() {
@@ -21,6 +18,8 @@ export function Navbar() {
 
   return (
     <Paper
+      component="nav"
+      aria-label="Huvudnavigering"
       elevation={0}
       sx={{ paddingBottom: 'env(safe-area-inset-bottom)', flexShrink: 0 }}
     >

@@ -7,8 +7,7 @@ import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import CheckIcon from '@mui/icons-material/Check'
+import { Icon } from '@iconify/react'
 import { useAuth } from '../contexts/AuthContext'
 
 export function PairingPage() {
@@ -53,8 +52,9 @@ export function PairingPage() {
               {profile?.pairing_code}
             </Typography>
             <Tooltip title={copied ? 'Kopierat!' : 'Kopiera'}>
-              <IconButton onClick={copyCode} color="primary" size="small">
-                {copied ? <CheckIcon /> : <ContentCopyIcon />}
+              <IconButton onClick={copyCode} color="primary" size="small"
+                aria-label={copied ? 'Kopierat' : 'Kopiera parningskod'}>
+                {copied ? <Icon icon="mdi:check" /> : <Icon icon="mdi:content-copy" />}
               </IconButton>
             </Tooltip>
           </Box>

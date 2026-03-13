@@ -1,13 +1,12 @@
 import Chip from '@mui/material/Chip'
-import WbSunnyRoundedIcon from '@mui/icons-material/WbSunnyRounded'
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded'
+import { Icon } from '@iconify/react'
 import { useMode } from '../contexts/ModeContext'
 
 export function ModeToggle() {
   const { mode, toggleMode } = useMode()
   return (
     <Chip
-      icon={mode === 'fint' ? <WbSunnyRoundedIcon /> : <DarkModeRoundedIcon />}
+      icon={<Icon icon={mode === 'fint' ? 'mdi:weather-sunny' : 'mdi:weather-night'} />}
       label={mode === 'fint' ? 'Light' : 'Dark'}
       onClick={toggleMode}
       color="primary"

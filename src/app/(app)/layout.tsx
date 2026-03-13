@@ -27,7 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <Box display="flex" flexDirection="column" height="100dvh" bgcolor="background.default">
-      <Box flex={1} overflow="auto">
+      <Box component="main" flex={1} overflow="auto">
         {children}
       </Box>
       <Navbar />
