@@ -78,9 +78,9 @@ export default function AppLayout() {
       <Tabs.Screen
         name="orders"
         options={{
-          title: 'Beställningar',
+          title: 'Önskningar',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="shopping-outline" size={size} color={color} />
+            <MaterialCommunityIcons name="inbox-outline" size={size} color={color} />
           ),
         }}
       />
@@ -96,9 +96,9 @@ export default function AppLayout() {
       <Tabs.Screen
         name="services"
         options={{
-          title: 'Mina tjänster',
+          title: 'Mina idéer',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="star-outline" size={size} color={color} />
+            <MaterialCommunityIcons name="heart-outline" size={size} color={color} />
           ),
         }}
       />

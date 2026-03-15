@@ -3,12 +3,14 @@ import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text, Button, TextInput, useTheme, ActivityIndicator, IconButton, Snackbar } from 'react-native-paper'
 import * as Haptics from 'expo-haptics'
 import { useAuth } from '@/contexts/AuthContext'
+import { useMode } from '@/contexts/ModeContext'
 import { supabase } from '@/lib/supabase'
 import type { Service } from '@/types'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 export default function ServicesScreen() {
   const { profile } = useAuth()
+  const { mode } = useMode()
   const theme = useTheme()
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
@@ -18,7 +20,7 @@ export default function ServicesScreen() {
   const [saving, setSaving] = useState(false)
   const [deleted, setDeleted] = useState(false)
 
-  useEffect(() => { loadServices() }, [])
+  useEffect(() => { loadServices() }, [mode])
 
   async function loadServices() {
     setLoading(true)
@@ -26,6 +28,7 @@ export default function ServicesScreen() {
       .from('services')
       .select('*')
       .eq('user_id', profile!.id)
+      .eq('mode', mode)
       .order('created_at', { ascending: true })
     setServices(data ?? [])
     setLoading(false)
@@ -39,7 +42,7 @@ export default function ServicesScreen() {
       user_id: profile!.id,
       title: title.trim(),
       description: description.trim() || null,
-      mode: 'fint',
+      mode,
       active: true,
     })
     setTitle('')
@@ -56,6 +59,8 @@ export default function ServicesScreen() {
     setDeleted(true)
   }
 
+  const countLabel = services.length === 1 ? '1 idé' : `${services.length} idéer`
+
   if (loading) {
     return (
       <View style={[styles.centered, { backgroundColor: theme.colors.background }]}>
@@ -68,14 +73,14 @@ export default function ServicesScreen() {
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <ScrollView contentContainerStyle={styles.list}>
         <Text variant="bodySmall" style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
-          {services.length} tjänst{services.length !== 1 ? 'er' : ''}
+          {countLabel}
         </Text>
 
         {/* Add form */}
         {showForm ? (
           <View style={[styles.formCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.primary }]}>
             <TextInput
-              label="Namn på tjänst"
+              label="Namn på idé"
               value={title}
               onChangeText={setTitle}
               placeholder="T.ex. Ryggmassage"
@@ -114,7 +119,7 @@ export default function ServicesScreen() {
               onPress={() => setShowForm(true)}
               contentStyle={{ paddingVertical: 8 }}
             >
-              Lägg till tjänst
+              Lägg till idé
             </Button>
           </View>
         )}
@@ -122,9 +127,9 @@ export default function ServicesScreen() {
         {/* Service list */}
         {services.length === 0 && !showForm ? (
           <View style={[styles.emptyBox, { borderColor: theme.colors.outline }]}>
-            <MaterialCommunityIcons name="star-outline" size={40} color={theme.colors.outlineVariant} style={{ marginBottom: 8 }} />
+            <MaterialCommunityIcons name="lightbulb-outline" size={40} color={theme.colors.outlineVariant} style={{ marginBottom: 8 }} />
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
-              Inga tjänster ännu{'\n'}Lägg till din första ovan
+              Inga idéer ännu{'\n'}Lägg till din första ovan
             </Text>
           </View>
         ) : (
@@ -154,7 +159,7 @@ export default function ServicesScreen() {
       </ScrollView>
 
       <Snackbar visible={deleted} onDismiss={() => setDeleted(false)} duration={2000}>
-        Tjänst borttagen
+        Idé borttagen
       </Snackbar>
     </View>
   )
@@ -163,55 +168,14 @@ export default function ServicesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  list: {
-    padding: 16,
-    gap: 10,
-    paddingBottom: 100,
-  },
-  subtitle: {
-    marginBottom: 4,
-  },
-  formCard: {
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1.5,
-    gap: 10,
-  },
-  formInput: {
-    marginBottom: 0,
-  },
-  formActions: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 4,
-  },
-  formBtn: {
-    flex: 1,
-    borderRadius: 10,
-  },
-  addBtn: {
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
-  emptyBox: {
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    borderRadius: 14,
-    padding: 40,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  serviceCard: {
-    borderRadius: 12,
-    padding: 14,
-    paddingRight: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 1,
-  },
-  serviceInfo: {
-    flex: 1,
-  },
+  list: { padding: 16, gap: 10, paddingBottom: 100 },
+  subtitle: { marginBottom: 4 },
+  formCard: { borderRadius: 14, padding: 16, borderWidth: 1.5, gap: 10 },
+  formInput: { marginBottom: 0 },
+  formActions: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  formBtn: { flex: 1, borderRadius: 10 },
+  addBtn: { borderWidth: 1.5, borderStyle: 'dashed', borderRadius: 14, overflow: 'hidden' },
+  emptyBox: { borderWidth: 1.5, borderStyle: 'dashed', borderRadius: 14, padding: 40, alignItems: 'center', marginTop: 8 },
+  serviceCard: { borderRadius: 12, padding: 14, paddingRight: 4, flexDirection: 'row', alignItems: 'center', elevation: 1 },
+  serviceInfo: { flex: 1 },
 })
