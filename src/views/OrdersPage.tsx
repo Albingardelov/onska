@@ -12,6 +12,7 @@ import Accordion from '@mui/material/Accordion'
 import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { Header } from '../components/Header'
+import { SwipeToDelete } from '../components/SwipeToDelete'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import type { Order } from '../types'
@@ -266,7 +267,11 @@ export function OrdersPage() {
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails sx={{ pt: 0, pb: 1.5, px: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      {historyByWeek[key].map(o => renderOrder(o, true))}
+                      {historyByWeek[key].map(o => (
+                        <SwipeToDelete key={o.id} onDelete={() => deleteOrder(o.id)}>
+                          {renderOrder(o, false)}
+                        </SwipeToDelete>
+                      ))}
                     </AccordionDetails>
                   </Accordion>
                 ))}
