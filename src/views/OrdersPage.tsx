@@ -45,13 +45,13 @@ export function OrdersPage() {
   useEffect(() => {
     loadOrders()
     const channel = supabase.channel('orders')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => loadOrders())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => loadOrders(true))
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [tab])
 
-  async function loadOrders() {
-    setLoading(true)
+  async function loadOrders(silent = false) {
+    if (!silent) setLoading(true)
     const { data } = await supabase.from('orders').select('*, service:services(*)')
       .eq(tab === 0 ? 'to_user_id' : 'from_user_id', profile!.id)
       .order('created_at', { ascending: false })
