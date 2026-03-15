@@ -14,6 +14,7 @@ import type { Service, Order } from '../types'
 import { format, addDays } from 'date-fns'
 import { sv } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
+import { useTranslations } from 'next-intl'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -25,6 +26,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export function HomePage() {
+  const t = useTranslations('home')
+  const tc = useTranslations('common')
   const { partner, profile } = useAuth()
   const { mode } = useMode()
   const [services, setServices] = useState<Service[]>([])
@@ -107,9 +110,9 @@ export function HomePage() {
   if (!partner) {
     return (
       <Box flex={1} display="flex" flexDirection="column">
-        <Header title="Önska" />
+        <Header title={t('header')} />
         <Box flex={1} display="flex" alignItems="center" justifyContent="center" p={4}>
-          <Typography color="text.secondary">Ingen partner kopplad ännu.</Typography>
+          <Typography color="text.secondary">{t('no_partner')}</Typography>
         </Box>
       </Box>
     )
@@ -121,7 +124,7 @@ export function HomePage() {
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
-      <Header title="Önska" />
+      <Header title={t('header')} />
       <Box pb={4} display="flex" flexDirection="column" maxWidth={560} width="100%" mx="auto">
 
         {/* Hero */}
@@ -136,7 +139,7 @@ export function HomePage() {
             {format(new Date(), 'EEEE d MMMM', { locale: sv })}
           </Typography>
           <Typography variant="h5" fontWeight={800} letterSpacing="-0.03em" mt={0.3} mb={1.5}>
-            Vad vill du önska av {partner.name}?
+            {t('greeting', { name: partner.name })}
           </Typography>
 
           {/* Partner availability today */}
@@ -145,7 +148,7 @@ export function HomePage() {
               sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
               <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}><Icon icon="mdi:check-circle-outline" /></Box>
               <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
-                {partner.name} är öppen för allt idag
+                {t('open_for_all', { name: partner.name })}
               </Typography>
             </Box>
           ) : (
@@ -153,7 +156,7 @@ export function HomePage() {
               sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
               <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}><Icon icon="mdi:information-outline" /></Box>
               <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
-                {partner.name} har stängt av {blockedTodayCount} sak{blockedTodayCount > 1 ? 'er' : ''} idag
+                {blockedTodayCount === 1 ? t('blocked_one', { name: partner.name }) : t('blocked_many', { name: partner.name, count: blockedTodayCount })}
               </Typography>
             </Box>
           )}
@@ -164,7 +167,7 @@ export function HomePage() {
           {/* Kommande önskningar */}
           {upcomingOrders.length > 0 && (
             <Box>
-              <SectionLabel>Ni har planerat</SectionLabel>
+              <SectionLabel>{t('planned_section')}</SectionLabel>
               <Box display="flex" flexDirection="column" gap={1.5}>
                 {upcomingOrders.map(order => (
                   <Box key={order.id} sx={{
@@ -184,7 +187,7 @@ export function HomePage() {
                         <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
                           <Box component="span" sx={{ fontSize: 14, color: 'success.main', display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
                           <Typography variant="caption" fontWeight={700} color="success.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.65rem' }}>
-                            Intresserad
+                            {t('accepted_label')}
                           </Typography>
                         </Box>
                         <Typography fontWeight={700} fontSize="1rem" letterSpacing="-0.02em">
@@ -213,7 +216,7 @@ export function HomePage() {
 
           {/* Partner services */}
           <Box>
-            <SectionLabel>{partner.name}s idéer</SectionLabel>
+            <SectionLabel>{t('ideas_label', { name: partner.name })}</SectionLabel>
             {loading ? (
               <Box display="flex" flexDirection="column" gap={1.5}>
                 {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={80} sx={{ borderRadius: 2 }} />)}
@@ -221,7 +224,7 @@ export function HomePage() {
             ) : services.length === 0 ? (
               <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
-                  {partner.name} har inga idéer ännu
+                  {t('no_ideas', { name: partner.name })}
                 </Typography>
               </Box>
             ) : (
@@ -258,7 +261,7 @@ export function HomePage() {
                           {isBlocked && (
                             <Typography variant="caption" color="text.disabled" mt={0.5} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                               <Icon icon="mdi:clock-outline" width={12} />
-                              Inte öppen för detta {selectedDate ? 'den dagen' : 'idag'}
+                              {selectedDate ? t('blocked_date') : t('blocked_today')}
                             </Typography>
                           )}
                         </Box>
@@ -280,7 +283,7 @@ export function HomePage() {
           {/* Date picker */}
           {selectedService && (
             <Box>
-              <SectionLabel>Föreslå ett datum (valfritt)</SectionLabel>
+              <SectionLabel>{t('suggest_date')}</SectionLabel>
               <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
                 {days.slice(0, 14).map(dateStr => {
                   const d = new Date(dateStr)
@@ -298,7 +301,7 @@ export function HomePage() {
                         transition: 'all 0.12s ease',
                       }}>
                       <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        {isToday && !selected ? 'Idag' : format(d, 'EEE', { locale: sv })}
+                        {isToday && !selected ? t('today_label') : format(d, 'EEE', { locale: sv })}
                       </Typography>
                       <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>{format(d, 'd')}</Typography>
                     </Box>
@@ -309,20 +312,20 @@ export function HomePage() {
           )}
 
           {selectedService && (
-            <TextField label="Meddelande (valfritt)" value={note}
-              onChange={e => setNote(e.target.value)} placeholder="Skriv något..." multiline rows={2} />
+            <TextField label={t('note_label')} value={note}
+              onChange={e => setNote(e.target.value)} placeholder={t('note_placeholder')} multiline rows={2} />
           )}
 
           {selectedService && (
             <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
               startIcon={<Icon icon="mdi:send" />}
               sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
-              {ordering ? 'Skickar...' : `Önska ${selectedService.title}`}
+              {ordering ? tc('sending') : t('wish_button', { title: selectedService.title })}
             </Button>
           )}
 
           {success && (
-            <Alert severity="success" sx={{ borderRadius: 2 }}>Önskan skickad!</Alert>
+            <Alert severity="success" sx={{ borderRadius: 2 }}>{t('wish_sent')}</Alert>
           )}
         </Box>
       </Box>

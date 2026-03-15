@@ -9,8 +9,10 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import { Icon } from '@iconify/react'
 import { useAuth } from '../contexts/AuthContext'
+import { useTranslations } from 'next-intl'
 
 export function PairingPage() {
+  const t = useTranslations('pairing')
   const { profile, pairWithPartner, signOut } = useAuth()
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
@@ -38,22 +40,24 @@ export function PairingPage() {
       <Box width="100%" maxWidth={400}>
         <Box textAlign="center" mb={4}>
           <Typography fontSize={56} lineHeight={1}>💞</Typography>
-          <Typography variant="h5" fontWeight={800} color="primary" mt={1}>Koppla ihop</Typography>
-          <Typography variant="body2" color="text.secondary" mt={0.5}>Hej {profile?.name}! Koppla ihop med din partner.</Typography>
+          <Typography variant="h5" fontWeight={800} color="primary" mt={1}>{t('title')}</Typography>
+          <Typography variant="body2" color="text.secondary" mt={0.5}>
+            {t('subtitle', { name: profile?.name ?? '' })}
+          </Typography>
         </Box>
 
         {/* My code */}
         <Paper elevation={0} sx={{ p: 3, mb: 2, border: 1, borderColor: 'divider', borderRadius: 4 }}>
           <Typography variant="body2" color="text.secondary" fontWeight={600} mb={1}>
-            Din kod – skicka till din partner
+            {t('my_code_label')}
           </Typography>
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h4" fontWeight={900} fontFamily="monospace" letterSpacing={4} color="primary" flex={1}>
               {profile?.pairing_code}
             </Typography>
-            <Tooltip title={copied ? 'Kopierat!' : 'Kopiera'}>
+            <Tooltip title={copied ? t('copied') : t('copy')}>
               <IconButton onClick={copyCode} color="primary" size="small"
-                aria-label={copied ? 'Kopierat' : 'Kopiera parningskod'}>
+                aria-label={copied ? t('copied_aria') : t('copy_aria')}>
                 {copied ? <Icon icon="mdi:check" /> : <Icon icon="mdi:content-copy" />}
               </IconButton>
             </Tooltip>
@@ -63,26 +67,26 @@ export function PairingPage() {
         {/* Enter partner code */}
         <Paper elevation={0} sx={{ p: 3, border: 1, borderColor: 'divider', borderRadius: 4 }}>
           <Typography variant="body2" color="text.secondary" fontWeight={600} mb={2}>
-            Ange din partners kod
+            {t('partner_code_label')}
           </Typography>
           <Box component="form" onSubmit={handlePair} display="flex" flexDirection="column" gap={2}>
             <TextField
               value={code}
               onChange={e => setCode(e.target.value.toUpperCase())}
-              placeholder="T.ex. AB1C2D"
+              placeholder={t('placeholder')}
               inputProps={{ maxLength: 6, style: { textAlign: 'center', letterSpacing: 8, fontSize: '1.4rem', fontWeight: 700, fontFamily: 'monospace' } }}
               required
             />
             {error && <Alert severity="error">{error}</Alert>}
             <Button type="submit" variant="contained" size="large"
               disabled={loading || code.length < 6}>
-              {loading ? '...' : 'Koppla ihop'}
+              {loading ? '...' : t('connect_button')}
             </Button>
           </Box>
         </Paper>
 
         <Button onClick={signOut} color="inherit" fullWidth sx={{ mt: 2, color: 'text.secondary' }}>
-          Logga ut
+          {t('sign_out')}
         </Button>
       </Box>
     </Box>

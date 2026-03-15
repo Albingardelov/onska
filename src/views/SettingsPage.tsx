@@ -11,10 +11,15 @@ import Divider from '@mui/material/Divider'
 import { Icon } from '@iconify/react'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
+import { useLocale } from '../contexts/LocaleContext'
 import { supabase } from '../lib/supabase'
+import { useTranslations } from 'next-intl'
 
 export function SettingsPage() {
+  const t = useTranslations('settings')
+  const tc = useTranslations('common')
   const { user, profile, signOut } = useAuth()
+  const { locale, setLocale } = useLocale()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -60,14 +65,14 @@ export function SettingsPage() {
       await signOut()
     } else {
       const body = await res.json()
-      setError(body.error ?? 'Något gick fel')
+      setError(body.error ?? tc('error_generic'))
       setDeleting(false)
     }
   }
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
-      <Header title="Inställningar" />
+      <Header title={t('header')} />
 
       <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={3} maxWidth={560} width="100%" mx="auto">
 
@@ -75,12 +80,42 @@ export function SettingsPage() {
         <Box>
           <Typography variant="caption" color="text.secondary" fontWeight={700}
             sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.7rem' }}>
-            Konto
+            {t('section_account')}
           </Typography>
           <Box mt={1} p={2} borderRadius={2} bgcolor="background.paper"
             sx={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.05)' }}>
             <Typography fontWeight={600}>{profile?.name}</Typography>
             <Typography variant="body2" color="text.secondary">{user?.email}</Typography>
+          </Box>
+        </Box>
+
+        <Divider />
+
+        {/* Language */}
+        <Box display="flex" flexDirection="column" gap={1.5}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex' }}>
+              <Icon icon="mdi:translate" />
+            </Box>
+            <Typography variant="subtitle1" fontWeight={700}>{t('language_title')}</Typography>
+          </Box>
+          <Box display="flex" gap={1}>
+            <Button
+              variant={locale === 'sv' ? 'contained' : 'outlined'}
+              onClick={() => setLocale('sv')}
+              size="small"
+              sx={{ minWidth: 80 }}
+            >
+              🇸🇪 Svenska
+            </Button>
+            <Button
+              variant={locale === 'en' ? 'contained' : 'outlined'}
+              onClick={() => setLocale('en')}
+              size="small"
+              sx={{ minWidth: 80 }}
+            >
+              🇬🇧 English
+            </Button>
           </Box>
         </Box>
 
@@ -92,30 +127,21 @@ export function SettingsPage() {
             <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex' }}>
               <Icon icon="mdi:shield-lock" />
             </Box>
-            <Typography variant="subtitle1" fontWeight={700}>GDPR & integritet</Typography>
+            <Typography variant="subtitle1" fontWeight={700}>{t('gdpr_title')}</Typography>
           </Box>
 
           <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
-            Du har rätt att ta del av och radera all data vi har om dig. Nedan kan du exportera din information
-            eller permanent radera ditt konto.
+            {t('gdpr_desc')}
           </Typography>
 
-          <Button
-            variant="outlined"
-            startIcon={<Icon icon="mdi:download" />}
-            onClick={exportData}
-            disabled={exporting}
-          >
-            {exporting ? 'Exporterar...' : 'Exportera min data'}
+          <Button variant="outlined" startIcon={<Icon icon="mdi:download" />}
+            onClick={exportData} disabled={exporting}>
+            {exporting ? '...' : t('export_button')}
           </Button>
 
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<Icon icon="mdi:delete-forever" />}
-            onClick={() => setDeleteOpen(true)}
-          >
-            Radera mitt konto
+          <Button variant="outlined" color="error" startIcon={<Icon icon="mdi:delete-forever" />}
+            onClick={() => setDeleteOpen(true)}>
+            {t('delete_button')}
           </Button>
         </Box>
 
@@ -127,37 +153,40 @@ export function SettingsPage() {
             <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex' }}>
               <Icon icon="mdi:human" />
             </Box>
-            <Typography variant="subtitle1" fontWeight={700}>Tillgänglighet</Typography>
+            <Typography variant="subtitle1" fontWeight={700}>{t('accessibility_title')}</Typography>
           </Box>
           <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
-            Couply följer WCAG 2.1 Level AA. Appen fungerar med skärmläsare, tangentbordsnavigering
-            och alla skärmstorlekar.
+            {t('accessibility_desc')}
           </Typography>
         </Box>
+
+        <Divider />
+
+        <Button onClick={signOut} color="inherit" sx={{ color: 'text.secondary' }}>
+          {t('sign_out')}
+        </Button>
 
       </Box>
 
       {/* Delete confirmation dialog */}
-      <Dialog
-        open={deleteOpen}
-        onClose={() => !deleting && setDeleteOpen(false)}
-        aria-labelledby="delete-dialog-title"
-      >
-        <DialogTitle id="delete-dialog-title">Radera konto?</DialogTitle>
+      <Dialog open={deleteOpen} onClose={() => !deleting && setDeleteOpen(false)}
+        aria-labelledby="delete-dialog-title">
+        <DialogTitle id="delete-dialog-title">{t('delete_dialog_title')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" mb={error ? 2 : 0}>
-            All din data raderas permanent — profil, tjänster, beställningar och kalender. Det går inte att ångra.
+            {t('delete_dialog_body')}
           </Typography>
           {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteOpen(false)} disabled={deleting} color="inherit">
-            Avbryt
+            {tc('cancel')}
           </Button>
           <Button onClick={deleteAccount} disabled={deleting} color="error" variant="contained">
-            {deleting ? 'Raderar...' : 'Ja, radera allt'}
+            {deleting ? '...' : t('delete_confirm')}
           </Button>
         </DialogActions>
+
       </Dialog>
     </Box>
   )

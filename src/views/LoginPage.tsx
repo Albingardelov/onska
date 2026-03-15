@@ -9,15 +9,10 @@ import Alert from '@mui/material/Alert'
 import Divider from '@mui/material/Divider'
 import { Icon } from '@iconify/react'
 import { useAuth } from '../contexts/AuthContext'
-
-const features: { icon: string; title: string; desc: string }[] = [
-  { icon: 'mdi:gift', title: 'Önska frimodigt', desc: 'Lägg in vad du är sugen på. Din partner ser det och svarar när de är med.' },
-  { icon: 'mdi:calendar', title: 'Föreslå en dag', desc: 'Inga oklarheter. Föreslå när det passar och se vad partnern är öppen för.' },
-  { icon: 'mdi:history', title: 'Era minnen', desc: 'Koll på vad ni planerat, gjort — och vad som väntar.' },
-  { icon: 'mdi:shield-lock', title: 'Privat som det ska vara', desc: 'Bara ni två ser er data. Radera allt när ni vill.' },
-]
+import { useTranslations } from 'next-intl'
 
 export function LoginPage() {
+  const t = useTranslations('login')
   const { signIn, signUp } = useAuth()
   const [isRegister, setIsRegister] = useState(false)
   const [name, setName] = useState('')
@@ -25,6 +20,13 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const features = [
+    { icon: 'mdi:gift', title: t('feature_wish_title'), desc: t('feature_wish_desc') },
+    { icon: 'mdi:calendar', title: t('feature_date_title'), desc: t('feature_date_desc') },
+    { icon: 'mdi:history', title: t('feature_memories_title'), desc: t('feature_memories_desc') },
+    { icon: 'mdi:shield-lock', title: t('feature_privacy_title'), desc: t('feature_privacy_desc') },
+  ]
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -59,25 +61,25 @@ export function LoginPage() {
               <Icon icon="mdi:heart" />
             </Box>
             <Typography variant="h5" fontWeight={900} color="primary" letterSpacing="-0.5px">
-              Couply
+              {t('app_name')}
             </Typography>
           </Box>
 
           <Typography variant="h5" fontWeight={800} mb={0.5} letterSpacing="-0.5px">
-            {isRegister ? 'Skapa konto' : 'Välkommen tillbaka'}
+            {isRegister ? t('create_account') : t('welcome_back')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={3.5}>
-            {isRegister ? 'Kom igång — det är gratis.' : 'Logga in på ditt konto.'}
+            {isRegister ? t('register_sub') : t('sign_in_sub')}
           </Typography>
 
           <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
             {isRegister && (
-              <TextField label="Namn" value={name} onChange={e => setName(e.target.value)}
-                placeholder="Ditt namn" required autoComplete="name" />
+              <TextField label={t('name_label')} value={name} onChange={e => setName(e.target.value)}
+                placeholder={t('name_placeholder')} required autoComplete="name" />
             )}
-            <TextField label="E-post" type="email" value={email}
+            <TextField label={t('email_label')} type="email" value={email}
               onChange={e => setEmail(e.target.value)} required autoComplete="email" />
-            <TextField label="Lösenord" type="password" value={password}
+            <TextField label={t('password_label')} type="password" value={password}
               onChange={e => setPassword(e.target.value)} required
               slotProps={{ htmlInput: { minLength: 6 } }}
               autoComplete={isRegister ? 'new-password' : 'current-password'} />
@@ -86,7 +88,7 @@ export function LoginPage() {
 
             <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}
               sx={{ mt: 0.5, borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>
-              {loading ? '...' : isRegister ? 'Skapa konto' : 'Logga in'}
+              {loading ? '...' : isRegister ? t('register_button') : t('sign_in_button')}
             </Button>
           </Box>
 
@@ -94,7 +96,7 @@ export function LoginPage() {
 
           <Button onClick={() => { setIsRegister(r => !r); setError('') }}
             color="inherit" fullWidth sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-            {isRegister ? 'Har du redan ett konto? Logga in' : 'Inget konto? Registrera dig'}
+            {isRegister ? t('have_account') : t('no_account')}
           </Button>
         </Box>
       </Box>
@@ -111,24 +113,22 @@ export function LoginPage() {
         background: 'linear-gradient(160deg, #cc2e6a14 0%, #ff9a3c0a 100%)',
       }}>
         <Box sx={{ maxWidth: 520 }}>
-          <Typography
-            sx={{
-              fontSize: { xs: '2.4rem', md: '3.2rem' },
-              fontWeight: 900,
-              letterSpacing: '-1.5px',
-              lineHeight: 1.1,
-              mb: 2,
-              color: 'text.primary',
-            }}
-          >
-            En app för
+          <Typography sx={{
+            fontSize: { xs: '2.4rem', md: '3.2rem' },
+            fontWeight: 900,
+            letterSpacing: '-1.5px',
+            lineHeight: 1.1,
+            mb: 2,
+            color: 'text.primary',
+          }}>
+            {t('headline')}
             <Box component="span" sx={{ color: 'primary.main', display: 'block' }}>
-              era önskningar.
+              {t('headline_highlight')}
             </Box>
           </Typography>
 
           <Typography variant="body1" color="text.secondary" mb={5} lineHeight={1.7} sx={{ maxWidth: 420 }}>
-            Säg vad du är sugen på. Enkelt och utan press.
+            {t('tagline')}
           </Typography>
 
           <Box display="flex" flexDirection="column" gap={3}>

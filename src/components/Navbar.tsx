@@ -1,25 +1,29 @@
+'use client'
 import { usePathname, useRouter } from 'next/navigation'
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import Paper from '@mui/material/Paper'
 import { Icon } from '@iconify/react'
-
-const tabs = [
-  { to: '/', icon: <Icon icon="mdi:home" width={28} />, label: 'Hem' },
-  { to: '/bestallningar', icon: <Icon icon="mdi:inbox" width={28} />, label: 'Önskningar' },
-  { to: '/kalender', icon: <Icon icon="mdi:calendar-today" width={28} />, label: 'Kalender' },
-  { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: 'Mina idéer' },
-]
+import { useTranslations } from 'next-intl'
 
 export function Navbar() {
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const router = useRouter()
-  const current = tabs.findIndex(t => t.to === pathname)
+
+  const tabs = [
+    { to: '/', icon: <Icon icon="mdi:home" width={28} />, label: t('home') },
+    { to: '/bestallningar', icon: <Icon icon="mdi:inbox" width={28} />, label: t('orders') },
+    { to: '/kalender', icon: <Icon icon="mdi:calendar-today" width={28} />, label: t('calendar') },
+    { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: t('services') },
+  ]
+
+  const current = tabs.findIndex(tab => tab.to === pathname)
 
   return (
     <Paper
       component="nav"
-      aria-label="Huvudnavigering"
+      aria-label={t('aria_label')}
       elevation={0}
       sx={{ paddingBottom: 'env(safe-area-inset-bottom)', flexShrink: 0 }}
     >

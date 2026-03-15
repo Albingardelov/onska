@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
-import Chip from '@mui/material/Chip'
 import Skeleton from '@mui/material/Skeleton'
 import Alert from '@mui/material/Alert'
 import { Header } from '../components/Header'
@@ -15,8 +13,11 @@ import { supabase } from '../lib/supabase'
 import { subscribeToPush } from '../lib/notifications'
 import type { Service } from '../types'
 import { Icon } from '@iconify/react'
+import { useTranslations } from 'next-intl'
 
 export function MyServicesPage() {
+  const t = useTranslations('services')
+  const tc = useTranslations('common')
   const { profile, user } = useAuth()
   const { mode } = useMode()
   const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
@@ -33,6 +34,7 @@ export function MyServicesPage() {
     setNotifStatus(Notification.permission === 'granted' ? 'granted' : 'denied')
     setActivating(false)
   }
+
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -67,31 +69,33 @@ export function MyServicesPage() {
     setServices(prev => prev.filter(s => s.id !== id))
   }
 
+  const countLabel = services.length === 1 ? t('count_one') : t('count_many', { count: services.length })
+
   return (
     <Box flex={1} display="flex" flexDirection="column">
-      <Header title="Mina idéer" />
+      <Header title={t('header')} />
 
       <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={2.5} maxWidth={560} width="100%" mx="auto">
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" color="text.secondary">
-            {services.length} idé{services.length !== 1 ? 'er' : ''} · {mode === 'fint' ? 'Light' : 'Dark'}
+            {countLabel} · {mode === 'fint' ? 'Light' : 'Dark'}
           </Typography>
         </Box>
 
         {notifStatus === 'granted' && (
-          <Alert severity="success" sx={{ borderRadius: 2 }}>Notiser är aktiverade</Alert>
+          <Alert severity="success" sx={{ borderRadius: 2 }}>{t('notif_granted')}</Alert>
         )}
         {notifStatus === 'denied' && (
-          <Alert severity="error" sx={{ borderRadius: 2 }}>Notiser är blockerade – tillåt dem i webbläsarens inställningar</Alert>
+          <Alert severity="error" sx={{ borderRadius: 2 }}>{t('notif_denied')}</Alert>
         )}
         {notifStatus === 'unknown' && (
           <Button variant="outlined" startIcon={<Icon icon="mdi:bell" />} onClick={enableNotifications} disabled={activating}>
-            {activating ? 'Aktiverar...' : 'Aktivera notiser'}
+            {activating ? '...' : t('notif_enable')}
           </Button>
         )}
         {notifStatus === 'unsupported' && (
-          <Alert severity="warning" sx={{ borderRadius: 2 }}>Den här enheten stöder inte notiser</Alert>
+          <Alert severity="warning" sx={{ borderRadius: 2 }}>{t('notif_unsupported')}</Alert>
         )}
 
         {/* Add form */}
@@ -99,24 +103,24 @@ export function MyServicesPage() {
           <Box sx={{ p: 2.5, borderRadius: 2, border: '1.5px solid', borderColor: 'primary.main', bgcolor: 'background.paper' }}>
             <Box component="form" onSubmit={addService} display="flex" flexDirection="column" gap={2}>
               <TextField
-                label="Namn på idé"
+                label={t('name_label')}
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                placeholder="T.ex. Ryggmassage"
+                placeholder={t('name_placeholder')}
                 required autoFocus
               />
               <TextField
-                label="Beskrivning (valfritt)"
+                label={t('desc_label')}
                 value={description}
                 onChange={e => setDescription(e.target.value)}
                 multiline rows={2}
               />
               <Box display="flex" gap={1}>
                 <Button onClick={() => setShowForm(false)} color="inherit" variant="outlined" fullWidth>
-                  Avbryt
+                  {tc('cancel')}
                 </Button>
                 <Button type="submit" variant="contained" disabled={saving || !title.trim()} fullWidth>
-                  {saving ? '...' : 'Lägg till'}
+                  {saving ? '...' : t('add_button')}
                 </Button>
               </Box>
             </Box>
@@ -125,7 +129,7 @@ export function MyServicesPage() {
           <Button onClick={() => setShowForm(true)} variant="outlined" startIcon={<Icon icon="mdi:plus" />} size="large"
             sx={{ borderStyle: 'dashed', py: 1.8, color: 'text.secondary', borderColor: 'divider',
               '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}>
-            Lägg till idé
+            {t('add_idea')}
           </Button>
         )}
 
@@ -136,9 +140,7 @@ export function MyServicesPage() {
           </Box>
         ) : services.length === 0 && !showForm ? (
           <Box sx={{ p: 5, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Inga idéer ännu — lägg till din första ovan
-            </Typography>
+            <Typography variant="body2" color="text.secondary">{t('no_ideas')}</Typography>
           </Box>
         ) : (
           <Box display="flex" flexDirection="column" gap={1}>
@@ -155,7 +157,7 @@ export function MyServicesPage() {
                   )}
                 </Box>
                 <IconButton onClick={() => deleteService(service.id)} size="small"
-                  aria-label={`Radera ${service.title}`}
+                  aria-label={t('delete_aria', { title: service.title })}
                   sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}>
                   <Icon icon="mdi:delete" />
                 </IconButton>
