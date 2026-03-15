@@ -102,10 +102,10 @@ export function HomePage() {
       <Header title="Önska" />
       <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={3.5} maxWidth={560} width="100%" mx="auto">
 
-        {/* Kommande bokningar */}
+        {/* Kommande önskningar */}
         {upcomingOrders.length > 0 && (
           <Box>
-            <SectionLabel>Kommande bokningar</SectionLabel>
+            <SectionLabel>Ni har planerat</SectionLabel>
             <Box display="flex" flexDirection="column" gap={1.5}>
               {upcomingOrders.map(order => (
                 <Box key={order.id} sx={{
@@ -125,7 +125,7 @@ export function HomePage() {
                       <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
                         <Box component="span" sx={{ fontSize: 14, color: 'success.main', display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
                         <Typography variant="caption" fontWeight={700} color="success.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.65rem' }}>
-                          Accepterad
+                          Intresserad
                         </Typography>
                       </Box>
                       <Typography fontWeight={700} fontSize="1rem" letterSpacing="-0.02em">
@@ -154,7 +154,7 @@ export function HomePage() {
 
         {/* Partner services */}
         <Box>
-          <SectionLabel>Beställ av {partner.name}</SectionLabel>
+          <SectionLabel>{partner.name}s idéer</SectionLabel>
           {loading ? (
             <Box display="flex" flexDirection="column" gap={1.5}>
               {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={68} sx={{ borderRadius: 2 }} />)}
@@ -162,7 +162,7 @@ export function HomePage() {
           ) : services.length === 0 ? (
             <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
-                {partner.name} har inga tjänster ännu
+                {partner.name} har inga idéer ännu
               </Typography>
             </Box>
           ) : (
@@ -235,14 +235,14 @@ export function HomePage() {
 
         {selectedService && (
           <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
-            startIcon={<Icon icon="mdi:shopping" />}
+            startIcon={<Icon icon="mdi:send" />}
             sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
-            {ordering ? 'Skickar...' : `Beställ ${selectedService.title}`}
+            {ordering ? 'Skickar...' : `Önska ${selectedService.title}`}
           </Button>
         )}
 
         {success && (
-          <Alert severity="success" sx={{ borderRadius: 2 }}>Beställning skickad!</Alert>
+          <Alert severity="success" sx={{ borderRadius: 2 }}>Önskan skickad!</Alert>
         )}
       </Box>
     </Box>

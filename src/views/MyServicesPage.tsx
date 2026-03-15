@@ -69,13 +69,13 @@ export function MyServicesPage() {
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
-      <Header title="Mina tjänster" />
+      <Header title="Mina idéer" />
 
       <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={2.5} maxWidth={560} width="100%" mx="auto">
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" color="text.secondary">
-            {services.length} tjänst{services.length !== 1 ? 'er' : ''} · {mode === 'fint' ? 'Light' : 'Dark'}
+            {services.length} idé{services.length !== 1 ? 'er' : ''} · {mode === 'fint' ? 'Light' : 'Dark'}
           </Typography>
         </Box>
 
@@ -99,7 +99,7 @@ export function MyServicesPage() {
           <Box sx={{ p: 2.5, borderRadius: 2, border: '1.5px solid', borderColor: 'primary.main', bgcolor: 'background.paper' }}>
             <Box component="form" onSubmit={addService} display="flex" flexDirection="column" gap={2}>
               <TextField
-                label="Namn på tjänst"
+                label="Namn på idé"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="T.ex. Ryggmassage"
@@ -125,7 +125,7 @@ export function MyServicesPage() {
           <Button onClick={() => setShowForm(true)} variant="outlined" startIcon={<Icon icon="mdi:plus" />} size="large"
             sx={{ borderStyle: 'dashed', py: 1.8, color: 'text.secondary', borderColor: 'divider',
               '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}>
-            Lägg till tjänst
+            Lägg till idé
           </Button>
         )}
 
@@ -137,7 +137,7 @@ export function MyServicesPage() {
         ) : services.length === 0 && !showForm ? (
           <Box sx={{ p: 5, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Inga tjänster ännu — lägg till din första ovan
+              Inga idéer ännu — lägg till din första ovan
             </Typography>
           </Box>
         ) : (

@@ -17,10 +17,10 @@ import { sv } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
 
 const statusLabel: Record<Order['status'], string> = {
-  pending: 'Väntar', accepted: 'Accepterad', declined: 'Nekad', completed: 'Klar',
+  pending: 'Väntar', accepted: 'Intresserad', declined: 'Inte nu', completed: 'Klar',
 }
 const statusColor: Record<Order['status'], 'warning' | 'success' | 'error' | 'secondary'> = {
-  pending: 'warning', accepted: 'success', declined: 'error', completed: 'secondary',
+  pending: 'warning', accepted: 'success', declined: 'secondary', completed: 'secondary',
 }
 
 export function OrdersPage() {
@@ -69,11 +69,11 @@ export function OrdersPage() {
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
-      <Header title="Beställningar" />
+      <Header title="Önskningar" />
       <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="fullWidth"
         sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-        <Tab label="Inkorg" />
-        <Tab label="Skickade" />
+        <Tab label="Till mig" />
+        <Tab label="Mina" />
       </Tabs>
 
       <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
@@ -81,14 +81,14 @@ export function OrdersPage() {
         : orders.length === 0 ? (
           <Box sx={{ p: 5, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center', mt: 1 }}>
             <Typography color="text.secondary" variant="body2">
-              Inga {tab === 0 ? 'inkommande' : 'utgående'} beställningar
+              Inga {tab === 0 ? 'inkommande' : 'utgående'} önskningar
             </Typography>
           </Box>
         ) : orders.map(order => {
           const isAccepting = acceptingId === order.id
           const borderLeft = order.status === 'pending' ? 'warning.main'
             : order.status === 'accepted' ? 'success.main'
-            : order.status === 'declined' ? 'error.main' : 'text.disabled'
+            : order.status === 'declined' ? 'text.disabled' : 'text.disabled'
           return (
             <Box key={order.id}
               sx={{
@@ -109,7 +109,7 @@ export function OrdersPage() {
                 </Typography>
               </Box>
 
-              <Typography fontWeight={700} fontSize="1rem">{order.service?.title ?? 'Okänd tjänst'}</Typography>
+              <Typography fontWeight={700} fontSize="1rem">{order.service?.title ?? 'Okänd önskan'}</Typography>
               {order.date && (
                 <Typography variant="body2" color="text.secondary">
                   {format(new Date(order.date), 'd MMMM yyyy', { locale: sv })}
@@ -140,18 +140,19 @@ export function OrdersPage() {
                     </Box>
                   ) : (
                     <Box display="flex" gap={1} mt={1}>
-                      <Button variant="outlined" color="error" size="small" fullWidth
-                        startIcon={<Icon icon="mdi:close" />} onClick={() => updateStatus(order.id, 'declined')}>Neka</Button>
+                      <Button variant="outlined" color="inherit" size="small" fullWidth
+                        sx={{ color: 'text.secondary' }}
+                        onClick={() => updateStatus(order.id, 'declined')}>Inte nu</Button>
                       <Button variant="contained" color="success" size="small" fullWidth
-                        startIcon={<Icon icon="mdi:check" />} onClick={() => setAcceptingId(order.id)}>Acceptera</Button>
+                        startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => setAcceptingId(order.id)}>Ja, gärna!</Button>
                     </Box>
                   )}
                 </Box>
               )}
               {tab === 0 && order.status === 'accepted' && (
                 <Button variant="outlined" color="secondary" size="small" fullWidth
-                  startIcon={<Icon icon="mdi:check-all" />} sx={{ mt: 1.5 }}
-                  onClick={() => updateStatus(order.id, 'completed')}>Markera som klar</Button>
+                  startIcon={<Icon icon="mdi:archive-outline" />} sx={{ mt: 1.5 }}
+                  onClick={() => updateStatus(order.id, 'completed')}>Arkivera</Button>
               )}
             </Box>
             </Box>

@@ -36,10 +36,10 @@ export async function POST(req: NextRequest) {
     await webpush.sendNotification(
       JSON.parse(profile.push_subscription),
       JSON.stringify({
-        title: isAccepted ? 'Beställning accepterad!' : 'Ny beställning!',
+        title: isAccepted ? 'Ny önskan intressant!' : 'Ny önskan från din partner',
         body: isAccepted
-          ? `${sender?.name ?? 'Din partner'} har accepterat ${service?.title ?? 'din beställning'}`
-          : `${sender?.name ?? 'Din partner'} vill ha ${service?.title ?? 'något'}`,
+          ? `${sender?.name ?? 'Din partner'} är intresserad av ${service?.title ?? 'din önskan'}`
+          : `${sender?.name ?? 'Din partner'} har delat en ny önskan`,
         url: '/bestallningar',
       })
     )

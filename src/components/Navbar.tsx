@@ -6,9 +6,9 @@ import { Icon } from '@iconify/react'
 
 const tabs = [
   { to: '/', icon: <Icon icon="mdi:home" width={28} />, label: 'Hem' },
-  { to: '/bestallningar', icon: <Icon icon="mdi:inbox" width={28} />, label: 'Beställningar' },
+  { to: '/bestallningar', icon: <Icon icon="mdi:inbox" width={28} />, label: 'Önskningar' },
   { to: '/kalender', icon: <Icon icon="mdi:calendar-today" width={28} />, label: 'Kalender' },
-  { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: 'Tjänster' },
+  { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: 'Mina idéer' },
 ]
 
 export function Navbar() {
