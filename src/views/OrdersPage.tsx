@@ -235,7 +235,10 @@ export function OrdersPage() {
         {loading ? (
           [1,2,3].map(i => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 2 }} />)
         ) : orders.length === 0 ? (
-          <Box sx={{ p: 5, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center', mt: 1 }}>
+          <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center', mt: 1 }}>
+            <Box component="span" sx={{ fontSize: 36, display: 'flex', justifyContent: 'center', mb: 1.5, opacity: 0.2 }}>
+              <Icon icon={tab === 0 ? 'mdi:inbox-outline' : 'mdi:send-outline'} />
+            </Box>
             <Typography color="text.secondary" variant="body2">
               {tab === 0 ? t('no_incoming') : t('no_outgoing')}
             </Typography>

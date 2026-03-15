@@ -209,6 +209,9 @@ export function CalendarPage() {
 
         {orders.length === 0 && !selectedDay && (
           <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
+            <Box component="span" sx={{ fontSize: 36, display: 'flex', justifyContent: 'center', mb: 1.5, opacity: 0.2 }}>
+              <Icon icon="mdi:calendar-outline" />
+            </Box>
             <Typography variant="body2" color="text.secondary">{t('empty_hint')}</Typography>
           </Box>
         )}

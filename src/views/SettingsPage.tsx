@@ -147,21 +147,6 @@ export function SettingsPage() {
 
         <Divider />
 
-        {/* Accessibility */}
-        <Box display="flex" flexDirection="column" gap={1.5}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex' }}>
-              <Icon icon="mdi:human" />
-            </Box>
-            <Typography variant="subtitle1" fontWeight={700}>{t('accessibility_title')}</Typography>
-          </Box>
-          <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
-            {t('accessibility_desc')}
-          </Typography>
-        </Box>
-
-        <Divider />
-
         <Button onClick={signOut} color="inherit" sx={{ color: 'text.secondary' }}>
           {t('sign_out')}
         </Button>

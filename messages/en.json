@@ -85,9 +85,15 @@
     "note_placeholder": "Write something...",
     "wish_button": "Wish for {title}",
     "wish_sent": "Wish sent!",
+    "wish_sent_subtitle": "sent to {name}",
     "blocked_date": "Not open for this on that day",
     "blocked_today": "Not open for this today",
-    "empty_hint": "Tap a day to set your availability"
+    "empty_hint": "Tap a day to set your availability",
+    "date_any": "Any day",
+    "notif_hint_title": "Don't miss anything",
+    "notif_hint_body": "Enable notifications to see when {name} responds",
+    "notif_enable": "Enable",
+    "mode_hint": "Switch mode with the button top right — Light for everyday wishes, Dark for more intimate ones."
   },
   "orders": {
     "header": "Wishes",

@@ -4,12 +4,13 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
-import Alert from '@mui/material/Alert'
 import Skeleton from '@mui/material/Skeleton'
+import Snackbar from '@mui/material/Snackbar'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
+import { subscribeToPush } from '../lib/notifications'
 import type { Service, Order } from '../types'
 import { format, addDays } from 'date-fns'
 import { sv } from 'date-fns/locale'
@@ -28,7 +29,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function HomePage() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
-  const { partner, profile } = useAuth()
+  const { partner, profile, user } = useAuth()
   const { mode } = useMode()
   const [services, setServices] = useState<Service[]>([])
   const [activeOrders, setActiveOrders] = useState<Order[]>([])
@@ -38,8 +39,25 @@ export function HomePage() {
   const [loading, setLoading] = useState(true)
   const [ordering, setOrdering] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [successTitle, setSuccessTitle] = useState('')
+  const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
+  const [activatingNotif, setActivatingNotif] = useState(false)
+  const [showModeHint, setShowModeHint] = useState(false)
   const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
   const [todayBlockedIds, setTodayBlockedIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!('Notification' in window)) { setNotifStatus('unsupported'); return }
+    setNotifStatus(Notification.permission === 'granted' ? 'granted' : Notification.permission === 'denied' ? 'denied' : 'unknown')
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!localStorage.getItem('modeHintSeen')) {
+      localStorage.setItem('modeHintSeen', '1')
+      setTimeout(() => setShowModeHint(true), 2500)
+    }
+  }, [])
 
   useEffect(() => {
     if (!partner) return
@@ -89,9 +107,17 @@ export function HomePage() {
 
   const days = Array.from({ length: 30 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
 
+  async function enableNotifications() {
+    setActivatingNotif(true)
+    await subscribeToPush(user!.id)
+    setNotifStatus(Notification.permission === 'granted' ? 'granted' : 'denied')
+    setActivatingNotif(false)
+  }
+
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return
     setOrdering(true)
+    const title = selectedService.title
     await supabase.from('orders').insert({
       from_user_id: profile.id, to_user_id: partner.id,
       service_id: selectedService.id, date: selectedDate,
@@ -102,9 +128,10 @@ export function HomePage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ record: { to_user_id: partner.id, from_user_id: profile.id, service_id: selectedService.id, mode } }),
     }).catch(() => {})
+    setSuccessTitle(title)
     setSuccess(true); setSelectedService(null); setSelectedDate(null); setNote('')
     setOrdering(false)
-    setTimeout(() => setSuccess(false), 3000)
+    setTimeout(() => setSuccess(false), 4000)
   }
 
   if (!partner) {
@@ -161,6 +188,27 @@ export function HomePage() {
             </Box>
           )}
         </Box>
+
+        {/* Notification prompt */}
+        {notifStatus === 'unknown' && (
+          <Box sx={{
+            mx: 2.5, mt: 1.5, p: 1.5, borderRadius: 2,
+            bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider',
+            display: 'flex', alignItems: 'center', gap: 1.5,
+          }}>
+            <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex', flexShrink: 0 }}>
+              <Icon icon="mdi:bell-outline" />
+            </Box>
+            <Box flex={1}>
+              <Typography variant="body2" fontWeight={700} lineHeight={1.3}>{t('notif_hint_title')}</Typography>
+              <Typography variant="caption" color="text.secondary">{t('notif_hint_body', { name: partner.name })}</Typography>
+            </Box>
+            <Button size="small" variant="contained" onClick={enableNotifications} disabled={activatingNotif}
+              sx={{ flexShrink: 0, minWidth: 0, px: 1.5 }}>
+              {activatingNotif ? '...' : t('notif_enable')}
+            </Button>
+          </Box>
+        )}
 
         <Box px={2.5} pt={3} display="flex" flexDirection="column" gap={3.5}>
 
@@ -223,6 +271,9 @@ export function HomePage() {
               </Box>
             ) : services.length === 0 ? (
               <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
+                <Box component="span" sx={{ fontSize: 38, display: 'flex', justifyContent: 'center', mb: 1.5, opacity: 0.2 }}>
+                  <Icon icon="mdi:heart-outline" />
+                </Box>
                 <Typography variant="body2" color="text.secondary">
                   {t('no_ideas', { name: partner.name })}
                 </Typography>
@@ -285,6 +336,21 @@ export function HomePage() {
             <Box>
               <SectionLabel>{t('suggest_date')}</SectionLabel>
               <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+                {/* No date / clear selection */}
+                <Box onClick={() => setSelectedDate(null)} sx={{
+                  flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
+                  border: '2px solid',
+                  borderColor: selectedDate === null ? 'primary.main' : 'divider',
+                  bgcolor: selectedDate === null ? 'primary.main' : 'background.paper',
+                  color: selectedDate === null ? 'primary.contrastText' : 'text.secondary',
+                  transition: 'all 0.12s ease',
+                }}>
+                  <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    {t('date_any')}
+                  </Typography>
+                  <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>–</Typography>
+                </Box>
                 {days.slice(0, 14).map(dateStr => {
                   const d = new Date(dateStr)
                   const selected = selectedDate === dateStr
@@ -325,10 +391,53 @@ export function HomePage() {
           )}
 
           {success && (
-            <Alert severity="success" sx={{ borderRadius: 2 }}>{t('wish_sent')}</Alert>
+            <Box sx={{
+              display: 'flex', alignItems: 'center', gap: 1.5,
+              p: 2, borderRadius: 2,
+              bgcolor: 'success.main', color: '#fff',
+              '@keyframes slideUp': {
+                from: { opacity: 0, transform: 'translateY(6px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+              animation: 'slideUp 0.25s cubic-bezier(0.4,0,0.2,1)',
+            }}>
+              <Box component="span" sx={{ fontSize: 24, display: 'flex', flexShrink: 0 }}>
+                <Icon icon="mdi:heart" />
+              </Box>
+              <Box>
+                <Typography fontWeight={700} fontSize="0.95rem">{t('wish_sent')}</Typography>
+                <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                  {successTitle} — {t('wish_sent_subtitle', { name: partner.name })}
+                </Typography>
+              </Box>
+            </Box>
           )}
         </Box>
       </Box>
+
+      {/* One-time mode hint */}
+      <Snackbar
+        open={showModeHint}
+        autoHideDuration={6000}
+        onClose={() => setShowModeHint(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: { xs: 80 } }}
+      >
+        <Box sx={{
+          display: 'flex', alignItems: 'flex-start', gap: 1.5,
+          px: 2, py: 1.5, borderRadius: 2,
+          bgcolor: 'background.paper',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)',
+          maxWidth: 320,
+        }}>
+          <Box component="span" sx={{ fontSize: 18, color: 'primary.main', display: 'flex', flexShrink: 0, mt: 0.2 }}>
+            <Icon icon="mdi:weather-sunny" />
+          </Box>
+          <Typography variant="caption" color="text.secondary" lineHeight={1.6}>
+            {t('mode_hint')}
+          </Typography>
+        </Box>
+      </Snackbar>
     </Box>
   )
 }

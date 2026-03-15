@@ -103,6 +103,17 @@ export function SwipeToDelete({ onDelete, children }: SwipeToDeleteProps) {
   moveRef.current = move
   endRef.current = end
 
+  // One-time swipe hint: briefly peek the delete background on first ever encounter
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (localStorage.getItem('swipeHintSeen')) return
+    localStorage.setItem('swipeHintSeen', '1')
+    const t1 = setTimeout(() => applyOffset(-16, true), 900)
+    const t2 = setTimeout(() => applyOffset(0, true), 1400)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Global mouse listeners so dragging outside the element works
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => moveRef.current(e.clientX)
