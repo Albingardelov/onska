@@ -58,6 +58,7 @@ export default function PairingScreen() {
             iconColor={theme.colors.primary}
             size={24}
             onPress={copyCode}
+            accessibilityLabel={copied ? 'Kopierat' : 'Kopiera parningskod'}
           />
         </View>
       </Surface>

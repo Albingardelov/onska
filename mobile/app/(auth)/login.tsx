@@ -8,6 +8,8 @@ const features = [
   { icon: 'gift-outline', title: 'Skicka önskningar', desc: 'Dela med dig av vad du drömmer om – stort som smått.' },
   { icon: 'calendar-outline', title: 'Boka upplevelser', desc: 'Planera datum och överraska din partner med något speciellt.' },
   { icon: 'auto-fix', title: 'Skapa minnen', desc: 'Förvandla önskningar till verkliga stunder tillsammans.' },
+  { icon: 'shield-lock', title: 'GDPR & integritet', desc: 'Full kontroll över din data. Radera ditt konto, exportera all din information — allt inbyggt från start.' },
+  { icon: 'human', title: 'Tillgänglighet', desc: 'Couply anpassar sig för alla skärmstorlekar och stöder systemets tillgänglighetsinställningar.' },
 ]
 
 export default function LoginScreen() {
@@ -48,7 +50,7 @@ export default function LoginScreen() {
             Couply
           </Text>
           <Text variant="titleMedium" style={[styles.tagline, { color: theme.colors.onSurfaceVariant }]}>
-            Turn wishes into moments
+            En app för era önskningar
           </Text>
           <Text variant="bodyMedium" style={[styles.description, { color: theme.colors.onSurfaceVariant }]}>
             En app för par – dela önskningar, boka upplevelser och skapa stunder som betyder något.

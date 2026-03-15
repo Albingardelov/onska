@@ -9,7 +9,12 @@ function ModeToggleButton() {
   const { mode, toggleMode } = useMode()
   const theme = useTheme()
   return (
-    <TouchableOpacity onPress={toggleMode} style={{ marginRight: 8, padding: 6 }}>
+    <TouchableOpacity
+      onPress={toggleMode}
+      style={{ marginRight: 8, padding: 6 }}
+      accessibilityLabel={mode === 'fint' ? 'Byt till mörkt läge' : 'Byt till ljust läge'}
+      accessibilityRole="button"
+    >
       <MaterialCommunityIcons
         name={mode === 'fint' ? 'weather-sunny' : 'weather-night'}
         size={22}
@@ -23,7 +28,12 @@ function LogoutButton() {
   const { signOut } = useAuth()
   const theme = useTheme()
   return (
-    <TouchableOpacity onPress={signOut} style={{ marginRight: 16, padding: 6 }}>
+    <TouchableOpacity
+      onPress={signOut}
+      style={{ marginRight: 16, padding: 6 }}
+      accessibilityLabel="Logga ut"
+      accessibilityRole="button"
+    >
       <MaterialCommunityIcons name="logout" size={20} color={theme.colors.onSurfaceVariant} />
     </TouchableOpacity>
   )
@@ -89,6 +99,15 @@ export default function AppLayout() {
           title: 'Mina tjänster',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="star-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Inställningar',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cog-outline" size={size} color={color} />
           ),
         }}
       />

@@ -146,6 +146,7 @@ export default function ServicesScreen() {
                 iconColor={theme.colors.onSurfaceVariant}
                 size={20}
                 onPress={() => deleteService(service.id)}
+                accessibilityLabel={`Radera ${service.title}`}
               />
             </View>
           ))
