@@ -11,7 +11,7 @@ import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
-import type { Service, Availability, Order } from '../types'
+import type { Service, Order } from '../types'
 import { format, addDays } from 'date-fns'
 import { sv } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
@@ -29,7 +29,6 @@ export function HomePage() {
   const { partner, profile } = useAuth()
   const { mode } = useMode()
   const [services, setServices] = useState<Service[]>([])
-  const [availability, setAvailability] = useState<Availability[]>([])
   const [activeOrders, setActiveOrders] = useState<Order[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
@@ -45,26 +44,17 @@ export function HomePage() {
 
   async function loadData() {
     setLoading(true)
-    const today = format(new Date(), 'yyyy-MM-dd')
-    const [servicesRes, availRes, inboxRes, sentRes] = await Promise.all([
+    const [servicesRes, inboxRes, sentRes] = await Promise.all([
       supabase.from('services').select('*').eq('user_id', partner!.id).eq('mode', mode).eq('active', true),
-      supabase.from('availability').select('*').eq('user_id', partner!.id).gte('date', today),
       supabase.from('orders').select('*, service:services(*)').eq('to_user_id', profile!.id).eq('status', 'accepted'),
       supabase.from('orders').select('*, service:services(*)').eq('from_user_id', profile!.id).eq('status', 'accepted'),
     ])
     setServices(servicesRes.data ?? [])
-    setAvailability(availRes.data ?? [])
     setActiveOrders([...(inboxRes.data ?? []), ...(sentRes.data ?? [])])
     setLoading(false)
   }
 
-  function isDateBlocked(dateStr: string): boolean {
-    const found = availability.find(a => a.date === dateStr)
-    return found ? !found.available : false
-  }
-
   const days = Array.from({ length: 30 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
-    .filter(d => !isDateBlocked(d))
 
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return
@@ -201,7 +191,7 @@ export function HomePage() {
         {/* Date picker */}
         {selectedService && (
           <Box>
-            <SectionLabel>Välj datum (valfritt)</SectionLabel>
+            <SectionLabel>Föreslå ett datum (valfritt)</SectionLabel>
             <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
               {days.slice(0, 14).map(dateStr => {
                 const d = new Date(dateStr)
