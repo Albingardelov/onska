@@ -214,6 +214,22 @@ export function OrdersPage() {
       </Tabs>
 
       <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
+
+        {/* Consent-påminnelse */}
+        {tab === 0 && (
+          <Box display="flex" alignItems="flex-start" gap={1} sx={{
+            p: 1.5, borderRadius: 2, bgcolor: 'background.paper',
+            border: '1px solid', borderColor: 'divider',
+          }}>
+            <Box component="span" sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, mt: '1px', display: 'flex' }}>
+              <Icon icon="mdi:information-outline" />
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+              Önskningar är alltid frivilliga. Du kan alltid svara "Inte nu" eller ändra dig — utan att förklara varför.
+            </Typography>
+          </Box>
+        )}
+
         {loading ? (
           [1,2,3].map(i => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 2 }} />)
         ) : orders.length === 0 ? (
