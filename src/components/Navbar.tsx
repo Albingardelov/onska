@@ -13,9 +13,9 @@ export function Navbar() {
 
   const tabs = [
     { to: '/', icon: <Icon icon="mdi:home" width={28} />, label: t('home') },
-    { to: '/bestallningar', icon: <Icon icon="mdi:inbox" width={28} />, label: t('orders') },
-    { to: '/kalender', icon: <Icon icon="mdi:calendar-today" width={28} />, label: t('calendar') },
-    { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: t('services') },
+    { to: '/wishes', icon: <Icon icon="mdi:inbox" width={28} />, label: t('orders') },
+    { to: '/calendar', icon: <Icon icon="mdi:calendar-today" width={28} />, label: t('calendar') },
+    { to: '/ideas', icon: <Icon icon="mdi:heart-outline" width={28} />, label: t('services') },
   ]
 
   const current = tabs.findIndex(tab => tab.to === pathname)

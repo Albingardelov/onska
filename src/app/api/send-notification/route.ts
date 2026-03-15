@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         body: isAccepted
           ? `${sender?.name ?? 'Din partner'} är intresserad av ${service?.title ?? 'din önskan'}`
           : `${sender?.name ?? 'Din partner'} har delat en ny önskan`,
-        url: '/bestallningar',
+        url: '/wishes',
       })
     )
     return NextResponse.json({ success: true })

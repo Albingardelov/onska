@@ -32,7 +32,7 @@ export function Header({ title }: HeaderProps) {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <ModeToggle />
           <Tooltip title="Inställningar">
-            <IconButton onClick={() => router.push('/instaellningar')} size="small" color="inherit"
+            <IconButton onClick={() => router.push('/settings')} size="small" color="inherit"
               aria-label="Inställningar"
               sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}>
               <Icon icon="mdi:cog" />
