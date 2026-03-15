@@ -2,21 +2,35 @@ import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
+import Switch from '@mui/material/Switch'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import type { Order } from '../types'
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isFuture, isToday } from 'date-fns'
+import type { Order, Service } from '../types'
+import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns'
 import { sv } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
 
 export function CalendarPage() {
   const { profile, partner } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
+  const [myServices, setMyServices] = useState<Service[]>([])
+  const [blockedServiceIds, setBlockedServiceIds] = useState<Set<string>>(new Set())
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const [daysWithBlocked, setDaysWithBlocked] = useState<Set<string>>(new Set())
 
-  useEffect(() => { loadOrders() }, [currentMonth])
+  useEffect(() => {
+    loadOrders()
+    loadDaysWithBlocked()
+  }, [currentMonth])
+
+  useEffect(() => { loadMyServices() }, [])
+
+  useEffect(() => {
+    if (selectedDay) loadBlockedForDay(selectedDay)
+    else setBlockedServiceIds(new Set())
+  }, [selectedDay])
 
   async function loadOrders() {
     const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd')
@@ -32,6 +46,56 @@ export function CalendarPage() {
     setOrders(data ?? [])
   }
 
+  async function loadDaysWithBlocked() {
+    const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd')
+    const end = format(endOfMonth(currentMonth), 'yyyy-MM-dd')
+    const { data } = await supabase
+      .from('service_availability')
+      .select('date')
+      .eq('user_id', profile!.id)
+      .gte('date', start)
+      .lte('date', end)
+    const dates = new Set((data ?? []).map((r: { date: string }) => r.date))
+    setDaysWithBlocked(dates)
+  }
+
+  async function loadMyServices() {
+    const { data } = await supabase
+      .from('services')
+      .select('*')
+      .eq('user_id', profile!.id)
+      .eq('active', true)
+      .order('created_at')
+    setMyServices(data ?? [])
+  }
+
+  async function loadBlockedForDay(date: string) {
+    const { data } = await supabase
+      .from('service_availability')
+      .select('service_id')
+      .eq('user_id', profile!.id)
+      .eq('date', date)
+    setBlockedServiceIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
+  }
+
+  async function toggleService(serviceId: string) {
+    if (!selectedDay) return
+    const isBlocked = blockedServiceIds.has(serviceId)
+    if (isBlocked) {
+      await supabase.from('service_availability')
+        .delete()
+        .eq('user_id', profile!.id)
+        .eq('service_id', serviceId)
+        .eq('date', selectedDay)
+      setBlockedServiceIds(prev => { const s = new Set(prev); s.delete(serviceId); return s })
+    } else {
+      await supabase.from('service_availability')
+        .insert({ user_id: profile!.id, service_id: serviceId, date: selectedDay })
+      setBlockedServiceIds(prev => new Set([...prev, serviceId]))
+    }
+    loadDaysWithBlocked()
+  }
+
   const days = eachDayOfInterval({ start: startOfMonth(currentMonth), end: endOfMonth(currentMonth) })
   const firstDayOffset = (getDay(days[0]) + 6) % 7
   const today = format(new Date(), 'yyyy-MM-dd')
@@ -41,11 +105,8 @@ export function CalendarPage() {
     return acc
   }, {})
 
-  const selectedDayOrders = selectedDay ? (ordersByDate[selectedDay] ?? []) : []
-
-  // Upcoming orders with dates, sorted
   const upcoming = orders
-    .filter(o => o.date && (o.date >= today))
+    .filter(o => o.date && o.date >= today)
     .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''))
 
   return (
@@ -81,19 +142,19 @@ export function CalendarPage() {
           {days.map(day => {
             const dateStr = format(day, 'yyyy-MM-dd')
             const hasOrders = !!ordersByDate[dateStr]?.length
+            const hasBlocked = daysWithBlocked.has(dateStr)
             const isSelected = selectedDay === dateStr
             const isPast = dateStr < today
             const isTodayDate = dateStr === today
 
             return (
               <Box key={dateStr}
-                onClick={() => hasOrders ? setSelectedDay(isSelected ? null : dateStr) : undefined}
+                onClick={() => !isPast && setSelectedDay(isSelected ? null : dateStr)}
                 sx={{
                   aspectRatio: '1', display: 'flex', flexDirection: 'column',
-                  alignItems: 'center', justifyContent: 'center',
-                  borderRadius: 2,
-                  cursor: hasOrders ? 'pointer' : 'default',
-                  opacity: isPast && !hasOrders ? 0.35 : 1,
+                  alignItems: 'center', justifyContent: 'center', position: 'relative',
+                  borderRadius: 2, cursor: isPast ? 'default' : 'pointer',
+                  opacity: isPast ? 0.35 : 1,
                   bgcolor: isSelected ? 'primary.main'
                     : hasOrders ? 'primary.light'
                     : isTodayDate ? 'background.paper'
@@ -113,32 +174,76 @@ export function CalendarPage() {
                     : 'text.primary'}>
                   {format(day, 'd')}
                 </Typography>
-                {hasOrders && (
-                  <Box sx={{
-                    width: 4, height: 4, borderRadius: '50%',
-                    bgcolor: isSelected ? 'primary.contrastText' : 'primary.main',
-                    mt: 0.2,
-                  }} />
+                {/* Dots: planned wish (primary) and/or blocked services (warning) */}
+                {(hasOrders || hasBlocked) && (
+                  <Box display="flex" gap={0.4} mt={0.2}>
+                    {hasOrders && <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: isSelected ? 'primary.contrastText' : 'primary.main' }} />}
+                    {hasBlocked && <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: isSelected ? 'primary.contrastText' : 'warning.main' }} />}
+                  </Box>
                 )}
               </Box>
             )
           })}
         </Box>
 
-        {/* Selected day details */}
-        {selectedDay && selectedDayOrders.length > 0 && (
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper', border: 1, borderColor: 'primary.light' }}>
-            <Typography variant="caption" fontWeight={700} color="primary" sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.7rem', display: 'block', mb: 1 }}>
+        {/* Legend */}
+        <Box display="flex" gap={2}>
+          {[
+            { color: 'primary.main', label: 'Planerat' },
+            { color: 'warning.main', label: 'Stängd för något' },
+          ].map(({ color, label }) => (
+            <Box key={label} display="flex" alignItems="center" gap={0.8}>
+              <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: color }} />
+              <Typography variant="caption" color="text.secondary">{label}</Typography>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Selected day panel */}
+        {selectedDay && (
+          <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper', border: 1, borderColor: 'divider' }}>
+            <Typography variant="caption" fontWeight={700} color="primary"
+              sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.7rem', display: 'block', mb: 1.5 }}>
               {format(new Date(selectedDay), 'EEEE d MMMM', { locale: sv })}
             </Typography>
-            {selectedDayOrders.map(o => (
-              <Box key={o.id} display="flex" alignItems="center" gap={1} py={0.5}>
-                <Box component="span" sx={{ fontSize: 14, color: 'primary.main', display: 'flex' }}>
-                  <Icon icon="mdi:heart" />
-                </Box>
+
+            {/* Planned wishes for this day */}
+            {(ordersByDate[selectedDay] ?? []).map(o => (
+              <Box key={o.id} display="flex" alignItems="center" gap={1} mb={1}>
+                <Box component="span" sx={{ fontSize: 14, color: 'primary.main', display: 'flex' }}><Icon icon="mdi:heart" /></Box>
                 <Typography variant="body2" fontWeight={600}>{o.service?.title ?? 'Önskan'}</Typography>
               </Box>
             ))}
+
+            {/* My services availability toggles */}
+            {myServices.length > 0 && (
+              <Box mt={ordersByDate[selectedDay]?.length ? 1.5 : 0}>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, lineHeight: 1.5 }}>
+                  Vad är du öppen för den här dagen? (allt är på som standard)
+                </Typography>
+                {myServices.map(service => {
+                  const isBlocked = blockedServiceIds.has(service.id)
+                  return (
+                    <Box key={service.id} display="flex" alignItems="center" justifyContent="space-between" py={0.5}>
+                      <Typography variant="body2" sx={{ opacity: isBlocked ? 0.45 : 1, textDecoration: isBlocked ? 'line-through' : 'none' }}>
+                        {service.title}
+                      </Typography>
+                      <Switch
+                        size="small"
+                        checked={!isBlocked}
+                        onChange={() => toggleService(service.id)}
+                        color="primary"
+                        inputProps={{ 'aria-label': `Öppen för ${service.title}` }}
+                      />
+                    </Box>
+                  )
+                })}
+              </Box>
+            )}
+
+            {myServices.length === 0 && !ordersByDate[selectedDay]?.length && (
+              <Typography variant="body2" color="text.secondary">Inga idéer att ställa in ännu.</Typography>
+            )}
           </Box>
         )}
 
@@ -171,10 +276,10 @@ export function CalendarPage() {
           </Box>
         )}
 
-        {orders.length === 0 && (
+        {orders.length === 0 && !selectedDay && (
           <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Inga planerade önskningar den här månaden
+              Tryck på en dag för att ställa in din tillgänglighet
             </Typography>
           </Box>
         )}

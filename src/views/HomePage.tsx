@@ -36,11 +36,17 @@ export function HomePage() {
   const [loading, setLoading] = useState(true)
   const [ordering, setOrdering] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!partner) return
     loadData()
   }, [partner, mode])
+
+  useEffect(() => {
+    if (selectedDate && partner) loadPartnerBlocked(selectedDate)
+    else setPartnerBlockedIds(new Set())
+  }, [selectedDate, partner])
 
   async function loadData() {
     setLoading(true)
@@ -52,6 +58,15 @@ export function HomePage() {
     setServices(servicesRes.data ?? [])
     setActiveOrders([...(inboxRes.data ?? []), ...(sentRes.data ?? [])])
     setLoading(false)
+  }
+
+  async function loadPartnerBlocked(date: string) {
+    const { data } = await supabase
+      .from('service_availability')
+      .select('service_id')
+      .eq('user_id', partner!.id)
+      .eq('date', date)
+    setPartnerBlockedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
   }
 
   const days = Array.from({ length: 30 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
@@ -159,6 +174,7 @@ export function HomePage() {
             <Box display="flex" flexDirection="column" gap={1}>
               {services.map(service => {
                 const selected = selectedService?.id === service.id
+                const isBlocked = selectedDate ? partnerBlockedIds.has(service.id) : false
                 return (
                   <Box key={service.id} onClick={() => setSelectedService(selected ? null : service)}
                     sx={{
@@ -167,6 +183,7 @@ export function HomePage() {
                       borderColor: selected ? 'primary.main' : 'divider',
                       bgcolor: selected ? 'primary.light' : 'background.paper',
                       boxShadow: selected ? 'none' : '0 1px 3px rgba(0,0,0,0.05)',
+                      opacity: isBlocked ? 0.5 : 1,
                       transition: 'all 0.15s ease',
                       '&:hover': { borderColor: 'primary.main', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' },
                     }}>
@@ -175,6 +192,11 @@ export function HomePage() {
                         <Typography fontWeight={600} letterSpacing="-0.01em">{service.title}</Typography>
                         {service.description && (
                           <Typography variant="body2" color="text.secondary" mt={0.2}>{service.description}</Typography>
+                        )}
+                        {isBlocked && (
+                          <Typography variant="caption" color="text.disabled" mt={0.3} sx={{ display: 'block' }}>
+                            Inte öppen för detta den dagen
+                          </Typography>
                         )}
                       </Box>
                       {selected && (

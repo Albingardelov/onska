@@ -26,6 +26,12 @@ export interface Availability {
   available: boolean
 }
 
+export interface ServiceAvailability {
+  user_id: string
+  service_id: string
+  date: string
+}
+
 export interface Order {
   id: string
   from_user_id: string
