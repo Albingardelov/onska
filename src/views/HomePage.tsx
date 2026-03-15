@@ -123,7 +123,9 @@ export function HomePage() {
         {/* Hero */}
         <Box sx={{
           px: 2.5, pt: 2.5, pb: 2,
-          background: 'linear-gradient(160deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-dark) 100%)',
+          background: mode === 'snusk'
+            ? 'linear-gradient(160deg, #C026D3 0%, #7C3AED 100%)'
+            : 'linear-gradient(160deg, #CC2E6A 0%, #A82158 100%)',
           color: '#fff',
         }}>
           <Typography variant="caption" sx={{ opacity: 0.75, textTransform: 'capitalize', letterSpacing: '0.03em' }}>
