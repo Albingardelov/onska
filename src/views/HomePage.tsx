@@ -180,12 +180,12 @@ export function HomePage() {
                     sx={{
                       p: 2, borderRadius: 2, cursor: 'pointer',
                       border: '1.5px solid',
-                      borderColor: selected ? 'primary.main' : 'divider',
-                      bgcolor: selected ? 'primary.light' : 'background.paper',
-                      boxShadow: selected ? 'none' : '0 1px 3px rgba(0,0,0,0.05)',
+                      borderColor: selected ? 'success.main' : 'divider',
+                      bgcolor: selected ? 'background.paper' : 'background.paper',
+                      boxShadow: selected ? '0 0 0 3px rgba(46,155,95,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
                       opacity: isBlocked ? 0.5 : 1,
                       transition: 'all 0.15s ease',
-                      '&:hover': { borderColor: 'primary.main', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' },
+                      '&:hover': { borderColor: 'success.main', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' },
                     }}>
                     <Box display="flex" alignItems="center" justifyContent="space-between">
                       <Box>
@@ -200,7 +200,7 @@ export function HomePage() {
                         )}
                       </Box>
                       {selected && (
-                        <Box component="span" sx={{ fontSize: 20, color: 'primary.main', flexShrink: 0, display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
+                        <Box component="span" sx={{ fontSize: 20, color: 'success.main', flexShrink: 0, display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
                       )}
                     </Box>
                   </Box>
