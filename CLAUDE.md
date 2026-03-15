@@ -22,13 +22,21 @@ No test suite is configured.
 ### Route structure
 
 - `/` — protected home page where you browse partner's services and place orders
-- `/bestallningar` — orders management (incoming/outgoing)
+- `/onskningar` — orders management (incoming/outgoing)
 - `/kalender` — calendar availability
 - `/mina-tjanster` — manage your own services
-- `/instaellningar` — settings
+- `/settings` — account settings, language, GDPR export/delete
 - `/login` — auth (sign up / sign in)
-- `/pairing` — link with a partner via code
-- `/(app)/layout.tsx` — auth guard; redirects unauthenticated users and unlinked users
+- `/pairing` — onboarding + partner pairing (3-step wizard for new users, pairing form for returning)
+- `/(app)/layout.tsx` — auth guard; redirects unauthenticated users to `/login`, unpaired users to `/pairing`
+
+### Key UX patterns
+
+- **ModeToggle** (`src/components/ModeToggle.tsx`) — icon-only `IconButton` in the Header; toggles fint/snusk theme
+- **Header** (`src/components/Header.tsx`) — sticky AppBar with page title, partner name subtitle, ModeToggle + settings + logout icons
+- **Onboarding** — new users see 3-step slide-animated wizard on `/pairing`; returning unpaired users skip to step 3 (pairing form) via `localStorage` key `couply_onboarding_seen`
+- **Consent banner** in `/onskningar` shown once, dismissed to `localStorage` key `couply_consent_seen`
+- **LocalStorage keys in use:** `modeHintSeen`, `couply_onboarding_seen`, `couply_consent_seen`
 
 ### Data layer
 
