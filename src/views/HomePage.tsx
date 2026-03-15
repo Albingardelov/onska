@@ -78,7 +78,7 @@ export function HomePage() {
   async function loadData() {
     setLoading(true)
     const [servicesRes, inboxRes, sentRes] = await Promise.all([
-      supabase.from('services').select('*').eq('user_id', partner!.id).eq('mode', mode).eq('active', true),
+      supabase.from('services').select('*').eq('user_id', partner!.id).eq('mode', mode).eq('active', true).order('title', { ascending: true }),
       supabase.from('orders').select('*, service:services(*)').eq('to_user_id', profile!.id).eq('status', 'accepted'),
       supabase.from('orders').select('*, service:services(*)').eq('from_user_id', profile!.id).eq('status', 'accepted'),
     ])

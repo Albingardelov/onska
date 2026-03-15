@@ -48,7 +48,7 @@ export function CalendarPage() {
 
   async function loadMyServices() {
     const { data } = await supabase.from('services').select('*')
-      .eq('user_id', profile!.id).eq('active', true).order('created_at')
+      .eq('user_id', profile!.id).eq('active', true).order('title', { ascending: true })
     setMyServices(data ?? [])
   }
 

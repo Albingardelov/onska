@@ -47,7 +47,7 @@ export function MyServicesPage() {
   async function loadServices() {
     setLoading(true)
     const { data } = await supabase.from('services').select('*')
-      .eq('user_id', profile!.id).eq('mode', mode).order('created_at', { ascending: true })
+      .eq('user_id', profile!.id).eq('mode', mode).order('title', { ascending: true })
     setServices(data ?? [])
     setLoading(false)
   }
