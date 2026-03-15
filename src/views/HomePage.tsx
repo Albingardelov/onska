@@ -42,6 +42,10 @@ export function HomePage() {
     if (!partner) return
     loadData()
     loadTodayBlocked()
+    const channel = supabase.channel('home-availability')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_availability' }, () => loadTodayBlocked())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
   }, [partner, mode])
 
   useEffect(() => {
