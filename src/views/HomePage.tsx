@@ -39,6 +39,7 @@ export function HomePage() {
   const [loading, setLoading] = useState(true)
   const [ordering, setOrdering] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [successFading, setSuccessFading] = useState(false)
   const [successTitle, setSuccessTitle] = useState('')
   const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
   const [activatingNotif, setActivatingNotif] = useState(false)
@@ -129,9 +130,10 @@ export function HomePage() {
       body: JSON.stringify({ record: { to_user_id: partner.id, from_user_id: profile.id, service_id: selectedService.id, mode } }),
     }).catch(() => {})
     setSuccessTitle(title)
-    setSuccess(true); setSelectedService(null); setSelectedDate(null); setNote('')
+    setSuccess(true); setSuccessFading(false); setSelectedService(null); setSelectedDate(null); setNote('')
     setOrdering(false)
-    setTimeout(() => setSuccess(false), 4000)
+    setTimeout(() => setSuccessFading(true), 3200)
+    setTimeout(() => { setSuccess(false); setSuccessFading(false) }, 4000)
   }
 
   if (!partner) {
@@ -400,6 +402,8 @@ export function HomePage() {
                 to: { opacity: 1, transform: 'translateY(0)' },
               },
               animation: 'slideUp 0.25s cubic-bezier(0.4,0,0.2,1)',
+              transition: 'opacity 0.8s ease',
+              opacity: successFading ? 0 : 1,
             }}>
               <Box component="span" sx={{ fontSize: 24, display: 'flex', flexShrink: 0 }}>
                 <Icon icon="mdi:heart" />

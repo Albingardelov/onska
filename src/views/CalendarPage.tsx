@@ -117,13 +117,13 @@ export function CalendarPage() {
                   aspectRatio: '1', display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center', position: 'relative',
                   borderRadius: 2, cursor: isPast ? 'default' : 'pointer', opacity: isPast ? 0.35 : 1,
-                  bgcolor: isSelected ? 'primary.main' : hasOrders ? 'primary.light' : isTodayDate ? 'background.paper' : 'transparent',
+                  bgcolor: isSelected ? 'primary.main' : isTodayDate ? 'background.paper' : 'transparent',
                   border: '2px solid',
-                  borderColor: isSelected ? 'primary.main' : isTodayDate ? 'primary.main' : hasOrders ? 'primary.light' : 'transparent',
+                  borderColor: isSelected ? 'primary.main' : isTodayDate ? 'primary.main' : 'transparent',
                   transition: 'all 0.12s',
                 }}>
                 <Typography variant="body2" fontWeight={isTodayDate || hasOrders ? 700 : 400}
-                  color={isSelected ? 'primary.contrastText' : hasOrders ? 'primary.dark' : isTodayDate ? 'primary.main' : 'text.primary'}>
+                  color={isSelected ? 'primary.contrastText' : isTodayDate ? 'primary.main' : 'text.primary'}>
                   {format(day, 'd')}
                 </Typography>
                 {(hasOrders || hasBlocked) && (
@@ -147,7 +147,16 @@ export function CalendarPage() {
         </Box>
 
         {selectedDay && (
-          <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'background.paper', border: 1, borderColor: 'divider' }}>
+          <Box sx={{
+            p: 2, borderRadius: 2, bgcolor: 'background.paper',
+            border: '1px solid', borderColor: 'primary.main',
+            boxShadow: '0 0 0 3px rgba(204,46,106,0.08)',
+            '@keyframes fadeSlideIn': {
+              from: { opacity: 0, transform: 'translateY(6px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+            animation: 'fadeSlideIn 0.2s cubic-bezier(0.4,0,0.2,1)',
+          }}>
             <Typography variant="caption" fontWeight={700} color="primary"
               sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.7rem', display: 'block', mb: 1.5 }}>
               {format(new Date(selectedDay), 'EEEE d MMMM', { locale: sv })}

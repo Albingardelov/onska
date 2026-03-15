@@ -22,6 +22,7 @@ export function OnboardingPage() {
   const tp = useTranslations('pairing')
   const { profile, pairWithPartner, signOut } = useAuth()
   const [step, setStep] = useState(0)
+  const [animKey, setAnimKey] = useState(0)
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -38,6 +39,7 @@ export function OnboardingPage() {
       localStorage.setItem(ONBOARDING_KEY, '1')
     }
     setStep(s => s + 1)
+    setAnimKey(k => k + 1)
   }
 
   async function handlePair(e: React.FormEvent) {
@@ -76,7 +78,10 @@ export function OnboardingPage() {
 
         {/* Step 1: Welcome */}
         {step === 0 && (
-          <Box textAlign="center">
+          <Box key={animKey} textAlign="center" sx={{
+            '@keyframes stepIn': { from: { opacity: 0, transform: 'translateX(24px)' }, to: { opacity: 1, transform: 'translateX(0)' } },
+            animation: 'stepIn 0.28s cubic-bezier(0.4,0,0.2,1)',
+          }}>
             <Typography fontSize={64} lineHeight={1} mb={2}>💞</Typography>
             <Typography variant="h5" fontWeight={800} color="primary" letterSpacing="-0.5px" mb={1.5}>
               {t('step1_title')}
@@ -98,7 +103,10 @@ export function OnboardingPage() {
 
         {/* Step 2: How it works */}
         {step === 1 && (
-          <Box>
+          <Box key={animKey} sx={{
+            '@keyframes stepIn': { from: { opacity: 0, transform: 'translateX(24px)' }, to: { opacity: 1, transform: 'translateX(0)' } },
+            animation: 'stepIn 0.28s cubic-bezier(0.4,0,0.2,1)',
+          }}>
             <Typography variant="h6" fontWeight={800} letterSpacing="-0.5px" mb={3} textAlign="center">
               {t('step2_title')}
             </Typography>
@@ -137,7 +145,10 @@ export function OnboardingPage() {
 
         {/* Step 3: Pairing */}
         {step === 2 && (
-          <Box>
+          <Box key={animKey} sx={{
+            '@keyframes stepIn': { from: { opacity: 0, transform: 'translateX(24px)' }, to: { opacity: 1, transform: 'translateX(0)' } },
+            animation: 'stepIn 0.28s cubic-bezier(0.4,0,0.2,1)',
+          }}>
             <Box textAlign="center" mb={3}>
               <Typography variant="h5" fontWeight={800} color="primary">{tp('title')}</Typography>
               <Typography variant="body2" color="text.secondary" mt={0.5}>

@@ -41,6 +41,9 @@ export function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [acceptingId, setAcceptingId] = useState<string | null>(null)
   const [responseNote, setResponseNote] = useState('')
+  const [showConsent, setShowConsent] = useState(() =>
+    typeof window !== 'undefined' ? !localStorage.getItem('couply_consent_seen') : false
+  )
 
   useEffect(() => {
     loadOrders()
@@ -120,8 +123,10 @@ export function OrdersPage() {
         <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, bgcolor: borderLeft }} />
         <Box sx={{ p: 2.5, pl: 3 }}>
           <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-            <Box display="flex" gap={0.8} flexWrap="wrap">
-              <Chip size="small" label={order.mode === 'fint' ? t('mode_light') : t('mode_dark')} variant="outlined" color="primary" />
+            <Box display="flex" gap={0.8} flexWrap="wrap" alignItems="center">
+              <Box component="span" sx={{ fontSize: 14, color: 'text.disabled', display: 'inline-flex' }}>
+                <Icon icon={order.mode === 'fint' ? 'mdi:weather-sunny' : 'mdi:weather-night'} />
+              </Box>
               <Chip size="small" label={statusLabel[order.status]} color={statusColor[order.status]} />
             </Box>
             <Box display="flex" alignItems="center" gap={0.5}>
@@ -172,8 +177,7 @@ export function OrdersPage() {
                 </Box>
               ) : (
                 <Box display="flex" gap={1} mt={1}>
-                  <Button variant="outlined" color="inherit" size="small" fullWidth
-                    sx={{ color: 'text.secondary' }}
+                  <Button variant="outlined" color="error" size="small" fullWidth
                     onClick={() => updateStatus(order.id, 'declined')}>{t('decline')}</Button>
                   <Button variant="contained" color="success" size="small" fullWidth
                     startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => setAcceptingId(order.id)}>{t('accept')}</Button>
@@ -184,7 +188,7 @@ export function OrdersPage() {
 
           {tab === 0 && order.status === 'accepted' && (
             <Box mt={1.5} display="flex" gap={1}>
-              <Button variant="outlined" color="inherit" size="small" sx={{ color: 'text.secondary' }}
+              <Button variant="outlined" color="error" size="small"
                 onClick={() => updateStatus(order.id, 'declined')}>{t('change_mind_receiver')}</Button>
               <Button variant="outlined" color="secondary" size="small" fullWidth
                 startIcon={<Icon icon="mdi:archive-outline" />}
@@ -193,13 +197,13 @@ export function OrdersPage() {
           )}
 
           {tab === 1 && order.status === 'accepted' && (
-            <Button variant="outlined" color="inherit" size="small" fullWidth
-              sx={{ mt: 1.5, color: 'text.secondary' }}
+            <Button variant="outlined" color="error" size="small" fullWidth
+              sx={{ mt: 1.5 }}
               onClick={() => updateStatus(order.id, 'declined')}>{t('change_mind_sender')}</Button>
           )}
           {tab === 1 && order.status === 'pending' && (
-            <Button variant="outlined" color="inherit" size="small" fullWidth
-              sx={{ mt: 1.5, color: 'text.secondary' }}
+            <Button variant="outlined" color="error" size="small" fullWidth
+              sx={{ mt: 1.5 }}
               onClick={() => updateStatus(order.id, 'declined')}>{t('withdraw')}</Button>
           )}
         </Box>
@@ -218,7 +222,7 @@ export function OrdersPage() {
 
       <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
 
-        {tab === 0 && (
+        {tab === 0 && showConsent && (
           <Box display="flex" alignItems="flex-start" gap={1} sx={{
             p: 1.5, borderRadius: 2, bgcolor: 'background.paper',
             border: '1px solid', borderColor: 'divider',
@@ -226,9 +230,14 @@ export function OrdersPage() {
             <Box component="span" sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, mt: '1px', display: 'flex' }}>
               <Icon icon="mdi:information-outline" />
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, flex: 1 }}>
               {t('consent_info')}
             </Typography>
+            <IconButton size="small" sx={{ color: 'text.disabled', flexShrink: 0, mt: '-2px', mr: '-4px' }}
+              onClick={() => { localStorage.setItem('couply_consent_seen', '1'); setShowConsent(false) }}
+              aria-label="Stäng">
+              <Icon icon="mdi:close" width={16} />
+            </IconButton>
           </Box>
         )}
 

@@ -79,23 +79,31 @@ export function MyServicesPage() {
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Typography variant="body2" color="text.secondary">
-            {countLabel} · {mode === 'fint' ? 'Light' : 'Dark'}
+            {countLabel}
           </Typography>
         </Box>
 
-        {notifStatus === 'granted' && (
-          <Alert severity="success" sx={{ borderRadius: 2 }}>{t('notif_granted')}</Alert>
+        {notifStatus === 'unknown' && (
+          <Box sx={{
+            p: 1.5, borderRadius: 2,
+            bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider',
+            display: 'flex', alignItems: 'center', gap: 1.5,
+          }}>
+            <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex', flexShrink: 0 }}>
+              <Icon icon="mdi:bell-outline" />
+            </Box>
+            <Typography variant="body2" fontWeight={600} flex={1}>{t('notif_enable')}</Typography>
+            <Button size="small" variant="contained" onClick={enableNotifications} disabled={activating}
+              sx={{ flexShrink: 0, minWidth: 0, px: 1.5 }}>
+              {activating ? '...' : 'Aktivera'}
+            </Button>
+          </Box>
         )}
         {notifStatus === 'denied' && (
-          <Alert severity="error" sx={{ borderRadius: 2 }}>{t('notif_denied')}</Alert>
-        )}
-        {notifStatus === 'unknown' && (
-          <Button variant="outlined" startIcon={<Icon icon="mdi:bell" />} onClick={enableNotifications} disabled={activating}>
-            {activating ? '...' : t('notif_enable')}
-          </Button>
+          <Alert severity="warning" sx={{ borderRadius: 2 }}>{t('notif_denied')}</Alert>
         )}
         {notifStatus === 'unsupported' && (
-          <Alert severity="warning" sx={{ borderRadius: 2 }}>{t('notif_unsupported')}</Alert>
+          <Alert severity="info" sx={{ borderRadius: 2 }}>{t('notif_unsupported')}</Alert>
         )}
 
         {/* Add form */}
