@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Alert from '@mui/material/Alert'
@@ -37,10 +36,12 @@ export function HomePage() {
   const [ordering, setOrdering] = useState(false)
   const [success, setSuccess] = useState(false)
   const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
+  const [todayBlockedIds, setTodayBlockedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!partner) return
     loadData()
+    loadTodayBlocked()
   }, [partner, mode])
 
   useEffect(() => {
@@ -58,6 +59,16 @@ export function HomePage() {
     setServices(servicesRes.data ?? [])
     setActiveOrders([...(inboxRes.data ?? []), ...(sentRes.data ?? [])])
     setLoading(false)
+  }
+
+  async function loadTodayBlocked() {
+    const today = format(new Date(), 'yyyy-MM-dd')
+    const { data } = await supabase
+      .from('service_availability')
+      .select('service_id')
+      .eq('user_id', partner!.id)
+      .eq('date', today)
+    setTodayBlockedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
   }
 
   async function loadPartnerBlocked(date: string) {
@@ -101,161 +112,213 @@ export function HomePage() {
   }
 
   const upcomingOrders = activeOrders.filter(o => o.from_user_id === profile!.id)
+  const todayStr = format(new Date(), 'yyyy-MM-dd')
+  const blockedTodayCount = todayBlockedIds.size
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
       <Header title="Önska" />
-      <Box p={2.5} pb={4} display="flex" flexDirection="column" gap={3.5} maxWidth={560} width="100%" mx="auto">
+      <Box pb={4} display="flex" flexDirection="column" maxWidth={560} width="100%" mx="auto">
 
-        {/* Kommande önskningar */}
-        {upcomingOrders.length > 0 && (
-          <Box>
-            <SectionLabel>Ni har planerat</SectionLabel>
-            <Box display="flex" flexDirection="column" gap={1.5}>
-              {upcomingOrders.map(order => (
-                <Box key={order.id} sx={{
-                  p: 2.5,
-                  borderRadius: 2,
-                  bgcolor: 'background.paper',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(46,155,95,0.2)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}>
-                  <Box sx={{
-                    position: 'absolute', left: 0, top: 0, bottom: 0, width: 4,
-                    bgcolor: 'success.main',
-                  }} />
-                  <Box display="flex" alignItems="flex-start" justifyContent="space-between" pl={0.5}>
-                    <Box>
-                      <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
-                        <Box component="span" sx={{ fontSize: 14, color: 'success.main', display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
-                        <Typography variant="caption" fontWeight={700} color="success.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.65rem' }}>
-                          Intresserad
-                        </Typography>
-                      </Box>
-                      <Typography fontWeight={700} fontSize="1rem" letterSpacing="-0.02em">
-                        {order.service?.title ?? 'Okänd tjänst'}
-                      </Typography>
-                      {order.date && (
-                        <Typography variant="body2" color="text.secondary" mt={0.3}>
-                          {format(new Date(order.date), 'EEEE d MMMM', { locale: sv })}
-                        </Typography>
-                      )}
-                      {order.response_note && (
-                        <Typography variant="body2" color="text.secondary" mt={0.3}>
-                          {order.response_note}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', mt: 0.2 }}>
-                      <Icon icon={order.mode === 'snusk' ? 'mdi:weather-night' : 'mdi:weather-sunny'} />
-                    </Box>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        )}
+        {/* Hero */}
+        <Box sx={{
+          px: 2.5, pt: 2.5, pb: 2,
+          background: 'linear-gradient(160deg, var(--mui-palette-primary-main) 0%, var(--mui-palette-primary-dark) 100%)',
+          color: '#fff',
+        }}>
+          <Typography variant="caption" sx={{ opacity: 0.75, textTransform: 'capitalize', letterSpacing: '0.03em' }}>
+            {format(new Date(), 'EEEE d MMMM', { locale: sv })}
+          </Typography>
+          <Typography variant="h5" fontWeight={800} letterSpacing="-0.03em" mt={0.3} mb={1.5}>
+            Vad vill du önska av {partner.name}?
+          </Typography>
 
-        {/* Partner services */}
-        <Box>
-          <SectionLabel>{partner.name}s idéer</SectionLabel>
-          {loading ? (
-            <Box display="flex" flexDirection="column" gap={1.5}>
-              {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={68} sx={{ borderRadius: 2 }} />)}
-            </Box>
-          ) : services.length === 0 ? (
-            <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                {partner.name} har inga idéer ännu
+          {/* Partner availability today */}
+          {loading ? null : blockedTodayCount === 0 ? (
+            <Box display="flex" alignItems="center" gap={0.8}
+              sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+              <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}><Icon icon="mdi:check-circle-outline" /></Box>
+              <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
+                {partner.name} är öppen för allt idag
               </Typography>
             </Box>
           ) : (
-            <Box display="flex" flexDirection="column" gap={1}>
-              {services.map(service => {
-                const selected = selectedService?.id === service.id
-                const isBlocked = selectedDate ? partnerBlockedIds.has(service.id) : false
-                return (
-                  <Box key={service.id} onClick={() => setSelectedService(selected ? null : service)}
-                    sx={{
-                      p: 2, borderRadius: 2, cursor: 'pointer',
-                      border: '1.5px solid',
-                      borderColor: selected ? 'success.main' : 'divider',
-                      bgcolor: selected ? 'background.paper' : 'background.paper',
-                      boxShadow: selected ? '0 0 0 3px rgba(46,155,95,0.12)' : '0 1px 3px rgba(0,0,0,0.05)',
-                      opacity: isBlocked ? 0.5 : 1,
-                      transition: 'all 0.15s ease',
-                      '&:hover': { borderColor: 'success.main', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' },
-                    }}>
-                    <Box display="flex" alignItems="center" justifyContent="space-between">
-                      <Box>
-                        <Typography fontWeight={600} letterSpacing="-0.01em">{service.title}</Typography>
-                        {service.description && (
-                          <Typography variant="body2" color="text.secondary" mt={0.2}>{service.description}</Typography>
-                        )}
-                        {isBlocked && (
-                          <Typography variant="caption" color="text.disabled" mt={0.3} sx={{ display: 'block' }}>
-                            Inte öppen för detta den dagen
-                          </Typography>
-                        )}
-                      </Box>
-                      {selected && (
-                        <Box component="span" sx={{ fontSize: 20, color: 'success.main', flexShrink: 0, display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
-                      )}
-                    </Box>
-                  </Box>
-                )
-              })}
+            <Box display="flex" alignItems="center" gap={0.8}
+              sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+              <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}><Icon icon="mdi:information-outline" /></Box>
+              <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
+                {partner.name} har stängt av {blockedTodayCount} sak{blockedTodayCount > 1 ? 'er' : ''} idag
+              </Typography>
             </Box>
           )}
         </Box>
 
-        {/* Date picker */}
-        {selectedService && (
-          <Box>
-            <SectionLabel>Föreslå ett datum (valfritt)</SectionLabel>
-            <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-              {days.slice(0, 14).map(dateStr => {
-                const d = new Date(dateStr)
-                const selected = selectedDate === dateStr
-                return (
-                  <Box key={dateStr} onClick={() => setSelectedDate(prev => prev === dateStr ? null : dateStr)}
-                    sx={{
-                      flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                      px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 48,
-                      border: '1.5px solid',
-                      borderColor: selected ? 'primary.main' : 'divider',
-                      bgcolor: selected ? 'primary.main' : 'background.paper',
-                      color: selected ? 'primary.contrastText' : 'text.primary',
-                      transition: 'all 0.12s ease',
-                    }}>
-                    <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {format(d, 'EEE', { locale: sv })}
-                    </Typography>
-                    <Typography fontWeight={700} fontSize="1.05rem" lineHeight={1.3}>{format(d, 'd')}</Typography>
+        <Box px={2.5} pt={3} display="flex" flexDirection="column" gap={3.5}>
+
+          {/* Kommande önskningar */}
+          {upcomingOrders.length > 0 && (
+            <Box>
+              <SectionLabel>Ni har planerat</SectionLabel>
+              <Box display="flex" flexDirection="column" gap={1.5}>
+                {upcomingOrders.map(order => (
+                  <Box key={order.id} sx={{
+                    p: 2.5,
+                    borderRadius: 2,
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(46,155,95,0.2)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                    <Box sx={{
+                      position: 'absolute', left: 0, top: 0, bottom: 0, width: 4,
+                      bgcolor: 'success.main',
+                    }} />
+                    <Box display="flex" alignItems="flex-start" justifyContent="space-between" pl={0.5}>
+                      <Box>
+                        <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
+                          <Box component="span" sx={{ fontSize: 14, color: 'success.main', display: 'inline-flex' }}><Icon icon="mdi:check-circle" /></Box>
+                          <Typography variant="caption" fontWeight={700} color="success.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '0.65rem' }}>
+                            Intresserad
+                          </Typography>
+                        </Box>
+                        <Typography fontWeight={700} fontSize="1rem" letterSpacing="-0.02em">
+                          {order.service?.title ?? 'Okänd tjänst'}
+                        </Typography>
+                        {order.date && (
+                          <Typography variant="body2" color="text.secondary" mt={0.3}>
+                            {format(new Date(order.date), 'EEEE d MMMM', { locale: sv })}
+                          </Typography>
+                        )}
+                        {order.response_note && (
+                          <Typography variant="body2" color="text.secondary" mt={0.3}>
+                            {order.response_note}
+                          </Typography>
+                        )}
+                      </Box>
+                      <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', mt: 0.2 }}>
+                        <Icon icon={order.mode === 'snusk' ? 'mdi:weather-night' : 'mdi:weather-sunny'} />
+                      </Box>
+                    </Box>
                   </Box>
-                )
-              })}
+                ))}
+              </Box>
             </Box>
+          )}
+
+          {/* Partner services */}
+          <Box>
+            <SectionLabel>{partner.name}s idéer</SectionLabel>
+            {loading ? (
+              <Box display="flex" flexDirection="column" gap={1.5}>
+                {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={80} sx={{ borderRadius: 2 }} />)}
+              </Box>
+            ) : services.length === 0 ? (
+              <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  {partner.name} har inga idéer ännu
+                </Typography>
+              </Box>
+            ) : (
+              <Box display="flex" flexDirection="column" gap={1.5}>
+                {services.map(service => {
+                  const selected = selectedService?.id === service.id
+                  const blockedForDate = selectedDate ? partnerBlockedIds.has(service.id) : false
+                  const blockedToday = !selectedDate && todayBlockedIds.has(service.id)
+                  const isBlocked = blockedForDate || blockedToday
+                  return (
+                    <Box key={service.id} onClick={() => setSelectedService(selected ? null : service)}
+                      sx={{
+                        p: 2.5, borderRadius: 2, cursor: 'pointer',
+                        border: '2px solid',
+                        borderColor: selected ? 'success.main' : 'divider',
+                        bgcolor: 'background.paper',
+                        boxShadow: selected
+                          ? '0 0 0 3px rgba(46,155,95,0.12), 0 2px 8px rgba(0,0,0,0.06)'
+                          : '0 1px 4px rgba(0,0,0,0.05)',
+                        opacity: isBlocked ? 0.45 : 1,
+                        transition: 'all 0.15s ease',
+                        '&:hover': !isBlocked ? { borderColor: selected ? 'success.main' : 'primary.main', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' } : {},
+                      }}>
+                      <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+                        <Box flex={1}>
+                          <Typography fontWeight={700} fontSize="1rem" letterSpacing="-0.01em">
+                            {service.title}
+                          </Typography>
+                          {service.description && (
+                            <Typography variant="body2" color="text.secondary" mt={0.3}>
+                              {service.description}
+                            </Typography>
+                          )}
+                          {isBlocked && (
+                            <Typography variant="caption" color="text.disabled" mt={0.5} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Icon icon="mdi:clock-outline" width={12} />
+                              Inte öppen för detta {selectedDate ? 'den dagen' : 'idag'}
+                            </Typography>
+                          )}
+                        </Box>
+                        <Box component="span" sx={{
+                          fontSize: 22, flexShrink: 0, display: 'flex',
+                          color: selected ? 'success.main' : 'divider',
+                          transition: 'color 0.15s',
+                        }}>
+                          <Icon icon={selected ? 'mdi:check-circle' : 'mdi:circle-outline'} />
+                        </Box>
+                      </Box>
+                    </Box>
+                  )
+                })}
+              </Box>
+            )}
           </Box>
-        )}
 
-        {selectedService && (
-          <TextField label="Meddelande (valfritt)" value={note}
-            onChange={e => setNote(e.target.value)} placeholder="Skriv något..." multiline rows={2} />
-        )}
+          {/* Date picker */}
+          {selectedService && (
+            <Box>
+              <SectionLabel>Föreslå ett datum (valfritt)</SectionLabel>
+              <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+                {days.slice(0, 14).map(dateStr => {
+                  const d = new Date(dateStr)
+                  const selected = selectedDate === dateStr
+                  const isToday = dateStr === todayStr
+                  return (
+                    <Box key={dateStr} onClick={() => setSelectedDate(prev => prev === dateStr ? null : dateStr)}
+                      sx={{
+                        flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                        px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
+                        border: '2px solid',
+                        borderColor: selected ? 'primary.main' : isToday ? 'primary.main' : 'divider',
+                        bgcolor: selected ? 'primary.main' : 'background.paper',
+                        color: selected ? 'primary.contrastText' : 'text.primary',
+                        transition: 'all 0.12s ease',
+                      }}>
+                      <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        {isToday && !selected ? 'Idag' : format(d, 'EEE', { locale: sv })}
+                      </Typography>
+                      <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>{format(d, 'd')}</Typography>
+                    </Box>
+                  )
+                })}
+              </Box>
+            </Box>
+          )}
 
-        {selectedService && (
-          <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
-            startIcon={<Icon icon="mdi:send" />}
-            sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
-            {ordering ? 'Skickar...' : `Önska ${selectedService.title}`}
-          </Button>
-        )}
+          {selectedService && (
+            <TextField label="Meddelande (valfritt)" value={note}
+              onChange={e => setNote(e.target.value)} placeholder="Skriv något..." multiline rows={2} />
+          )}
 
-        {success && (
-          <Alert severity="success" sx={{ borderRadius: 2 }}>Önskan skickad!</Alert>
-        )}
+          {selectedService && (
+            <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
+              startIcon={<Icon icon="mdi:send" />}
+              sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
+              {ordering ? 'Skickar...' : `Önska ${selectedService.title}`}
+            </Button>
+          )}
+
+          {success && (
+            <Alert severity="success" sx={{ borderRadius: 2 }}>Önskan skickad!</Alert>
+          )}
+        </Box>
       </Box>
     </Box>
   )
