@@ -11,11 +11,10 @@ import { Icon } from '@iconify/react'
 import { useAuth } from '../contexts/AuthContext'
 
 const features: { icon: string; title: string; desc: string }[] = [
-  { icon: 'mdi:gift', title: 'Skicka önskningar', desc: 'Dela med dig av vad du drömmer om – stort som smått.' },
-  { icon: 'mdi:calendar', title: 'Boka upplevelser', desc: 'Planera datum och överraska din partner med något speciellt.' },
-  { icon: 'mdi:creation', title: 'Skapa minnen', desc: 'Förvandla önskningar till verkliga stunder tillsammans.' },
-  { icon: 'mdi:shield-lock', title: 'GDPR & integritet', desc: 'Full kontroll över din data. Radera ditt konto, exportera all din information och läs vår integritetspolicy — allt inbyggt från start.' },
-  { icon: 'mdi:human', title: 'Tillgänglighet', desc: 'Couply följer WCAG 2.1 Level AA. Appen fungerar med skärmläsare, tangentbordsnavigering och alla skärmstorlekar.' },
+  { icon: 'mdi:gift', title: 'Önska frimodigt', desc: 'Lägg in vad du är sugen på. Din partner ser det och svarar när de är med.' },
+  { icon: 'mdi:calendar', title: 'Föreslå en dag', desc: 'Inga oklarheter. Föreslå när det passar och se vad partnern är öppen för.' },
+  { icon: 'mdi:history', title: 'Era minnen', desc: 'Koll på vad ni planerat, gjort — och vad som väntar.' },
+  { icon: 'mdi:shield-lock', title: 'Privat som det ska vara', desc: 'Bara ni två ser er data. Radera allt när ni vill.' },
 ]
 
 export function LoginPage() {
@@ -129,7 +128,7 @@ export function LoginPage() {
           </Typography>
 
           <Typography variant="body1" color="text.secondary" mb={5} lineHeight={1.7} sx={{ maxWidth: 420 }}>
-            Dela vad du drömmer om, boka upplevelser tillsammans och skapa stunder som betyder något.
+            Säg vad du är sugen på. Enkelt och utan press.
           </Typography>
 
           <Box display="flex" flexDirection="column" gap={3}>
