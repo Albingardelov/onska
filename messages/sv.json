@@ -42,6 +42,19 @@
     "feature_privacy_title": "Privat som det ska vara",
     "feature_privacy_desc": "Bara ni två ser er data. Radera allt när ni vill."
   },
+  "onboarding": {
+    "step1_title": "Välkommen till Couply",
+    "step1_body": "En privat app för er två — önska från varandra, svara i din egen takt, utan press.",
+    "step2_title": "Så funkar det",
+    "step2_item1_title": "Lägg till idéer",
+    "step2_item1_desc": "Berätta vad du är öppen för. Din partner ser dina idéer och kan önska dem.",
+    "step2_item2_title": "Önska från din partner",
+    "step2_item2_desc": "Bläddra bland partnerns idéer och skicka en önskan när du är sugen.",
+    "step2_item3_title": "Svara i din takt",
+    "step2_item3_desc": "Acceptera, säg \"inte nu\", eller ändra dig — utan att förklara varför.",
+    "next": "Nästa",
+    "get_started": "Kom igång"
+  },
   "pairing": {
     "title": "Koppla ihop",
     "subtitle": "Hej {name}! Koppla ihop med din partner.",

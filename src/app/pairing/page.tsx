@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/src/contexts/AuthContext'
-import { PairingPage } from '@/src/views/PairingPage'
+import { OnboardingPage } from '@/src/views/OnboardingPage'
 
 export default function PairingRoute() {
   const { user, profile, loading } = useAuth()
@@ -17,5 +17,5 @@ export default function PairingRoute() {
 
   if (loading || !user || profile?.partner_id) return null
 
-  return <PairingPage />
+  return <OnboardingPage />
 }

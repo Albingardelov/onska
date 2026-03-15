@@ -42,6 +42,19 @@
     "feature_privacy_title": "Private as it should be",
     "feature_privacy_desc": "Only the two of you see your data. Delete everything whenever you want."
   },
+  "onboarding": {
+    "step1_title": "Welcome to Couply",
+    "step1_body": "A private app for the two of you — wish from each other, respond at your own pace, without pressure.",
+    "step2_title": "How it works",
+    "step2_item1_title": "Add ideas",
+    "step2_item1_desc": "Share what you're open to. Your partner sees your ideas and can wish for them.",
+    "step2_item2_title": "Wish from your partner",
+    "step2_item2_desc": "Browse your partner's ideas and send a wish when you're in the mood.",
+    "step2_item3_title": "Respond at your pace",
+    "step2_item3_desc": "Accept, say \"not now\", or change your mind — without explaining why.",
+    "next": "Next",
+    "get_started": "Get started"
+  },
   "pairing": {
     "title": "Connect",
     "subtitle": "Hi {name}! Connect with your partner.",
