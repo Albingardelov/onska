@@ -79,8 +79,8 @@ export function OrdersPage() {
   }
 
   async function deleteOrder(id: string) {
-    await supabase.from('orders').delete().eq('id', id)
-    setOrders(prev => prev.filter(o => o.id !== id))
+    const { error } = await supabase.from('orders').delete().eq('id', id)
+    if (!error) setOrders(prev => prev.filter(o => o.id !== id))
   }
 
   const active = orders.filter(o => o.status === 'pending' || o.status === 'accepted')

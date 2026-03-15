@@ -77,6 +77,9 @@ create policy "orders_insert" on public.orders for insert with check (auth.uid()
 create policy "orders_update" on public.orders for update using (
   auth.uid() = from_user_id or auth.uid() = to_user_id
 );
+create policy "orders_delete" on public.orders for delete using (
+  auth.uid() = from_user_id or auth.uid() = to_user_id
+);
 
 -- ── Realtime ── (aktivera för orders-tabellen)
 alter publication supabase_realtime add table public.orders;
