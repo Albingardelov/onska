@@ -35,8 +35,9 @@ No test suite is configured.
 - **ModeToggle** (`src/components/ModeToggle.tsx`) — icon-only `IconButton` in the Header; toggles fint/snusk theme
 - **Header** (`src/components/Header.tsx`) — sticky AppBar with page title, partner name subtitle, ModeToggle + settings + logout icons
 - **Onboarding** — new users see 3-step slide-animated wizard on `/pairing`; returning unpaired users skip to step 3 (pairing form) via `localStorage` key `couply_onboarding_seen`
+- **QR pairing** — step 3 shows a QR code encoding `${origin}/pairing?code=XXXX`; scanning auto-triggers pairing. The `?code=` param is saved to `localStorage` key `couply_pairing_code_prefill` so it survives a login redirect.
 - **Consent banner** in `/onskningar` shown once, dismissed to `localStorage` key `couply_consent_seen`
-- **LocalStorage keys in use:** `modeHintSeen`, `couply_onboarding_seen`, `couply_consent_seen`
+- **LocalStorage keys in use:** `modeHintSeen`, `couply_onboarding_seen`, `couply_consent_seen`, `couply_pairing_code_prefill`
 
 ### Data layer
 
@@ -61,7 +62,7 @@ Two MUI themes are defined in `src/lib/themes.ts`: `fintTheme` (light, pink) and
 
 ### Translations
 
-Translation files are at `src/messages/sv.json` and `src/messages/en.json`. Both languages must be kept in sync when adding new strings.
+Translation files are at `messages/sv.json` and `messages/en.json`. Both languages must be kept in sync when adding new strings.
 
 ### Push notifications
 

@@ -19,6 +19,7 @@
     "date-fns": "^4.1.0",
     "next": "^15.3.3",
     "next-intl": "^4.8.3",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "web-push": "^3.6.7"

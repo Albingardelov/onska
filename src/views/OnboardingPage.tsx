@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Button from '@mui/material/Button'
@@ -10,29 +10,60 @@ import Alert from '@mui/material/Alert'
 import MobileStepper from '@mui/material/MobileStepper'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
+import CircularProgress from '@mui/material/CircularProgress'
 import { Icon } from '@iconify/react'
+import { QRCodeSVG } from 'qrcode.react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTranslations } from 'next-intl'
 
 const ONBOARDING_KEY = 'couply_onboarding_seen'
+const PREFILL_KEY = 'couply_pairing_code_prefill'
 const TOTAL_STEPS = 3
 
-export function OnboardingPage() {
+interface Props {
+  initialCode?: string
+}
+
+export function OnboardingPage({ initialCode }: Props) {
   const t = useTranslations('onboarding')
   const tp = useTranslations('pairing')
   const { profile, pairWithPartner, signOut } = useAuth()
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(() => initialCode ? 2 : 0)
   const [animKey, setAnimKey] = useState(0)
-  const [code, setCode] = useState('')
+  const [code, setCode] = useState(initialCode ?? '')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [pairingUrl, setPairingUrl] = useState('')
+  const hasAutoPaired = useRef(false)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem(ONBOARDING_KEY)) {
+    if (!initialCode && typeof window !== 'undefined' && localStorage.getItem(ONBOARDING_KEY)) {
       setStep(2)
     }
-  }, [])
+  }, [initialCode])
+
+  useEffect(() => {
+    if (profile?.pairing_code) {
+      setPairingUrl(`${window.location.origin}/pairing?code=${profile.pairing_code}`)
+    }
+  }, [profile?.pairing_code])
+
+  // Auto-pair when arriving via QR code
+  useEffect(() => {
+    if (!initialCode || step !== 2 || !profile || hasAutoPaired.current) return
+    hasAutoPaired.current = true
+    setLoading(true)
+    pairWithPartner(initialCode).then(err => {
+      if (err) {
+        setError(err)
+        hasAutoPaired.current = false
+      } else {
+        localStorage.removeItem(PREFILL_KEY)
+      }
+      setLoading(false)
+    })
+  }, [initialCode, step, profile, pairWithPartner])
 
   function handleNext() {
     if (step === 1) {
@@ -47,7 +78,11 @@ export function OnboardingPage() {
     setError('')
     setLoading(true)
     const err = await pairWithPartner(code)
-    if (err) setError(err)
+    if (err) {
+      setError(err)
+    } else {
+      localStorage.removeItem(PREFILL_KEY)
+    }
     setLoading(false)
   }
 
@@ -156,12 +191,12 @@ export function OnboardingPage() {
               </Typography>
             </Box>
 
-            {/* My code */}
+            {/* My code + QR */}
             <Paper elevation={0} sx={{ p: 3, mb: 2, border: 1, borderColor: 'divider', borderRadius: 4 }}>
               <Typography variant="body2" color="text.secondary" fontWeight={600} mb={1}>
                 {tp('my_code_label')}
               </Typography>
-              <Box display="flex" alignItems="center" gap={1}>
+              <Box display="flex" alignItems="center" gap={1} mb={2}>
                 <Typography
                   variant="h4"
                   fontWeight={900}
@@ -183,6 +218,21 @@ export function OnboardingPage() {
                   </IconButton>
                 </Tooltip>
               </Box>
+
+              {pairingUrl && (
+                <Box display="flex" flexDirection="column" alignItems="center" gap={1} pt={1} borderTop={1} borderColor="divider">
+                  <Typography variant="caption" color="text.secondary">{tp('qr_label')}</Typography>
+                  <Box
+                    p={1.5}
+                    bgcolor="white"
+                    borderRadius={2}
+                    role="img"
+                    aria-label={tp('qr_aria')}
+                  >
+                    <QRCodeSVG value={pairingUrl} size={140} />
+                  </Box>
+                </Box>
+              )}
             </Paper>
 
             {/* Enter partner code */}
@@ -190,33 +240,39 @@ export function OnboardingPage() {
               <Typography variant="body2" color="text.secondary" fontWeight={600} mb={2}>
                 {tp('partner_code_label')}
               </Typography>
-              <Box component="form" onSubmit={handlePair} display="flex" flexDirection="column" gap={2}>
-                <TextField
-                  value={code}
-                  onChange={e => setCode(e.target.value.toUpperCase())}
-                  placeholder={tp('placeholder')}
-                  inputProps={{
-                    maxLength: 6,
-                    style: {
-                      textAlign: 'center',
-                      letterSpacing: 8,
-                      fontSize: '1.4rem',
-                      fontWeight: 700,
-                      fontFamily: 'monospace',
-                    },
-                  }}
-                  required
-                />
-                {error && <Alert severity="error">{error}</Alert>}
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  disabled={loading || code.length < 6}
-                >
-                  {loading ? '...' : tp('connect_button')}
-                </Button>
-              </Box>
+              {loading && initialCode ? (
+                <Box display="flex" justifyContent="center" py={2}>
+                  <CircularProgress size={28} />
+                </Box>
+              ) : (
+                <Box component="form" onSubmit={handlePair} display="flex" flexDirection="column" gap={2}>
+                  <TextField
+                    value={code}
+                    onChange={e => setCode(e.target.value.toUpperCase())}
+                    placeholder={tp('placeholder')}
+                    inputProps={{
+                      maxLength: 6,
+                      style: {
+                        textAlign: 'center',
+                        letterSpacing: 8,
+                        fontSize: '1.4rem',
+                        fontWeight: 700,
+                        fontFamily: 'monospace',
+                      },
+                    }}
+                    required
+                  />
+                  {error && <Alert severity="error">{error}</Alert>}
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    disabled={loading || code.length < 6}
+                  >
+                    {loading ? tp('connecting') : tp('connect_button')}
+                  </Button>
+                </Box>
+              )}
             </Paper>
 
             <Button

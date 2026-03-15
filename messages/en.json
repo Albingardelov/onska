@@ -66,7 +66,10 @@
     "partner_code_label": "Enter your partner's code",
     "placeholder": "E.g. AB1C2D",
     "connect_button": "Connect",
-    "sign_out": "Sign out"
+    "sign_out": "Sign out",
+    "qr_label": "Or let your partner scan",
+    "qr_aria": "QR code for pairing",
+    "connecting": "Connecting..."
   },
   "home": {
     "header": "Wish",

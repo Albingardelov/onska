@@ -1,12 +1,20 @@
 'use client'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/src/contexts/AuthContext'
 import { OnboardingPage } from '@/src/views/OnboardingPage'
 
-export default function PairingRoute() {
+const PREFILL_KEY = 'couply_pairing_code_prefill'
+
+function PairingContent() {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const codeParam = searchParams.get('code')?.toUpperCase() ?? null
+
+  useEffect(() => {
+    if (codeParam) localStorage.setItem(PREFILL_KEY, codeParam)
+  }, [codeParam])
 
   useEffect(() => {
     if (!loading) {
@@ -17,5 +25,15 @@ export default function PairingRoute() {
 
   if (loading || !user || profile?.partner_id) return null
 
-  return <OnboardingPage />
+  const initialCode = codeParam ?? localStorage.getItem(PREFILL_KEY) ?? undefined
+
+  return <OnboardingPage initialCode={initialCode || undefined} />
+}
+
+export default function PairingRoute() {
+  return (
+    <Suspense>
+      <PairingContent />
+    </Suspense>
+  )
 }
