@@ -69,7 +69,10 @@
     "sign_out": "Logga ut",
     "qr_label": "Eller låt partnern skanna",
     "qr_aria": "QR-kod för parkoppling",
-    "connecting": "Kopplar ihop..."
+    "connecting": "Kopplar ihop...",
+    "qr_instruction": "Låt din partner skanna koden med sin telefon",
+    "manual_entry": "Ange kod manuellt",
+    "manual_hide": "Dölj"
   },
   "home": {
     "header": "Önska",

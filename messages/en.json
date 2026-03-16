@@ -69,7 +69,10 @@
     "sign_out": "Sign out",
     "qr_label": "Or let your partner scan",
     "qr_aria": "QR code for pairing",
-    "connecting": "Connecting..."
+    "connecting": "Connecting...",
+    "qr_instruction": "Let your partner scan the code with their phone",
+    "manual_entry": "Enter code manually",
+    "manual_hide": "Hide"
   },
   "home": {
     "header": "Wish",
