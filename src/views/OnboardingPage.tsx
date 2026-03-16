@@ -96,132 +96,6 @@ export function OnboardingPage({ initialCode }: Props) {
     { icon: 'mdi:heart-outline', title: t('step2_item3_title'), desc: t('step2_item3_desc') },
   ]
 
-  // Step 3: full-screen QR layout
-  if (step === 2) {
-    return (
-      <Box component="main" minHeight="100dvh" display="flex" flexDirection="column" bgcolor="background.default">
-
-        {/* Gradient hero with QR */}
-        <Box sx={{
-          background: 'linear-gradient(160deg, #CC2E6A 0%, #A82158 100%)',
-          color: '#fff',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          pt: 7,
-          pb: 4,
-          px: 3,
-          gap: 1.5,
-        }}>
-          <Typography fontSize={44} lineHeight={1}>💞</Typography>
-          <Typography variant="h5" fontWeight={800} letterSpacing="-0.5px" color="inherit">
-            {tp('title')}
-          </Typography>
-          <Typography variant="body2" textAlign="center" sx={{ opacity: 0.8, maxWidth: 280 }}>
-            {tp('subtitle', { name: profile?.name ?? '' })}
-          </Typography>
-
-          {pairingUrl ? (
-            <Box
-              sx={{ bgcolor: 'white', borderRadius: 3, p: 2, mt: 1.5 }}
-              role="img"
-              aria-label={tp('qr_aria')}
-            >
-              <QRCodeSVG value={pairingUrl} size={180} />
-            </Box>
-          ) : (
-            <Box sx={{ width: 212, height: 212, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <CircularProgress sx={{ color: 'rgba(255,255,255,0.6)' }} />
-            </Box>
-          )}
-        </Box>
-
-        {/* Bottom content */}
-        <Box flex={1} display="flex" flexDirection="column" alignItems="center" px={3} pt={3} pb={4} gap={1.5}>
-
-          <Typography variant="body2" color="text.secondary" textAlign="center">
-            {tp('qr_instruction')}
-          </Typography>
-
-          {/* Code + copy */}
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography variant="h4" fontWeight={900} fontFamily="monospace" letterSpacing={4} color="primary">
-              {profile?.pairing_code}
-            </Typography>
-            <Tooltip title={copied ? tp('copied') : tp('copy')}>
-              <IconButton
-                onClick={copyCode}
-                color="primary"
-                size="small"
-                aria-label={copied ? tp('copied_aria') : tp('copy_aria')}
-              >
-                {copied ? <Icon icon="mdi:check" /> : <Icon icon="mdi:content-copy" />}
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          {/* Auto-connecting state */}
-          {loading && !showManual && (
-            <Box display="flex" alignItems="center" gap={1.5} mt={0.5}>
-              <CircularProgress size={18} color="primary" />
-              <Typography variant="body2" color="text.secondary">{tp('connecting')}</Typography>
-            </Box>
-          )}
-
-          {error && !showManual && (
-            <Alert severity="error" sx={{ width: '100%' }}>{error}</Alert>
-          )}
-
-          {/* Manual entry toggle */}
-          <Button
-            size="small"
-            onClick={() => setShowManual(m => !m)}
-            color="inherit"
-            sx={{ color: 'text.disabled', fontSize: '0.75rem', mt: 0.5 }}
-          >
-            {showManual ? tp('manual_hide') : tp('manual_entry')}
-          </Button>
-
-          {showManual && (
-            <Box component="form" onSubmit={handlePair} width="100%" display="flex" flexDirection="column" gap={2}>
-              <TextField
-                value={code}
-                onChange={e => setCode(e.target.value.toUpperCase())}
-                placeholder={tp('placeholder')}
-                inputProps={{
-                  maxLength: 6,
-                  style: { textAlign: 'center', letterSpacing: 8, fontSize: '1.4rem', fontWeight: 700, fontFamily: 'monospace' },
-                }}
-                required
-              />
-              {error && <Alert severity="error">{error}</Alert>}
-              <Button type="submit" variant="contained" size="large" disabled={loading || code.length < 6}>
-                {loading ? tp('connecting') : tp('connect_button')}
-              </Button>
-            </Box>
-          )}
-
-          <Box flex={1} />
-
-          <Button onClick={signOut} color="inherit" fullWidth sx={{ color: 'text.secondary' }}>
-            {tp('sign_out')}
-          </Button>
-        </Box>
-
-        <MobileStepper
-          variant="dots"
-          steps={TOTAL_STEPS}
-          position="static"
-          activeStep={step}
-          sx={{ justifyContent: 'center', bgcolor: 'transparent', pb: 2 }}
-          nextButton={null}
-          backButton={null}
-        />
-      </Box>
-    )
-  }
-
-  // Steps 0 & 1: centered card layout
   return (
     <Box
       component="main"
@@ -235,6 +109,7 @@ export function OnboardingPage({ initialCode }: Props) {
     >
       <Box width="100%" maxWidth={400} display="flex" flexDirection="column" gap={3}>
 
+        {/* Step 1: Welcome */}
         {step === 0 && (
           <Box key={animKey} textAlign="center" sx={{
             '@keyframes stepIn': { from: { opacity: 0, transform: 'translateX(24px)' }, to: { opacity: 1, transform: 'translateX(0)' } },
@@ -254,6 +129,7 @@ export function OnboardingPage({ initialCode }: Props) {
           </Box>
         )}
 
+        {/* Step 2: How it works */}
         {step === 1 && (
           <Box key={animKey} sx={{
             '@keyframes stepIn': { from: { opacity: 0, transform: 'translateX(24px)' }, to: { opacity: 1, transform: 'translateX(0)' } },
@@ -278,6 +154,164 @@ export function OnboardingPage({ initialCode }: Props) {
             <Button variant="contained" size="large" fullWidth onClick={handleNext}
               sx={{ borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>
               {t('get_started')}
+            </Button>
+          </Box>
+        )}
+
+        {/* Step 3: Pairing */}
+        {step === 2 && (
+          <Box key={animKey} display="flex" flexDirection="column" gap={2} sx={{
+            '@keyframes stepIn': { from: { opacity: 0, transform: 'translateX(24px)' }, to: { opacity: 1, transform: 'translateX(0)' } },
+            animation: 'stepIn 0.28s cubic-bezier(0.4,0,0.2,1)',
+          }}>
+
+            {/* Gradient card */}
+            <Box sx={{
+              borderRadius: 4,
+              background: 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
+              overflow: 'hidden',
+              position: 'relative',
+              p: 3,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 2,
+              // decorative circles
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: -48,
+                right: -48,
+                width: 160,
+                height: 160,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.07)',
+                pointerEvents: 'none',
+              },
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                bottom: -32,
+                left: -32,
+                width: 120,
+                height: 120,
+                borderRadius: '50%',
+                background: 'rgba(255,255,255,0.05)',
+                pointerEvents: 'none',
+              },
+            }}>
+              <Box sx={{ textAlign: 'center', zIndex: 1 }}>
+                <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.65)', letterSpacing: '0.12em', fontSize: '0.65rem' }}>
+                  {tp('my_code_label')}
+                </Typography>
+                <Typography variant="h5" fontWeight={800} letterSpacing="-0.5px" sx={{ color: '#fff', mt: 0.25 }}>
+                  {tp('title')}
+                </Typography>
+              </Box>
+
+              {/* QR code */}
+              <Box sx={{ zIndex: 1 }}>
+                {pairingUrl ? (
+                  <Box
+                    sx={{
+                      bgcolor: '#fff',
+                      borderRadius: 3,
+                      p: 1.75,
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+                    }}
+                    role="img"
+                    aria-label={tp('qr_aria')}
+                  >
+                    <QRCodeSVG value={pairingUrl} size={164} />
+                  </Box>
+                ) : (
+                  <Box sx={{ width: 196, height: 196, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CircularProgress sx={{ color: 'rgba(255,255,255,0.6)' }} />
+                  </Box>
+                )}
+              </Box>
+
+              {/* Instruction */}
+              <Typography variant="body2" textAlign="center" sx={{ color: 'rgba(255,255,255,0.82)', zIndex: 1, maxWidth: 240, lineHeight: 1.5 }}>
+                {tp('qr_instruction')}
+              </Typography>
+
+              {/* Code + copy */}
+              <Box display="flex" alignItems="center" gap={0.5} sx={{
+                bgcolor: 'rgba(255,255,255,0.13)',
+                borderRadius: 2,
+                px: 2,
+                py: 0.75,
+                zIndex: 1,
+              }}>
+                <Typography sx={{
+                  fontFamily: 'monospace',
+                  fontWeight: 900,
+                  fontSize: '1.4rem',
+                  letterSpacing: 6,
+                  color: '#fff',
+                }}>
+                  {profile?.pairing_code}
+                </Typography>
+                <Tooltip title={copied ? tp('copied') : tp('copy')}>
+                  <IconButton
+                    onClick={copyCode}
+                    size="small"
+                    aria-label={copied ? tp('copied_aria') : tp('copy_aria')}
+                    sx={{ color: 'rgba(255,255,255,0.75)', '&:hover': { color: '#fff' } }}
+                  >
+                    {copied ? <Icon icon="mdi:check" /> : <Icon icon="mdi:content-copy" />}
+                  </IconButton>
+                </Tooltip>
+              </Box>
+
+              {/* Connecting state */}
+              {loading && !showManual && (
+                <Box display="flex" alignItems="center" gap={1} sx={{ zIndex: 1 }}>
+                  <CircularProgress size={16} sx={{ color: 'rgba(255,255,255,0.7)' }} />
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                    {tp('connecting')}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+
+            {/* Error outside card */}
+            {error && !showManual && <Alert severity="error">{error}</Alert>}
+
+            {/* Manual entry toggle */}
+            <Box textAlign="center">
+              <Button
+                size="small"
+                onClick={() => setShowManual(m => !m)}
+                sx={{ color: 'text.disabled', fontSize: '0.75rem', textDecoration: 'underline', textUnderlineOffset: 3 }}
+              >
+                {showManual ? tp('manual_hide') : tp('manual_entry')}
+              </Button>
+            </Box>
+
+            {/* Manual form */}
+            {showManual && (
+              <Box component="form" onSubmit={handlePair} display="flex" flexDirection="column" gap={2}>
+                <TextField
+                  value={code}
+                  onChange={e => setCode(e.target.value.toUpperCase())}
+                  placeholder={tp('placeholder')}
+                  inputProps={{
+                    maxLength: 6,
+                    style: { textAlign: 'center', letterSpacing: 8, fontSize: '1.4rem', fontWeight: 700, fontFamily: 'monospace' },
+                  }}
+                  required
+                />
+                {error && <Alert severity="error">{error}</Alert>}
+                <Button type="submit" variant="contained" size="large" disabled={loading || code.length < 6}>
+                  {loading ? tp('connecting') : tp('connect_button')}
+                </Button>
+              </Box>
+            )}
+
+            <Button onClick={signOut} color="inherit" sx={{ color: 'text.secondary' }}>
+              {tp('sign_out')}
             </Button>
           </Box>
         )}
