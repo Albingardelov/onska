@@ -13,8 +13,8 @@ import { useTranslations } from 'next-intl'
 
 const mockCards = [
   { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0 },
-  { emoji: '🌿', title: 'Promenad i solnedgången', sub: 'Lördag', accepted: false, rotate: '1.5deg', offset: 24 },
-  { emoji: '🍷', title: 'Middagsdate hemma', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10 },
+  { emoji: '🛁', title: 'Badkar för två', sub: 'Ikväll?', accepted: false, rotate: '1.5deg', offset: 24 },
+  { emoji: '🌙', title: 'Sova naken ikväll', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10 },
 ]
 
 export function LoginPage() {
