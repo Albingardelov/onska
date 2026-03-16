@@ -72,7 +72,10 @@
     "connecting": "Connecting...",
     "qr_instruction": "Let your partner scan the code with their phone",
     "manual_entry": "Enter code manually",
-    "manual_hide": "Hide"
+    "manual_hide": "Hide",
+    "scan_button": "Scan partner's QR code",
+    "scan_title": "Point the camera at your partner's QR code",
+    "scan_close": "Cancel"
   },
   "home": {
     "header": "Wish",

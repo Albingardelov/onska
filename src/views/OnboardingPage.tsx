@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -10,9 +10,14 @@ import MobileStepper from '@mui/material/MobileStepper'
 import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import { Icon } from '@iconify/react'
 import { QRCodeSVG } from 'qrcode.react'
+import jsQR from 'jsqr'
 import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 import { useTranslations } from 'next-intl'
 
 const ONBOARDING_KEY = 'couply_onboarding_seen'
@@ -26,7 +31,7 @@ interface Props {
 export function OnboardingPage({ initialCode }: Props) {
   const t = useTranslations('onboarding')
   const tp = useTranslations('pairing')
-  const { profile, pairWithPartner, signOut } = useAuth()
+  const { user, profile, pairWithPartner, refreshProfile, signOut } = useAuth()
   const [step, setStep] = useState(() => initialCode ? 2 : 0)
   const [animKey, setAnimKey] = useState(0)
   const [code, setCode] = useState(initialCode ?? '')
@@ -35,20 +40,28 @@ export function OnboardingPage({ initialCode }: Props) {
   const [copied, setCopied] = useState(false)
   const [pairingUrl, setPairingUrl] = useState('')
   const [showManual, setShowManual] = useState(false)
+  const [scanning, setScanning] = useState(false)
   const hasAutoPaired = useRef(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const scanLoopRef = useRef<number | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
 
+  // Skip onboarding for returning users
   useEffect(() => {
     if (!initialCode && typeof window !== 'undefined' && localStorage.getItem(ONBOARDING_KEY)) {
       setStep(2)
     }
   }, [initialCode])
 
+  // Build pairing URL
   useEffect(() => {
     if (profile?.pairing_code) {
       setPairingUrl(`${window.location.origin}/pairing?code=${profile.pairing_code}`)
     }
   }, [profile?.pairing_code])
 
+  // Auto-pair when arriving via QR link
   useEffect(() => {
     if (!initialCode || step !== 2 || !profile || hasAutoPaired.current) return
     hasAutoPaired.current = true
@@ -65,6 +78,93 @@ export function OnboardingPage({ initialCode }: Props) {
     })
   }, [initialCode, step, profile, pairWithPartner])
 
+  // Realtime: refresh when partner pairs with us (so phone A updates without F5)
+  useEffect(() => {
+    if (!user || step !== 2) return
+    const channel = supabase
+      .channel(`profile-paired-${user.id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.new && (payload.new as { partner_id: string | null }).partner_id) {
+          refreshProfile()
+        }
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [user, step, refreshProfile])
+
+  // QR scanner — start camera
+  const startScanner = useCallback(async () => {
+    setScanning(true)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      })
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        videoRef.current.play()
+      }
+    } catch {
+      setScanning(false)
+      setError('Kunde inte öppna kameran')
+    }
+  }, [])
+
+  // QR scanner — scan loop
+  const scanFrame = useCallback(() => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    if (!video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
+      scanLoopRef.current = requestAnimationFrame(scanFrame)
+      return
+    }
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    const ctx = canvas.getContext('2d')!
+    ctx.drawImage(video, 0, 0)
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const result = jsQR(imageData.data, imageData.width, imageData.height)
+    if (result?.data) {
+      stopScanner()
+      // Extract code from URL or use raw value
+      try {
+        const url = new URL(result.data)
+        const scannedCode = url.searchParams.get('code')?.toUpperCase()
+        if (scannedCode) doPair(scannedCode)
+        else doPair(result.data.toUpperCase())
+      } catch {
+        doPair(result.data.toUpperCase())
+      }
+    } else {
+      scanLoopRef.current = requestAnimationFrame(scanFrame)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  function stopScanner() {
+    if (scanLoopRef.current) cancelAnimationFrame(scanLoopRef.current)
+    streamRef.current?.getTracks().forEach(t => t.stop())
+    streamRef.current = null
+    setScanning(false)
+  }
+
+  async function doPair(scannedCode: string) {
+    setError('')
+    setLoading(true)
+    const err = await pairWithPartner(scannedCode)
+    if (err) {
+      setError(err)
+      setShowManual(true)
+    } else {
+      localStorage.removeItem(PREFILL_KEY)
+    }
+    setLoading(false)
+  }
+
   function handleNext() {
     if (step === 1) localStorage.setItem(ONBOARDING_KEY, '1')
     setStep(s => s + 1)
@@ -73,15 +173,7 @@ export function OnboardingPage({ initialCode }: Props) {
 
   async function handlePair(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
-    setLoading(true)
-    const err = await pairWithPartner(code)
-    if (err) {
-      setError(err)
-    } else {
-      localStorage.removeItem(PREFILL_KEY)
-    }
-    setLoading(false)
+    await doPair(code)
   }
 
   function copyCode() {
@@ -176,14 +268,11 @@ export function OnboardingPage({ initialCode }: Props) {
               flexDirection: 'column',
               alignItems: 'center',
               gap: 2,
-              // decorative circles
               '&::before': {
                 content: '""',
                 position: 'absolute',
-                top: -48,
-                right: -48,
-                width: 160,
-                height: 160,
+                top: -48, right: -48,
+                width: 160, height: 160,
                 borderRadius: '50%',
                 background: 'rgba(255,255,255,0.07)',
                 pointerEvents: 'none',
@@ -191,10 +280,8 @@ export function OnboardingPage({ initialCode }: Props) {
               '&::after': {
                 content: '""',
                 position: 'absolute',
-                bottom: -32,
-                left: -32,
-                width: 120,
-                height: 120,
+                bottom: -32, left: -32,
+                width: 120, height: 120,
                 borderRadius: '50%',
                 background: 'rgba(255,255,255,0.05)',
                 pointerEvents: 'none',
@@ -209,63 +296,36 @@ export function OnboardingPage({ initialCode }: Props) {
                 </Typography>
               </Box>
 
-              {/* QR code */}
-              <Box sx={{ zIndex: 1 }}>
-                {pairingUrl ? (
-                  <Box
-                    sx={{
-                      bgcolor: '#fff',
-                      borderRadius: 3,
-                      p: 1.75,
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-                    }}
-                    role="img"
-                    aria-label={tp('qr_aria')}
-                  >
-                    <QRCodeSVG value={pairingUrl} size={164} />
-                  </Box>
-                ) : (
-                  <Box sx={{ width: 196, height: 196, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CircularProgress sx={{ color: 'rgba(255,255,255,0.6)' }} />
-                  </Box>
-                )}
-              </Box>
+              {pairingUrl ? (
+                <Box sx={{ zIndex: 1, bgcolor: '#fff', borderRadius: 3, p: 1.75, boxShadow: '0 8px 32px rgba(0,0,0,0.25)' }}
+                  role="img" aria-label={tp('qr_aria')}>
+                  <QRCodeSVG value={pairingUrl} size={164} />
+                </Box>
+              ) : (
+                <Box sx={{ width: 196, height: 196, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CircularProgress sx={{ color: 'rgba(255,255,255,0.6)' }} />
+                </Box>
+              )}
 
-              {/* Instruction */}
               <Typography variant="body2" textAlign="center" sx={{ color: 'rgba(255,255,255,0.82)', zIndex: 1, maxWidth: 240, lineHeight: 1.5 }}>
                 {tp('qr_instruction')}
               </Typography>
 
-              {/* Code + copy */}
               <Box display="flex" alignItems="center" gap={0.5} sx={{
-                bgcolor: 'rgba(255,255,255,0.13)',
-                borderRadius: 2,
-                px: 2,
-                py: 0.75,
-                zIndex: 1,
+                bgcolor: 'rgba(255,255,255,0.13)', borderRadius: 2, px: 2, py: 0.75, zIndex: 1,
               }}>
-                <Typography sx={{
-                  fontFamily: 'monospace',
-                  fontWeight: 900,
-                  fontSize: '1.4rem',
-                  letterSpacing: 6,
-                  color: '#fff',
-                }}>
+                <Typography sx={{ fontFamily: 'monospace', fontWeight: 900, fontSize: '1.4rem', letterSpacing: 6, color: '#fff' }}>
                   {profile?.pairing_code}
                 </Typography>
                 <Tooltip title={copied ? tp('copied') : tp('copy')}>
-                  <IconButton
-                    onClick={copyCode}
-                    size="small"
+                  <IconButton onClick={copyCode} size="small"
                     aria-label={copied ? tp('copied_aria') : tp('copy_aria')}
-                    sx={{ color: 'rgba(255,255,255,0.75)', '&:hover': { color: '#fff' } }}
-                  >
+                    sx={{ color: 'rgba(255,255,255,0.75)', '&:hover': { color: '#fff' } }}>
                     {copied ? <Icon icon="mdi:check" /> : <Icon icon="mdi:content-copy" />}
                   </IconButton>
                 </Tooltip>
               </Box>
 
-              {/* Connecting state */}
               {loading && !showManual && (
                 <Box display="flex" alignItems="center" gap={1} sx={{ zIndex: 1 }}>
                   <CircularProgress size={16} sx={{ color: 'rgba(255,255,255,0.7)' }} />
@@ -276,21 +336,26 @@ export function OnboardingPage({ initialCode }: Props) {
               )}
             </Box>
 
-            {/* Error outside card */}
             {error && !showManual && <Alert severity="error">{error}</Alert>}
+
+            {/* Scan button */}
+            <Button
+              variant="outlined"
+              startIcon={<Icon icon="mdi:qrcode-scan" />}
+              onClick={startScanner}
+              disabled={loading}
+            >
+              {tp('scan_button')}
+            </Button>
 
             {/* Manual entry toggle */}
             <Box textAlign="center">
-              <Button
-                size="small"
-                onClick={() => setShowManual(m => !m)}
-                sx={{ color: 'text.disabled', fontSize: '0.75rem', textDecoration: 'underline', textUnderlineOffset: 3 }}
-              >
+              <Button size="small" onClick={() => setShowManual(m => !m)}
+                sx={{ color: 'text.disabled', fontSize: '0.75rem', textDecoration: 'underline', textUnderlineOffset: 3 }}>
                 {showManual ? tp('manual_hide') : tp('manual_entry')}
               </Button>
             </Box>
 
-            {/* Manual form */}
             {showManual && (
               <Box component="form" onSubmit={handlePair} display="flex" flexDirection="column" gap={2}>
                 <TextField
@@ -326,6 +391,49 @@ export function OnboardingPage({ initialCode }: Props) {
           backButton={null}
         />
       </Box>
+
+      {/* Camera scanner dialog */}
+      <Dialog
+        open={scanning}
+        onClose={stopScanner}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{ sx: { borderRadius: 4, overflow: 'hidden', m: 2 } }}
+      >
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pb: 1 }}>
+          <Typography fontWeight={700}>{tp('scan_title')}</Typography>
+          <IconButton onClick={stopScanner} size="small" aria-label={tp('scan_close')}>
+            <Icon icon="mdi:close" />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          <Box sx={{ position: 'relative', width: '100%', aspectRatio: '1', bgcolor: '#000' }}>
+            <video
+              ref={videoRef}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              playsInline
+              muted
+              onCanPlay={() => {
+                scanLoopRef.current = requestAnimationFrame(scanFrame)
+              }}
+            />
+            {/* Viewfinder overlay */}
+            <Box sx={{
+              position: 'absolute', inset: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              pointerEvents: 'none',
+            }}>
+              <Box sx={{
+                width: 200, height: 200,
+                border: '2px solid rgba(255,255,255,0.8)',
+                borderRadius: 3,
+                boxShadow: '0 0 0 9999px rgba(0,0,0,0.45)',
+              }} />
+            </Box>
+          </Box>
+          <canvas ref={canvasRef} style={{ display: 'none' }} />
+        </DialogContent>
+      </Dialog>
     </Box>
   )
 }

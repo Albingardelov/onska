@@ -72,7 +72,10 @@
     "connecting": "Kopplar ihop...",
     "qr_instruction": "Låt din partner skanna koden med sin telefon",
     "manual_entry": "Ange kod manuellt",
-    "manual_hide": "Dölj"
+    "manual_hide": "Dölj",
+    "scan_button": "Skanna partnerns QR-kod",
+    "scan_title": "Rikta kameran mot partnerns QR-kod",
+    "scan_close": "Avbryt"
   },
   "home": {
     "header": "Önska",
