@@ -20,9 +20,14 @@ export function Header({ title }: HeaderProps) {
     <AppBar position="sticky" color="inherit" elevation={0}>
       <Toolbar sx={{ justifyContent: 'space-between', minHeight: 60, px: 2.5 }}>
         <Box>
-          <Typography variant="h6" fontWeight={700} letterSpacing="-0.02em" lineHeight={1.2}>
-            {title}
-          </Typography>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex' }}>
+              <Icon icon="mdi:heart" />
+            </Box>
+            <Typography variant="h6" fontWeight={900} color="primary" letterSpacing="-0.03em" lineHeight={1.2}>
+              Couply
+            </Typography>
+          </Box>
           {partner && (
             <Typography variant="caption" color="text.secondary" letterSpacing="0.01em">
               med {partner.name}
