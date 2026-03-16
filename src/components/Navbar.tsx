@@ -1,50 +1,88 @@
 'use client'
 import { usePathname, useRouter } from 'next/navigation'
-import BottomNavigation from '@mui/material/BottomNavigation'
-import BottomNavigationAction from '@mui/material/BottomNavigationAction'
-import Paper from '@mui/material/Paper'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import { Icon } from '@iconify/react'
 import { useTranslations } from 'next-intl'
+import { useMode } from '../contexts/ModeContext'
 
 export function Navbar() {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const router = useRouter()
+  const { mode } = useMode()
 
   const tabs = [
-    { to: '/', icon: <Icon icon="mdi:home" width={28} />, label: t('home') },
-    { to: '/onskningar', icon: <Icon icon="mdi:inbox" width={28} />, label: t('orders') },
-    { to: '/kalender', icon: <Icon icon="mdi:calendar-today" width={28} />, label: t('calendar') },
-    { to: '/mina-tjanster', icon: <Icon icon="mdi:heart-outline" width={28} />, label: t('services') },
+    { to: '/', icon: 'mdi:home-outline', activeIcon: 'mdi:home', label: t('home') },
+    { to: '/onskningar', icon: 'mdi:inbox-outline', activeIcon: 'mdi:inbox', label: t('orders') },
+    { to: '/kalender', icon: 'mdi:calendar-outline', activeIcon: 'mdi:calendar-today', label: t('calendar') },
+    { to: '/mina-tjanster', icon: 'mdi:heart-outline', activeIcon: 'mdi:heart', label: t('services') },
   ]
 
-  const current = tabs.findIndex(tab => tab.to === pathname)
+  const isSnusk = mode === 'snusk'
 
   return (
-    <Paper
+    <Box
       component="nav"
       aria-label={t('aria_label')}
-      elevation={0}
-      sx={{ paddingBottom: 'env(safe-area-inset-bottom)', flexShrink: 0 }}
+      sx={{
+        position: 'fixed',
+        bottom: 'calc(14px + env(safe-area-inset-bottom))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1100,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 0.5,
+        px: 1,
+        py: '6px',
+        borderRadius: '28px',
+        bgcolor: isSnusk ? 'rgba(23,13,30,0.88)' : 'rgba(255,255,255,0.92)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        boxShadow: isSnusk
+          ? '0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)'
+          : '0 8px 28px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
+      }}
     >
-      <BottomNavigation
-        value={current === -1 ? 0 : current}
-        onChange={(_, v) => router.push(tabs[v].to)}
-      >
-        {tabs.map(tab => (
-          <BottomNavigationAction
+      {tabs.map(tab => {
+        const active = pathname === tab.to
+        return (
+          <Box
             key={tab.to}
-            label={tab.label}
-            icon={tab.icon}
+            onClick={() => router.push(tab.to)}
             sx={{
-              borderRadius: 2,
-              mx: 0.5,
-              transition: 'all 0.15s ease',
-              '&:hover': { bgcolor: 'action.hover' },
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '3px',
+              px: '14px',
+              py: '7px',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              bgcolor: active ? 'primary.main' : 'transparent',
+              color: active ? 'primary.contrastText' : 'text.secondary',
+              transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
+              minWidth: 54,
+              '&:active': { transform: 'scale(0.91)' },
             }}
-          />
-        ))}
-      </BottomNavigation>
-    </Paper>
+          >
+            <Box sx={{ fontSize: 22, display: 'flex', lineHeight: 1 }}>
+              <Icon icon={active ? tab.activeIcon : tab.icon} />
+            </Box>
+            <Typography sx={{
+              fontSize: '0.58rem',
+              fontWeight: active ? 700 : 500,
+              letterSpacing: '0.03em',
+              lineHeight: 1,
+              opacity: active ? 1 : 0.65,
+              whiteSpace: 'nowrap',
+            }}>
+              {tab.label}
+            </Typography>
+          </Box>
+        )
+      })}
+    </Box>
   )
 }

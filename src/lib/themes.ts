@@ -14,8 +14,8 @@ export const fintTheme = createTheme({
   shape: { borderRadius: 4 },
   typography: {
     fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    h4: { fontWeight: 800, letterSpacing: '-0.03em' },
-    h5: { fontWeight: 700, letterSpacing: '-0.02em' },
+    h4: { fontFamily: 'var(--font-fraunces), Georgia, serif', fontWeight: 700, letterSpacing: '-0.03em' },
+    h5: { fontFamily: 'var(--font-fraunces), Georgia, serif', fontWeight: 700, letterSpacing: '-0.02em' },
     h6: { fontWeight: 700, letterSpacing: '-0.02em' },
     button: { textTransform: 'none', fontWeight: 600, letterSpacing: '-0.01em' },
     overline: { letterSpacing: '0.08em', fontSize: '0.7rem' },
@@ -83,13 +83,30 @@ export const snuskTheme = createTheme({
   shape: { borderRadius: 4 },
   typography: {
     fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    h4: { fontWeight: 800, letterSpacing: '-0.03em' },
-    h5: { fontWeight: 700, letterSpacing: '-0.02em' },
+    h4: { fontFamily: 'var(--font-fraunces), Georgia, serif', fontWeight: 700, letterSpacing: '-0.03em' },
+    h5: { fontFamily: 'var(--font-fraunces), Georgia, serif', fontWeight: 700, letterSpacing: '-0.02em' },
     h6: { fontWeight: 700, letterSpacing: '-0.02em' },
     button: { textTransform: 'none', fontWeight: 600, letterSpacing: '-0.01em' },
     overline: { letterSpacing: '0.08em', fontSize: '0.7rem' },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          '&::after': {
+            content: '""',
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            pointerEvents: 'none',
+            zIndex: 9999,
+            opacity: 0.035,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: '300px 300px',
+          },
+        },
+      },
+    },
     MuiTextField: {
       defaultProps: { variant: 'outlined', fullWidth: true, size: 'medium' },
     },

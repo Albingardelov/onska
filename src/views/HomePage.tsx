@@ -306,7 +306,7 @@ export function HomePage() {
               </Box>
             ) : (
               <Box display="flex" flexDirection="column" gap={1.5}>
-                {services.map(service => {
+                {services.map((service, index) => {
                   const selected = selectedService?.id === service.id
                   const blockedForDate = selectedDate ? partnerBlockedIds.has(service.id) : false
                   const blockedToday = !selectedDate && todayBlockedIds.has(service.id)
@@ -314,16 +314,32 @@ export function HomePage() {
                   return (
                     <Box key={service.id} onClick={() => setSelectedService(selected ? null : service)}
                       sx={{
-                        p: 2.5, borderRadius: 2, cursor: 'pointer',
+                        p: 2.5, borderRadius: 3, cursor: 'pointer',
                         border: '2px solid',
                         borderColor: selected ? 'success.main' : 'divider',
-                        bgcolor: 'background.paper',
+                        ...(mode === 'snusk' && !selected
+                          ? { background: 'linear-gradient(135deg, #1C1028 0%, #16091F 100%)' }
+                          : { bgcolor: 'background.paper' }
+                        ),
                         boxShadow: selected
                           ? '0 0 0 3px rgba(46,155,95,0.12), 0 2px 8px rgba(0,0,0,0.06)'
-                          : '0 1px 4px rgba(0,0,0,0.05)',
+                          : mode === 'snusk'
+                            ? '0 2px 8px rgba(0,0,0,0.3)'
+                            : '0 1px 4px rgba(0,0,0,0.05)',
                         opacity: isBlocked ? 0.45 : 1,
-                        transition: 'all 0.15s ease',
-                        '&:hover': !isBlocked ? { borderColor: selected ? 'success.main' : 'primary.main', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' } : {},
+                        transition: 'all 0.18s ease',
+                        '@keyframes cardIn': {
+                          from: { opacity: 0, transform: 'translateY(10px)' },
+                          to: { opacity: 1, transform: 'translateY(0)' },
+                        },
+                        animation: `cardIn 0.32s cubic-bezier(0.4,0,0.2,1) ${index * 55}ms both`,
+                        '&:hover': !isBlocked ? {
+                          borderColor: selected ? 'success.main' : 'primary.main',
+                          boxShadow: mode === 'snusk'
+                            ? '0 4px 16px rgba(192,38,211,0.15)'
+                            : '0 4px 12px rgba(0,0,0,0.08)',
+                          transform: 'translateY(-1px)',
+                        } : {},
                       }}>
                       <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
                         <Box flex={1}>
