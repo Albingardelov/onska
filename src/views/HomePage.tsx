@@ -160,9 +160,33 @@ export function HomePage() {
         <Box sx={{
           px: 2.5, pt: 2.5, pb: 2,
           background: mode === 'snusk'
-            ? 'linear-gradient(160deg, #C026D3 0%, #7C3AED 100%)'
-            : 'linear-gradient(160deg, #CC2E6A 0%, #A82158 100%)',
+            ? 'linear-gradient(145deg, #C026D3 0%, #7C3AED 55%, #6D28D9 100%)'
+            : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
           color: '#fff',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: -48,
+            right: -48,
+            width: 160,
+            height: 160,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.07)',
+            pointerEvents: 'none',
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: -32,
+            left: -32,
+            width: 120,
+            height: 120,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.05)',
+            pointerEvents: 'none',
+          },
         }}>
           <Typography variant="caption" sx={{ opacity: 0.75, textTransform: 'capitalize', letterSpacing: '0.03em' }}>
             {format(new Date(), 'EEEE d MMMM', { locale: sv })}
