@@ -151,8 +151,10 @@
   },
   "services": {
     "header": "My ideas",
-    "count_one": "1 idea",
-    "count_many": "{count} ideas",
+    "count_one": "1 suggestion",
+    "count_many": "{count} suggestions",
+    "count_one_snusk": "1 fantasy",
+    "count_many_snusk": "{count} fantasies",
     "notif_granted": "Notifications are enabled",
     "notif_denied": "Notifications are blocked – allow them in your browser settings",
     "notif_enable": "Enable notifications",

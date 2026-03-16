@@ -69,7 +69,9 @@ export function MyServicesPage() {
     setServices(prev => prev.filter(s => s.id !== id))
   }
 
-  const countLabel = services.length === 1 ? t('count_one') : t('count_many', { count: services.length })
+  const countLabel = mode === 'snusk'
+    ? services.length === 1 ? t('count_one_snusk') : t('count_many_snusk', { count: services.length })
+    : services.length === 1 ? t('count_one') : t('count_many', { count: services.length })
 
   return (
     <Box flex={1} display="flex" flexDirection="column">

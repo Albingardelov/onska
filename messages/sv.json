@@ -151,8 +151,10 @@
   },
   "services": {
     "header": "Mina idéer",
-    "count_one": "1 idé",
-    "count_many": "{count} idéer",
+    "count_one": "1 förslag",
+    "count_many": "{count} förslag",
+    "count_one_snusk": "1 fantasi",
+    "count_many_snusk": "{count} fantasier",
     "notif_granted": "Notiser är aktiverade",
     "notif_denied": "Notiser är blockerade – tillåt dem i webbläsarens inställningar",
     "notif_enable": "Aktivera notiser",
