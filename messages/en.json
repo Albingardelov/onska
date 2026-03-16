@@ -82,7 +82,7 @@
     "header": "Wish",
     "no_partner": "No partner connected yet.",
     "greeting": "What do you want to wish from {name}?",
-    "greeting_snusk": "What do you long for from {name}?",
+    "greeting_snusk": "What would make your day with {name} extra hot?",
     "open_for_all": "{name} is open for everything today",
     "blocked_one": "{name} has closed 1 thing today",
     "blocked_many": "{name} has closed {count} things today",

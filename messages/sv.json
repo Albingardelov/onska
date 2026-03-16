@@ -82,7 +82,7 @@
     "header": "Önska",
     "no_partner": "Ingen partner kopplad ännu.",
     "greeting": "Vad vill du önska av {name}?",
-    "greeting_snusk": "Vad längtar du efter av {name}?",
+    "greeting_snusk": "Vad skulle göra din dag med {name} extra het?",
     "open_for_all": "{name} är öppen för allt idag",
     "blocked_one": "{name} har stängt av 1 sak idag",
     "blocked_many": "{name} har stängt av {count} saker idag",
