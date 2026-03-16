@@ -81,7 +81,7 @@
   "home": {
     "header": "Wish",
     "no_partner": "No partner connected yet.",
-    "greeting": "What do you want to wish from {name}?",
+    "greeting": "How do you want to be spoiled by {name}?",
     "greeting_snusk": "What would make your day with {name} extra hot?",
     "open_for_all": "{name} is open for everything today",
     "blocked_one": "{name} has closed 1 thing today",
