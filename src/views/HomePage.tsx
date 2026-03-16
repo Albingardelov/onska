@@ -192,7 +192,7 @@ export function HomePage() {
             {format(new Date(), 'EEEE d MMMM', { locale: sv })}
           </Typography>
           <Typography variant="h5" fontWeight={800} letterSpacing="-0.03em" mt={0.3} mb={1.5}>
-            {t('greeting', { name: partner.name })}
+            {mode === 'snusk' ? t('greeting_snusk', { name: partner.name }) : t('greeting', { name: partner.name })}
           </Typography>
 
           {/* Partner availability today */}
@@ -290,7 +290,7 @@ export function HomePage() {
 
           {/* Partner services */}
           <Box>
-            <SectionLabel>{t('ideas_label', { name: partner.name })}</SectionLabel>
+            <SectionLabel>{mode === 'snusk' ? t('ideas_label_snusk', { name: partner.name }) : t('ideas_label', { name: partner.name })}</SectionLabel>
             {loading ? (
               <Box display="flex" flexDirection="column" gap={1.5}>
                 {[1,2,3].map(i => <Skeleton key={i} variant="rounded" height={80} sx={{ borderRadius: 2 }} />)}
@@ -301,7 +301,7 @@ export function HomePage() {
                   <Icon icon="mdi:heart-outline" />
                 </Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('no_ideas', { name: partner.name })}
+                  {mode === 'snusk' ? t('no_ideas_snusk', { name: partner.name }) : t('no_ideas', { name: partner.name })}
                 </Typography>
               </Box>
             ) : (
@@ -428,7 +428,7 @@ export function HomePage() {
             <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
               startIcon={<Icon icon="mdi:send" />}
               sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
-              {ordering ? tc('sending') : t('wish_button', { title: selectedService.title })}
+              {ordering ? tc('sending') : mode === 'snusk' ? t('wish_button_snusk', { title: selectedService.title }) : t('wish_button', { title: selectedService.title })}
             </Button>
           )}
 
