@@ -97,7 +97,7 @@
     "note_label": "Meddelande (valfritt)",
     "note_placeholder": "Skriv något...",
     "wish_button": "Önska {title}",
-    "wish_button_snusk": "Begär {title}",
+    "wish_button_snusk": "Sugen på {title}",
     "wish_sent": "Önskan skickad!",
     "wish_sent_subtitle": "skickad till {name}",
     "blocked_date": "Inte öppen för detta den dagen",
