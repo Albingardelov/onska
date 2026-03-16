@@ -14,7 +14,7 @@
     "orders": "Önskningar",
     "calendar": "Kalender",
     "services": "Mina förslag",
-    "services_snusk": "Mina begär",
+    "services_snusk": "Mina fantasier",
     "aria_label": "Huvudnavigering"
   },
   "login": {
@@ -89,9 +89,9 @@
     "planned_section": "Ni har planerat",
     "accepted_label": "Intresserad",
     "ideas_label": "{name}s förslag",
-    "ideas_label_snusk": "{name}s begär",
+    "ideas_label_snusk": "{name}s fantasier",
     "no_ideas": "{name} har inga förslag ännu",
-    "no_ideas_snusk": "{name} har inga begär ännu",
+    "no_ideas_snusk": "{name} har inga fantasier ännu",
     "suggest_date": "Föreslå ett datum (valfritt)",
     "today_label": "Idag",
     "note_label": "Meddelande (valfritt)",

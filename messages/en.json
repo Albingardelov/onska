@@ -14,7 +14,7 @@
     "orders": "Wishes",
     "calendar": "Calendar",
     "services": "My suggestions",
-    "services_snusk": "My desires",
+    "services_snusk": "My fantasies",
     "aria_label": "Main navigation"
   },
   "login": {
@@ -89,9 +89,9 @@
     "planned_section": "You have planned",
     "accepted_label": "Interested",
     "ideas_label": "{name}'s suggestions",
-    "ideas_label_snusk": "{name}'s desires",
+    "ideas_label_snusk": "{name}'s fantasies",
     "no_ideas": "{name} has no suggestions yet",
-    "no_ideas_snusk": "{name} has no desires yet",
+    "no_ideas_snusk": "{name} has no fantasies yet",
     "suggest_date": "Suggest a date (optional)",
     "today_label": "Today",
     "note_label": "Message (optional)",
