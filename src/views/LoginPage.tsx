@@ -11,6 +11,12 @@ import { Icon } from '@iconify/react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTranslations } from 'next-intl'
 
+const mockCards = [
+  { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0 },
+  { emoji: '🌿', title: 'Promenad i solnedgången', sub: 'Lördag', accepted: false, rotate: '1.5deg', offset: 24 },
+  { emoji: '🍷', title: 'Middagsdate hemma', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10 },
+]
+
 export function LoginPage() {
   const t = useTranslations('login')
   const { signIn, signUp } = useAuth()
@@ -20,13 +26,6 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  const features = [
-    { icon: 'mdi:gift', title: t('feature_wish_title'), desc: t('feature_wish_desc') },
-    { icon: 'mdi:calendar', title: t('feature_date_title'), desc: t('feature_date_desc') },
-    { icon: 'mdi:history', title: t('feature_memories_title'), desc: t('feature_memories_desc') },
-    { icon: 'mdi:shield-lock', title: t('feature_privacy_title'), desc: t('feature_privacy_desc') },
-  ]
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -107,43 +106,105 @@ export function LoginPage() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        px: { xs: 3, md: 8 },
-        py: { xs: 6, md: 0 },
-        bgcolor: 'background.default',
-        background: 'linear-gradient(160deg, #cc2e6a14 0%, #ff9a3c0a 100%)',
+        alignItems: { xs: 'center', md: 'flex-start' },
+        position: 'relative',
+        overflow: 'hidden',
+        px: { xs: 4, md: 9 },
+        py: { xs: 7, md: 0 },
+        minHeight: { xs: 380, md: 'auto' },
+        background: 'linear-gradient(148deg, #D4366E 0%, #C02E64 30%, #9A1E4E 65%, #6B0F35 100%)',
       }}>
-        <Box sx={{ maxWidth: 520 }}>
+        {/* Decorative orbs */}
+        <Box sx={{
+          position: 'absolute', top: -110, right: -90, width: 440, height: 440,
+          borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none',
+        }} />
+        <Box sx={{
+          position: 'absolute', bottom: -90, left: -110, width: 340, height: 340,
+          borderRadius: '50%', background: 'rgba(0,0,0,0.14)', pointerEvents: 'none',
+        }} />
+        <Box sx={{
+          position: 'absolute', top: '38%', right: '8%', width: 200, height: 200,
+          borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none',
+        }} />
+
+        <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 460, width: '100%' }}>
+
+          {/* Quote */}
           <Typography sx={{
-            fontSize: { xs: '2.4rem', md: '3.2rem' },
-            fontWeight: 900,
-            letterSpacing: '-1.5px',
-            lineHeight: 1.1,
-            mb: 2,
-            color: 'text.primary',
+            fontFamily: 'var(--font-fraunces), Georgia, serif',
+            fontSize: { xs: '2rem', md: '2.6rem', lg: '3.1rem' },
+            fontWeight: 300,
+            fontStyle: 'italic',
+            lineHeight: 1.22,
+            color: 'rgba(255,255,255,0.95)',
+            letterSpacing: '-0.02em',
+            mb: { xs: 4, md: 5.5 },
           }}>
-            {t('headline')}
-            <Box component="span" sx={{ color: 'primary.main', display: 'block' }}>
-              {t('headline_highlight')}
-            </Box>
-          </Typography>
-
-          <Typography variant="body1" color="text.secondary" mb={5} lineHeight={1.7} sx={{ maxWidth: 420 }}>
+            <Box component="span" sx={{ opacity: 0.45, fontSize: '1.2em', verticalAlign: 'top', lineHeight: 1, mr: 0.5 }}>&ldquo;</Box>
             {t('tagline')}
+            <Box component="span" sx={{ opacity: 0.45, fontSize: '1.2em', verticalAlign: 'bottom', lineHeight: 0, ml: 0.5 }}>&rdquo;</Box>
           </Typography>
 
-          <Box display="flex" flexDirection="column" gap={3}>
-            {features.map(({ icon, title, desc }) => (
-              <Box key={title} display="flex" alignItems="flex-start" gap={2}>
-                <Box component="span" sx={{ fontSize: 24, color: 'primary.main', mt: 0.2, flexShrink: 0, display: 'flex' }}>
-                  <Icon icon={icon} />
+          {/* Mock wish-cards */}
+          <Box sx={{
+            display: 'flex', flexDirection: 'column', gap: 1.5,
+            '@keyframes gentleFloat': {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            animation: 'gentleFloat 7s ease-in-out infinite',
+          }}>
+            {mockCards.map((card, i) => (
+              <Box key={i} sx={{
+                display: 'flex', alignItems: 'center', gap: 1.5,
+                bgcolor: 'rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.16)',
+                borderRadius: '14px',
+                px: 2, py: 1.5,
+                transform: `translateX(${card.offset}px) rotate(${card.rotate})`,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.18)',
+                transition: 'transform 0.3s ease',
+              }}>
+                <Box sx={{ fontSize: 22, flexShrink: 0, lineHeight: 1 }}>{card.emoji}</Box>
+                <Box flex={1} minWidth={0}>
+                  <Typography sx={{
+                    color: '#fff', fontWeight: 600, fontSize: '0.88rem',
+                    lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {card.title}
+                  </Typography>
+                  <Typography sx={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.73rem' }}>
+                    {card.sub}
+                  </Typography>
                 </Box>
-                <Box>
-                  <Typography variant="subtitle2" fontWeight={700}>{title}</Typography>
-                  <Typography variant="body2" color="text.secondary">{desc}</Typography>
+                <Box sx={{
+                  flexShrink: 0,
+                  fontSize: '0.68rem', fontWeight: 700,
+                  px: 1.2, py: 0.5,
+                  borderRadius: '8px',
+                  bgcolor: card.accepted ? 'rgba(46,155,95,0.28)' : 'rgba(255,255,255,0.12)',
+                  color: card.accepted ? '#8FEBB5' : 'rgba(255,255,255,0.65)',
+                  border: `1px solid ${card.accepted ? 'rgba(46,155,95,0.35)' : 'rgba(255,255,255,0.18)'}`,
+                  whiteSpace: 'nowrap',
+                }}>
+                  {card.accepted ? '✓ Accepterad' : 'Väntar…'}
                 </Box>
               </Box>
             ))}
           </Box>
+
+          {/* Footer */}
+          <Typography sx={{
+            mt: { xs: 4, md: 5 },
+            color: 'rgba(255,255,255,0.38)',
+            fontSize: '0.76rem',
+            letterSpacing: '0.04em',
+          }}>
+            Privat och säkert — bara ni två.
+          </Typography>
         </Box>
       </Box>
 
