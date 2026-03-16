@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
   if (!profile?.push_subscription) return NextResponse.json({ message: 'No subscription' })
 
   const isAccepted = record.status === 'accepted'
+  const isSnusk = record.mode === 'snusk'
 
   try {
     await webpush.sendNotification(
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
         body: isAccepted
           ? `${sender?.name ?? 'Din partner'} är intresserad av ${service?.title ?? 'din önskan'}`
           : `${sender?.name ?? 'Din partner'} har delat en ny önskan`,
+        icon: isSnusk ? '/icon-dark.svg' : '/icon.svg',
         url: '/wishes',
       })
     )

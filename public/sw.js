@@ -6,8 +6,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title ?? 'Önska', {
       body: data.body ?? '',
-      icon: '/icon.svg',
-      badge: '/icon.svg',
+      icon: data.icon ?? '/icon.svg',
+      badge: data.icon ?? '/icon.svg',
       tag: 'onska',
       data: { url: data.url ?? '/' },
     })
