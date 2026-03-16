@@ -160,7 +160,7 @@ export function HomePage() {
         <Box sx={{
           px: 2.5, pt: 2.5, pb: 2,
           background: mode === 'snusk'
-            ? 'linear-gradient(145deg, #C026D3 0%, #7C3AED 55%, #6D28D9 100%)'
+            ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
             : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
           color: '#fff',
           position: 'relative',
@@ -318,7 +318,7 @@ export function HomePage() {
                         border: '2px solid',
                         borderColor: selected ? 'success.main' : 'divider',
                         ...(mode === 'snusk' && !selected
-                          ? { background: 'linear-gradient(135deg, #1C1028 0%, #16091F 100%)' }
+                          ? { background: 'linear-gradient(135deg, #150208 0%, #0E0106 100%)' }
                           : { bgcolor: 'background.paper' }
                         ),
                         boxShadow: selected
@@ -336,7 +336,7 @@ export function HomePage() {
                         '&:hover': !isBlocked ? {
                           borderColor: selected ? 'success.main' : 'primary.main',
                           boxShadow: mode === 'snusk'
-                            ? '0 4px 16px rgba(192,38,211,0.15)'
+                            ? '0 4px 16px rgba(196,18,48,0.2)'
                             : '0 4px 12px rgba(0,0,0,0.08)',
                           transform: 'translateY(-1px)',
                         } : {},

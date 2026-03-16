@@ -72,13 +72,13 @@ export const fintTheme = createTheme({
 export const snuskTheme = createTheme({
   palette: {
     mode: 'dark',
-    primary: { main: '#C026D3', dark: '#A21CAF', light: '#7C3AED', contrastText: '#fff' },
-    secondary: { main: '#7C3AED' },
-    background: { default: '#0D0612', paper: '#170D1E' },
-    text: { primary: '#F0E6FF', secondary: '#9B7AB0' },
+    primary: { main: '#C41230', dark: '#9B0E26', light: '#E84060', contrastText: '#fff' },
+    secondary: { main: '#E84060' },
+    background: { default: '#080204', paper: '#12040A' },
+    text: { primary: '#F5E4E8', secondary: '#A87888' },
     error: { main: '#F44336' },
     success: { main: '#4CAF7D' },
-    divider: '#2D1540',
+    divider: '#2A0A14',
   },
   shape: { borderRadius: 4 },
   typography: {
@@ -124,7 +124,7 @@ export const snuskTheme = createTheme({
         root: {
           borderRadius: 8,
           '& fieldset': { borderColor: '#2D1540' },
-          '&:hover fieldset': { borderColor: '#C026D3' },
+          '&:hover fieldset': { borderColor: '#C41230' },
         },
       },
     },
@@ -132,8 +132,8 @@ export const snuskTheme = createTheme({
       styleOverrides: {
         root: {
           backdropFilter: 'blur(12px)',
-          backgroundColor: 'rgba(13,6,18,0.85)',
-          borderBottom: '1px solid #2D1540',
+          backgroundColor: 'rgba(8,2,4,0.88)',
+          borderBottom: '1px solid #2A0A14',
           boxShadow: 'none',
         },
       },
@@ -144,11 +144,11 @@ export const snuskTheme = createTheme({
       },
     },
     MuiBottomNavigation: {
-      styleOverrides: { root: { height: 64, borderTop: '1px solid #2D1540', backgroundColor: '#120919' } },
+      styleOverrides: { root: { height: 64, borderTop: '1px solid #2A0A14', backgroundColor: '#0E0308' } },
     },
     MuiBottomNavigationAction: {
       styleOverrides: {
-        root: { color: '#9D7BB5', minWidth: 0, '&.Mui-selected': { color: '#D46EE2' } },
+        root: { color: '#8A5060', minWidth: 0, '&.Mui-selected': { color: '#E84060' } },
       },
     },
   },

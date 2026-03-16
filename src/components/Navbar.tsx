@@ -37,11 +37,11 @@ export function Navbar() {
         px: 1,
         py: '6px',
         borderRadius: '28px',
-        bgcolor: isSnusk ? 'rgba(23,13,30,0.88)' : 'rgba(255,255,255,0.92)',
+        bgcolor: isSnusk ? 'rgba(12,2,6,0.92)' : 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         boxShadow: isSnusk
-          ? '0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.07)'
+          ? '0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(196,18,48,0.15)'
           : '0 8px 28px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06)',
       }}
     >
