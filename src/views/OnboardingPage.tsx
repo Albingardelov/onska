@@ -38,7 +38,6 @@ export function OnboardingPage({ initialCode }: Props) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [pairingUrl, setPairingUrl] = useState('')
   const [showManual, setShowManual] = useState(false)
   const [scanning, setScanning] = useState(false)
   const hasAutoPaired = useRef(false)
@@ -54,12 +53,10 @@ export function OnboardingPage({ initialCode }: Props) {
     }
   }, [initialCode])
 
-  // Build pairing URL
-  useEffect(() => {
-    if (profile?.pairing_code) {
-      setPairingUrl(`${window.location.origin}/pairing?code=${profile.pairing_code}`)
-    }
-  }, [profile?.pairing_code])
+  // Derived — no useEffect needed, always in sync with profile
+  const pairingUrl = typeof window !== 'undefined' && profile?.pairing_code
+    ? `${window.location.origin}/pairing?code=${profile.pairing_code}`
+    : ''
 
   // Auto-pair when arriving via QR link
   useEffect(() => {
