@@ -12,9 +12,9 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTranslations } from 'next-intl'
 
 const mockCards = [
-  { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0 },
-  { emoji: '🛁', title: 'Badkar för två', sub: 'Ikväll?', accepted: false, rotate: '1.5deg', offset: 24 },
-  { emoji: '🌙', title: 'Sova naken ikväll', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10 },
+  { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0, blurred: false },
+  { emoji: '🔥', title: 'Du vet vad jag vill', sub: 'Ikväll?', accepted: false, rotate: '1.5deg', offset: 24, blurred: true },
+  { emoji: '🌙', title: 'Sova naken ikväll', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10, blurred: false },
 ]
 
 export function LoginPage() {
@@ -173,10 +173,14 @@ export function LoginPage() {
                   <Typography sx={{
                     color: '#fff', fontWeight: 600, fontSize: '0.88rem',
                     lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    ...(card.blurred && { filter: 'blur(5px)', userSelect: 'none' }),
                   }}>
                     {card.title}
                   </Typography>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.73rem' }}>
+                  <Typography sx={{
+                    color: 'rgba(255,255,255,0.58)', fontSize: '0.73rem',
+                    ...(card.blurred && { filter: 'blur(4px)', userSelect: 'none' }),
+                  }}>
                     {card.sub}
                   </Typography>
                 </Box>
