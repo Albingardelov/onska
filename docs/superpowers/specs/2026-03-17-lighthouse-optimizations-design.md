@@ -86,12 +86,12 @@ last 2 Edge versions
 ```
 **Note:** This drops support for browsers older than ~2 years. Acceptable for a couples app with a modern mobile-first audience.
 
-### Fix 7: Dynamic imports for PairingPage heavy libraries
-**File:** `src/views/PairingPage.tsx`
-**Issue:** `qrcode.react` (~40KB) and `jsqr` (~180KB) are statically imported and bundled into the shared JS chunk, loaded on every page even though they're only used in PairingPage.
+### Fix 7: Dynamic imports for QR libraries in OnboardingPage
+**File:** `src/views/OnboardingPage.tsx`
+**Issue:** `qrcode.react` (~40KB) and `jsqr` (~180KB) are statically imported at lines 17–18 of `OnboardingPage.tsx` and bundled into the shared JS chunk, loaded on every page even though they're only used during onboarding (new users only).
 **Fix:**
 - Replace `import { QRCodeSVG } from 'qrcode.react'` with `next/dynamic`: `const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false })`
-- Replace the static `import jsQR from 'jsqr'` with a dynamic `import('jsqr')` inside the camera scan callback function (not at module level)
+- Replace the static `import jsQR from 'jsqr'` with a ref-based lazy loader: load via `import('jsqr')` inside `startScanner` when scanning first starts, store in a ref, use the ref in `scanFrame`
 
 ---
 
@@ -113,4 +113,4 @@ last 2 Edge versions
 | `src/app/(app)/layout.tsx` | Fix 5 — rewrite as server component |
 | `src/app/(app)/AuthGuard.tsx` | Fix 5 — new file, client component |
 | `.browserslistrc` | Fix 6 — new file |
-| `src/views/PairingPage.tsx` | Fix 7 — dynamic imports |
+| `src/views/OnboardingPage.tsx` | Fix 7 — dynamic imports |
