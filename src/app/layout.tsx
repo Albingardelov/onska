@@ -44,6 +44,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="sv" className={`${inter.variable} ${fraunces.variable}`}>
+      <head>
+        <meta name="description" content="Turn wishes into moments" />
+      </head>
       <body style={{ margin: 0, padding: 0 }}>
         <Providers>
           <ServiceWorkerRegistration />
