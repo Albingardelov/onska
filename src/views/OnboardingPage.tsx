@@ -1,5 +1,8 @@
 'use client'
 
+import dynamic from 'next/dynamic'
+const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false })
+
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -14,8 +17,6 @@ import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { Icon } from '@iconify/react'
-import { QRCodeSVG } from 'qrcode.react'
-import jsQR from 'jsqr'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useTranslations } from 'next-intl'
@@ -45,6 +46,7 @@ export function OnboardingPage({ initialCode }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const scanLoopRef = useRef<number | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const jsQRRef = useRef<((data: Uint8ClampedArray, width: number, height: number) => { data: string } | null) | null>(null)
 
   // Skip onboarding for returning users
   useEffect(() => {
@@ -96,6 +98,11 @@ export function OnboardingPage({ initialCode }: Props) {
 
   // QR scanner — start camera
   const startScanner = useCallback(async () => {
+    // Load jsqr lazily on first scan
+    if (!jsQRRef.current) {
+      const mod = await import('jsqr')
+      jsQRRef.current = mod.default
+    }
     setScanning(true)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -125,7 +132,7 @@ export function OnboardingPage({ initialCode }: Props) {
     const ctx = canvas.getContext('2d')!
     ctx.drawImage(video, 0, 0)
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-    const result = jsQR(imageData.data, imageData.width, imageData.height)
+    const result = jsQRRef.current ? jsQRRef.current(imageData.data, imageData.width, imageData.height) : null
     if (result?.data) {
       stopScanner()
       // Extract code from URL or use raw value
