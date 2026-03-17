@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
           ? `${sender?.name ?? 'Din partner'} är intresserad av ${service?.title ?? 'din önskan'}`
           : `${sender?.name ?? 'Din partner'} har delat en ny önskan`,
         icon: isSnusk ? '/icon-dark.svg' : '/icon.svg',
-        url: '/wishes',
+        url: '/onskningar',
       })
     )
     return NextResponse.json({ success: true })
