@@ -50,7 +50,16 @@ export function Navbar() {
         return (
           <Box
             key={tab.to}
+            component="button"
             onClick={() => router.push(tab.to)}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                router.push(tab.to)
+              }
+            }}
+            aria-label={tab.label}
+            aria-current={active ? 'page' : undefined}
             sx={{
               display: 'flex',
               flexDirection: 'column',
@@ -60,11 +69,18 @@ export function Navbar() {
               py: '7px',
               borderRadius: '20px',
               cursor: 'pointer',
+              border: 'none',
+              outline: 'none',
               bgcolor: active ? 'primary.main' : 'transparent',
-              color: active ? 'primary.contrastText' : 'text.secondary',
+              color: active ? 'primary.contrastText' : isSnusk ? '#BA7080' : 'text.secondary',
               transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
               minWidth: 54,
               '&:active': { transform: 'scale(0.91)' },
+              '&:focus-visible': {
+                outline: '2px solid',
+                outlineColor: 'primary.main',
+                outlineOffset: '2px',
+              },
             }}
           >
             <Box sx={{ fontSize: 22, display: 'flex', lineHeight: 1 }}>
@@ -75,8 +91,8 @@ export function Navbar() {
               fontWeight: active ? 700 : 500,
               letterSpacing: '0.03em',
               lineHeight: 1,
-              opacity: active ? 1 : 0.65,
               whiteSpace: 'nowrap',
+              color: 'inherit',
             }}>
               {tab.label}
             </Typography>

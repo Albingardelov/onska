@@ -26,6 +26,16 @@ export const metadata: Metadata = {
     statusBarStyle: 'default',
     title: 'Couply',
   },
+  openGraph: {
+    title: 'Couply',
+    description: 'Turn wishes into moments',
+    type: 'website',
+    locale: 'sv_SE',
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export const viewport: Viewport = {

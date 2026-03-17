@@ -9,8 +9,12 @@ export function ModeToggle() {
 
   return (
     <Box
+      component="button"
       onClick={toggleMode}
-      aria-label="Byt läge"
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMode() }
+      }}
+      aria-label={isLight ? 'Byt till mörkt läge' : 'Byt till ljust läge'}
       role="switch"
       aria-checked={!isLight}
       sx={{
@@ -25,7 +29,14 @@ export function ModeToggle() {
         cursor: 'pointer',
         userSelect: 'none',
         flexShrink: 0,
+        border: 'none',
+        outline: 'none',
         '&:active': { opacity: 0.8 },
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: 'primary.main',
+          outlineOffset: '2px',
+        },
       }}
     >
       {/* Sliding indicator */}
