@@ -32,10 +32,6 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'sv_SE',
   },
-  robots: {
-    index: false,
-    follow: false,
-  },
 }
 
 export const viewport: Viewport = {
