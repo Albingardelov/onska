@@ -18,7 +18,7 @@ export function Navbar() {
     { to: '/', icon: 'mdi:home-outline', activeIcon: 'mdi:home', label: t('home') },
     { to: '/onskningar', icon: 'mdi:inbox-outline', activeIcon: 'mdi:inbox', label: t('orders') },
     { to: '/kalender', icon: 'mdi:calendar-outline', activeIcon: 'mdi:calendar-today', label: t('calendar') },
-    { to: '/mina-tjanster', icon: 'mdi:heart-outline', activeIcon: 'mdi:heart', label: isSnusk ? t('services_snusk') : t('services') },
+    { to: '/services', icon: 'mdi:heart-outline', activeIcon: 'mdi:heart', label: isSnusk ? t('services_snusk') : t('services') },
   ]
 
   return (
