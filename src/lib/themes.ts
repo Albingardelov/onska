@@ -7,7 +7,7 @@ export const fintTheme = createTheme({
     secondary: { main: '#FFB3C1' },
     background: { default: '#FDF6F8', paper: '#FFFFFF' },
     text: { primary: '#1A1018', secondary: '#7A5663' },
-    error: { main: '#E53935' },
+    error: { main: '#C62828' },
     success: { main: '#2E9B5F' },
     divider: '#F0DDE3',
   },
@@ -114,6 +114,7 @@ export const snuskTheme = createTheme({
       defaultProps: { disableElevation: true },
       styleOverrides: {
         root: { borderRadius: 8, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
+        outlinedPrimary: { color: '#F5E4E8' },
       },
     },
     MuiPaper: {
@@ -149,6 +150,13 @@ export const snuskTheme = createTheme({
     MuiBottomNavigationAction: {
       styleOverrides: {
         root: { color: '#8A5060', minWidth: 0, '&.Mui-selected': { color: '#E84060' } },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': { color: '#F5E4E8' },
+        },
       },
     },
   },
