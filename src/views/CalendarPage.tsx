@@ -116,14 +116,14 @@ export function CalendarPage() {
                 sx={{
                   aspectRatio: '1', display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center', position: 'relative',
-                  borderRadius: 2, cursor: isPast ? 'default' : 'pointer', opacity: isPast ? 0.35 : 1,
+                  borderRadius: 2, cursor: isPast ? 'default' : 'pointer',
                   bgcolor: isSelected ? 'primary.main' : isTodayDate ? 'background.paper' : 'transparent',
                   border: '2px solid',
                   borderColor: isSelected ? 'primary.main' : isTodayDate ? 'primary.main' : 'transparent',
                   transition: 'all 0.12s',
                 }}>
                 <Typography variant="body2" fontWeight={isTodayDate || hasOrders ? 700 : 400}
-                  color={isSelected ? 'primary.contrastText' : isTodayDate ? 'primary.main' : 'text.primary'}>
+                  color={isSelected ? 'primary.contrastText' : isTodayDate ? 'primary.main' : isPast ? '#767676' : 'text.primary'}>
                   {format(day, 'd')}
                 </Typography>
                 {(hasOrders || hasBlocked) && (

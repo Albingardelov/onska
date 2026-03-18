@@ -10,6 +10,7 @@ import Divider from '@mui/material/Divider'
 import { Icon } from '@iconify/react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTranslations } from 'next-intl'
+import { supabase } from '../lib/supabase'
 
 const mockCards = [
   { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0, blurred: false },
@@ -21,11 +22,13 @@ export function LoginPage() {
   const t = useTranslations('login')
   const { signIn, signUp } = useAuth()
   const [isRegister, setIsRegister] = useState(false)
+  const [isForgot, setIsForgot] = useState(false)
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [forgotSent, setForgotSent] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -33,6 +36,18 @@ export function LoginPage() {
     setLoading(true)
     const err = isRegister ? await signUp(email, password, name) : await signIn(email, password)
     if (err) setError(err)
+    setLoading(false)
+  }
+
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (err) setError(err.message)
+    else setForgotSent(true)
     setLoading(false)
   }
 
@@ -65,38 +80,78 @@ export function LoginPage() {
           </Box>
 
           <Typography variant="h5" fontWeight={800} mb={0.5} letterSpacing="-0.5px">
-            {isRegister ? t('create_account') : t('welcome_back')}
+            {isForgot ? t('forgot_title') : isRegister ? t('create_account') : t('welcome_back')}
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={3.5}>
-            {isRegister ? t('register_sub') : t('sign_in_sub')}
+            {isForgot ? t('forgot_sub') : isRegister ? t('register_sub') : t('sign_in_sub')}
           </Typography>
 
-          <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
-            {isRegister && (
-              <TextField label={t('name_label')} value={name} onChange={e => setName(e.target.value)}
-                placeholder={t('name_placeholder')} required autoComplete="name" />
-            )}
-            <TextField label={t('email_label')} type="email" value={email}
-              onChange={e => setEmail(e.target.value)} required autoComplete="email" />
-            <TextField label={t('password_label')} type="password" value={password}
-              onChange={e => setPassword(e.target.value)} required
-              slotProps={{ htmlInput: { minLength: 6 } }}
-              autoComplete={isRegister ? 'new-password' : 'current-password'} />
+          {isForgot ? (
+            forgotSent ? (
+              <>
+                <Alert severity="success" sx={{ mb: 2 }}>{t('forgot_success')}</Alert>
+                <Button onClick={() => { setIsForgot(false); setForgotSent(false); setError('') }}
+                  color="inherit" fullWidth sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
+                  {t('back_to_login')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Box component="form" onSubmit={handleForgot} display="flex" flexDirection="column" gap={2}>
+                  <TextField label={t('email_label')} type="email" value={email}
+                    onChange={e => setEmail(e.target.value)} required autoComplete="email" autoFocus />
+                  {error && <Alert severity="error">{error}</Alert>}
+                  <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}
+                    sx={{ mt: 0.5, borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>
+                    {loading ? '...' : t('forgot_button')}
+                  </Button>
+                </Box>
+                <Divider sx={{ my: 2.5 }} />
+                <Button onClick={() => { setIsForgot(false); setError('') }}
+                  color="inherit" fullWidth sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
+                  {t('back_to_login')}
+                </Button>
+              </>
+            )
+          ) : (
+            <>
+              <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
+                {isRegister && (
+                  <TextField label={t('name_label')} value={name} onChange={e => setName(e.target.value)}
+                    placeholder={t('name_placeholder')} required autoComplete="name" />
+                )}
+                <TextField label={t('email_label')} type="email" value={email}
+                  onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+                <TextField label={t('password_label')} type="password" value={password}
+                  onChange={e => setPassword(e.target.value)} required
+                  slotProps={{ htmlInput: { minLength: 6 } }}
+                  autoComplete={isRegister ? 'new-password' : 'current-password'} />
 
-            {error && <Alert severity="error">{error}</Alert>}
+                {error && <Alert severity="error">{error}</Alert>}
 
-            <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}
-              sx={{ mt: 0.5, borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>
-              {loading ? '...' : isRegister ? t('register_button') : t('sign_in_button')}
-            </Button>
-          </Box>
+                <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}
+                  sx={{ mt: 0.5, borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>
+                  {loading ? '...' : isRegister ? t('register_button') : t('sign_in_button')}
+                </Button>
+              </Box>
 
-          <Divider sx={{ my: 2.5 }} />
+              {!isRegister && (
+                <Box textAlign="right" mt={0.5}>
+                  <Button onClick={() => { setIsForgot(true); setError('') }}
+                    color="inherit" sx={{ color: 'text.secondary', fontSize: '0.8rem', p: 0, minWidth: 0 }}>
+                    {t('forgot_password')}
+                  </Button>
+                </Box>
+              )}
 
-          <Button onClick={() => { setIsRegister(r => !r); setError('') }}
-            color="inherit" fullWidth sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
-            {isRegister ? t('have_account') : t('no_account')}
-          </Button>
+              <Divider sx={{ my: 2.5 }} />
+
+              <Button onClick={() => { setIsRegister(r => !r); setError('') }}
+                color="inherit" fullWidth sx={{ color: 'text.secondary', fontSize: '0.85rem' }}>
+                {isRegister ? t('have_account') : t('no_account')}
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
 
