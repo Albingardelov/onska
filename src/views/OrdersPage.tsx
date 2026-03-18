@@ -226,18 +226,16 @@ export function OrdersPage() {
           <Box display="flex" alignItems="flex-start" gap={1} sx={{
             p: 1.5, borderRadius: 2,
             background: mode === 'snusk'
-              ? 'linear-gradient(135deg, #2A0A14 0%, #1A0408 100%)'
-              : 'linear-gradient(135deg, #FDF0F4 0%, #F7DCE5 100%)',
-            border: '1px solid',
-            borderColor: mode === 'snusk' ? 'rgba(196,18,48,0.25)' : 'rgba(204,46,106,0.2)',
+              ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
+              : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
           }}>
-            <Box component="span" sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, mt: '1px', display: 'flex' }}>
+            <Box component="span" sx={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', flexShrink: 0, mt: '1px', display: 'flex' }}>
               <Icon icon="mdi:information-outline" />
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6, flex: 1 }}>
+            <Typography variant="caption" sx={{ lineHeight: 1.6, flex: 1, color: 'rgba(255,255,255,0.85)' }}>
               {t('consent_info')}
             </Typography>
-            <IconButton size="small" sx={{ color: 'text.disabled', flexShrink: 0, mt: '-2px', mr: '-4px' }}
+            <IconButton size="small" sx={{ color: 'rgba(255,255,255,0.5)', flexShrink: 0, mt: '-2px', mr: '-4px' }}
               onClick={() => setShowConsent(false)}
               aria-label="Stäng">
               <Icon icon="mdi:close" width={16} />
