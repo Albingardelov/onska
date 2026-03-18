@@ -14,6 +14,7 @@ import AccordionDetails from '@mui/material/AccordionDetails'
 import { Header } from '../components/Header'
 import { SwipeToDelete } from '../components/SwipeToDelete'
 import { useAuth } from '../contexts/AuthContext'
+import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
 import type { Order } from '../types'
 import { format, startOfWeek, endOfWeek } from 'date-fns'
@@ -36,6 +37,7 @@ export function OrdersPage() {
   const t = useTranslations('orders')
   const tc = useTranslations('common')
   const { profile } = useAuth()
+  const { mode } = useMode()
   const [tab, setTab] = useState(0)
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
@@ -224,8 +226,12 @@ export function OrdersPage() {
 
         {tab === 0 && showConsent && (
           <Box display="flex" alignItems="flex-start" gap={1} sx={{
-            p: 1.5, borderRadius: 2, bgcolor: 'background.paper',
-            border: '1px solid', borderColor: 'divider',
+            p: 1.5, borderRadius: 2,
+            background: mode === 'snusk'
+              ? 'linear-gradient(135deg, #2A0A14 0%, #1A0408 100%)'
+              : 'linear-gradient(135deg, #FDF0F4 0%, #F7DCE5 100%)',
+            border: '1px solid',
+            borderColor: mode === 'snusk' ? 'rgba(196,18,48,0.25)' : 'rgba(204,46,106,0.2)',
           }}>
             <Box component="span" sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, mt: '1px', display: 'flex' }}>
               <Icon icon="mdi:information-outline" />
