@@ -43,9 +43,7 @@ export function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [acceptingId, setAcceptingId] = useState<string | null>(null)
   const [responseNote, setResponseNote] = useState('')
-  const [showConsent, setShowConsent] = useState(() =>
-    typeof window !== 'undefined' ? !localStorage.getItem('couply_consent_seen') : false
-  )
+  const [showConsent, setShowConsent] = useState(true)
 
   useEffect(() => {
     loadOrders()
@@ -240,7 +238,7 @@ export function OrdersPage() {
               {t('consent_info')}
             </Typography>
             <IconButton size="small" sx={{ color: 'text.disabled', flexShrink: 0, mt: '-2px', mr: '-4px' }}
-              onClick={() => { localStorage.setItem('couply_consent_seen', '1'); setShowConsent(false) }}
+              onClick={() => setShowConsent(false)}
               aria-label="Stäng">
               <Icon icon="mdi:close" width={16} />
             </IconButton>
