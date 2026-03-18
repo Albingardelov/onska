@@ -219,34 +219,33 @@ export function OrdersPage() {
         <Tab label={t('tab_mine')} />
       </Tabs>
 
-      <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
+      {tab === 0 && (
+        <Box sx={{
+          px: 2.5, pt: 2, pb: 2,
+          background: mode === 'snusk'
+            ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
+            : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
+          color: '#fff',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""', position: 'absolute',
+            top: -48, right: -48, width: 160, height: 160,
+            borderRadius: '50%', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none',
+          },
+          '&::after': {
+            content: '""', position: 'absolute',
+            bottom: -32, left: -32, width: 120, height: 120,
+            borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none',
+          },
+        }}>
+          <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'rgba(255,255,255,0.9)', position: 'relative', zIndex: 1 }}>
+            {t('consent_info')}
+          </Typography>
+        </Box>
+      )}
 
-        {tab === 0 && (
-          <Box sx={{
-            px: 2.5, pt: 2, pb: 2,
-            background: mode === 'snusk'
-              ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
-              : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
-            color: '#fff',
-            position: 'relative',
-            overflow: 'hidden',
-            borderRadius: 2,
-            '&::before': {
-              content: '""', position: 'absolute',
-              top: -48, right: -48, width: 160, height: 160,
-              borderRadius: '50%', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none',
-            },
-            '&::after': {
-              content: '""', position: 'absolute',
-              bottom: -32, left: -32, width: 120, height: 120,
-              borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none',
-            },
-          }}>
-            <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'rgba(255,255,255,0.9)', position: 'relative', zIndex: 1 }}>
-              {t('consent_info')}
-            </Typography>
-          </Box>
-        )}
+      <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
 
         {loading ? (
           [1,2,3].map(i => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 2 }} />)
