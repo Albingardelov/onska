@@ -159,7 +159,7 @@ export function HomePage() {
         {/* Hero */}
         <Box sx={{
           px: 2.5, pt: 2.5, pb: 2,
-          minHeight: 130,
+          minHeight: 152,
           background: mode === 'snusk'
             ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
             : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
