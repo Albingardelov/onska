@@ -174,7 +174,8 @@
     "name_placeholder": "E.g. Back massage",
     "desc_label": "Description (optional)",
     "add_button": "Add",
-    "add_idea": "Add idea",
+    "add_idea_fint": "Add gesture",
+    "add_idea_snusk": "Add fantasy",
     "no_ideas": "No ideas yet — add your first one above",
     "delete_aria": "Delete {title}"
   },

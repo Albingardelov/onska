@@ -139,7 +139,7 @@ export function MyServicesPage() {
           <Button onClick={() => setShowForm(true)} variant="outlined" startIcon={<Icon icon="mdi:plus" />} size="large"
             sx={{ borderStyle: 'dashed', py: 1.8, color: 'text.secondary', borderColor: 'divider',
               '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}>
-            {t('add_idea')}
+            {mode === 'snusk' ? t('add_idea_snusk') : t('add_idea_fint')}
           </Button>
         )}
 

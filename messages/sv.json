@@ -174,7 +174,8 @@
     "name_placeholder": "T.ex. Ryggmassage",
     "desc_label": "Beskrivning (valfritt)",
     "add_button": "Lägg till",
-    "add_idea": "Lägg till idé",
+    "add_idea_fint": "Lägg till omtanke",
+    "add_idea_snusk": "Lägg till fantasi",
     "no_ideas": "Inga idéer ännu — lägg till din första ovan",
     "delete_aria": "Radera {title}"
   },
