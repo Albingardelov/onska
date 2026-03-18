@@ -43,7 +43,6 @@ export function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [acceptingId, setAcceptingId] = useState<string | null>(null)
   const [responseNote, setResponseNote] = useState('')
-  const [showConsent, setShowConsent] = useState(true)
 
   useEffect(() => {
     loadOrders()
@@ -222,24 +221,30 @@ export function OrdersPage() {
 
       <Box p={2.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
 
-        {tab === 0 && showConsent && (
-          <Box display="flex" alignItems="flex-start" gap={1} sx={{
-            p: 1.5, borderRadius: 2,
+        {tab === 0 && (
+          <Box sx={{
+            px: 2.5, pt: 2, pb: 2,
             background: mode === 'snusk'
               ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
               : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
+            color: '#fff',
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: 2,
+            '&::before': {
+              content: '""', position: 'absolute',
+              top: -48, right: -48, width: 160, height: 160,
+              borderRadius: '50%', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none',
+            },
+            '&::after': {
+              content: '""', position: 'absolute',
+              bottom: -32, left: -32, width: 120, height: 120,
+              borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none',
+            },
           }}>
-            <Box component="span" sx={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', flexShrink: 0, mt: '1px', display: 'flex' }}>
-              <Icon icon="mdi:information-outline" />
-            </Box>
-            <Typography variant="caption" sx={{ lineHeight: 1.6, flex: 1, color: 'rgba(255,255,255,0.85)' }}>
+            <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'rgba(255,255,255,0.9)', position: 'relative', zIndex: 1 }}>
               {t('consent_info')}
             </Typography>
-            <IconButton size="small" sx={{ color: 'rgba(255,255,255,0.5)', flexShrink: 0, mt: '-2px', mr: '-4px' }}
-              onClick={() => setShowConsent(false)}
-              aria-label="Stäng">
-              <Icon icon="mdi:close" width={16} />
-            </IconButton>
           </Box>
         )}
 
