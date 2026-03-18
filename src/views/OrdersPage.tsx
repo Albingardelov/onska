@@ -220,9 +220,10 @@ export function OrdersPage() {
       </Tabs>
 
       {tab === 0 && (
+        <Box sx={{ maxWidth: 560, width: '100%', mx: 'auto' }}>
         <Box sx={{
           px: 2.5, pt: 2.5, pb: 2,
-          minHeight: 152,
+          minHeight: 171,
           display: 'flex', alignItems: 'center',
           background: mode === 'snusk'
             ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
@@ -244,6 +245,7 @@ export function OrdersPage() {
           <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'rgba(255,255,255,0.9)', position: 'relative', zIndex: 1 }}>
             {t('consent_info')}
           </Typography>
+        </Box>
         </Box>
       )}
 
