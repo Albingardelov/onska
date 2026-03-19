@@ -193,5 +193,18 @@
     "delete_dialog_body": "All din data raderas permanent — profil, tjänster, beställningar och kalender. Det går inte att ångra.",
     "delete_confirm": "Ja, radera allt",
     "sign_out": "Logga ut"
+  },
+  "statuses": {
+    "behover_omtanke": "Behöver omtanke",
+    "vill_vara_nara": "Vill vara nära",
+    "lugn_kvall": "Lugn kväll",
+    "pa_bra_humor": "På bra humör",
+    "kanner_sig_vild": "Känner sig vild",
+    "nyfiken": "Nyfiken",
+    "laddad": "Laddad",
+    "behover_distraktion": "Behöver distraheras",
+    "set_status": "Sätt din status",
+    "clear_status": "Rensa status",
+    "your_status": "Din status"
   }
 }

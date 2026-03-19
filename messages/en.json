@@ -193,5 +193,18 @@
     "delete_dialog_body": "All your data will be permanently deleted — profile, services, orders and calendar. This cannot be undone.",
     "delete_confirm": "Yes, delete everything",
     "sign_out": "Sign out"
+  },
+  "statuses": {
+    "behover_omtanke": "Needs affection",
+    "vill_vara_nara": "Want to be close",
+    "lugn_kvall": "Quiet evening",
+    "pa_bra_humor": "In a good mood",
+    "kanner_sig_vild": "Feeling wild",
+    "nyfiken": "Curious",
+    "laddad": "Charged up",
+    "behover_distraktion": "Needs distraction",
+    "set_status": "Set your status",
+    "clear_status": "Clear status",
+    "your_status": "Your status"
   }
 }
