@@ -33,7 +33,7 @@ export function HomePage() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
   const ts = useTranslations('statuses')
-  const { partner, profile, user, updateStatus } = useAuth()
+  const { partner, profile, user, updateStatus, refreshProfile } = useAuth()
   const { mode } = useMode()
   const [services, setServices] = useState<Service[]>([])
   const [activeOrders, setActiveOrders] = useState<Order[]>([])
@@ -79,6 +79,20 @@ export function HomePage() {
     if (selectedDate && partner) loadPartnerBlocked(selectedDate)
     else setPartnerBlockedIds(new Set())
   }, [selectedDate, partner])
+
+  useEffect(() => {
+    if (!partner?.id) return
+    const channel = supabase
+      .channel('partner-profile-updates')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'profiles',
+        filter: `id=eq.${partner.id}`,
+      }, () => { refreshProfile() })
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [partner?.id])
 
   async function loadData() {
     setLoading(true)
