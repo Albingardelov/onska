@@ -1,5 +1,6 @@
 'use client'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { Icon } from '@iconify/react'
@@ -9,7 +10,6 @@ import { useMode } from '../contexts/ModeContext'
 export function Navbar() {
   const t = useTranslations('nav')
   const pathname = usePathname()
-  const router = useRouter()
   const { mode } = useMode()
 
   const isSnusk = mode === 'snusk'
@@ -50,14 +50,8 @@ export function Navbar() {
         return (
           <Box
             key={tab.to}
-            component="button"
-            onClick={() => router.push(tab.to)}
-            onKeyDown={(e: React.KeyboardEvent) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                router.push(tab.to)
-              }
-            }}
+            component={Link}
+            href={tab.to}
             aria-label={tab.label}
             aria-current={active ? 'page' : undefined}
             sx={{
@@ -68,9 +62,7 @@ export function Navbar() {
               px: '14px',
               py: '7px',
               borderRadius: '20px',
-              cursor: 'pointer',
-              border: 'none',
-              outline: 'none',
+              textDecoration: 'none',
               bgcolor: active ? 'primary.main' : 'transparent',
               color: active ? 'primary.contrastText' : isSnusk ? '#BA7080' : 'text.secondary',
               transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',

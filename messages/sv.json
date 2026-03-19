@@ -17,6 +17,11 @@
     "services_snusk": "Mina fantasier",
     "aria_label": "Huvudnavigering"
   },
+  "header": {
+    "settings": "Inställningar",
+    "sign_out": "Logga ut",
+    "with_partner": "med {name}"
+  },
   "login": {
     "app_name": "Couply",
     "headline": "En app för",
@@ -40,6 +45,9 @@
     "forgot_button": "Skicka länk",
     "forgot_success": "Kolla din e-post! Vi har skickat en återställningslänk.",
     "back_to_login": "Tillbaka till inloggning",
+    "mock_accepted": "Accepterad",
+    "mock_pending": "Väntar…",
+    "privacy_footer": "Privat och säkert — bara ni två.",
     "reset_title": "Nytt lösenord",
     "reset_sub": "Välj ett nytt lösenord för ditt konto.",
     "new_password_label": "Nytt lösenord",
@@ -118,7 +126,8 @@
     "notif_hint_title": "Missa inget",
     "notif_hint_body": "Aktivera notiser för att se när {name} svarar",
     "notif_enable": "Aktivera",
-    "mode_hint": "Byt läge med knappen uppe till höger — Fint för vanliga önskningar, Dark för intimare."
+    "mode_hint": "Byt läge med knappen uppe till höger — Fint för vanliga önskningar, Dark för intimare.",
+    "unknown_service": "Okänd tjänst"
   },
   "orders": {
     "header": "Önskningar",

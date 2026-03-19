@@ -5,9 +5,10 @@ import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
 import { Icon } from '@iconify/react'
 import Tooltip from '@mui/material/Tooltip'
+import Link from 'next/link'
 import { ModeToggle } from './ModeToggle'
 import { useAuth } from '../contexts/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 interface HeaderProps {
   title: string
@@ -15,7 +16,7 @@ interface HeaderProps {
 
 export function Header({ title }: HeaderProps) {
   const { partner, signOut } = useAuth()
-  const router = useRouter()
+  const t = useTranslations('header')
   return (
     <AppBar position="sticky" color="inherit" elevation={0}>
       <Toolbar sx={{ justifyContent: 'space-between', minHeight: 60, px: 2.5 }}>
@@ -30,22 +31,22 @@ export function Header({ title }: HeaderProps) {
           </Box>
           {partner && (
             <Typography variant="caption" color="text.secondary" letterSpacing="0.01em">
-              med {partner.name}
+              {t('with_partner', { name: partner.name })}
             </Typography>
           )}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <ModeToggle />
-          <Tooltip title="Inställningar">
-            <IconButton onClick={() => router.push('/settings')} size="small" color="inherit"
-              aria-label="Inställningar"
+          <Tooltip title={t('settings')}>
+            <IconButton component={Link} href="/settings" size="small" color="inherit"
+              aria-label={t('settings')}
               sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}>
               <Icon icon="mdi:cog" />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Logga ut">
+          <Tooltip title={t('sign_out')}>
             <IconButton onClick={signOut} size="small" color="inherit"
-              aria-label="Logga ut"
+              aria-label={t('sign_out')}
               sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}>
               <Icon icon="mdi:logout" />
             </IconButton>

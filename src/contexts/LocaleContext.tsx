@@ -24,17 +24,17 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem('locale') as Locale | null
-    if (stored === 'sv' || stored === 'en') {
-      setLocaleState(stored)
-    } else {
-      const browser = navigator.language.startsWith('sv') ? 'sv' : 'en'
-      setLocaleState(browser)
-    }
+    const resolved = (stored === 'sv' || stored === 'en')
+      ? stored
+      : (navigator.language.startsWith('sv') ? 'sv' : 'en')
+    setLocaleState(resolved)
+    document.documentElement.lang = resolved
     setReady(true)
   }, [])
 
   function setLocale(l: Locale) {
     localStorage.setItem('locale', l)
+    document.documentElement.lang = l
     setLocaleState(l)
   }
 

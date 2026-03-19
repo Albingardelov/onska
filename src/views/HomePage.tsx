@@ -16,9 +16,10 @@ import type { Service, Order, Profile } from '../types'
 import { getStatusesForMode, isValidStatusKey } from '../lib/statuses'
 import type { StatusKey } from '../lib/statuses'
 import { format, addDays } from 'date-fns'
-import { sv } from 'date-fns/locale'
+import { sv, enUS } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
 import { useTranslations } from 'next-intl'
+import { useLocale } from '../contexts/LocaleContext'
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -35,6 +36,8 @@ export function HomePage() {
   const ts = useTranslations('statuses')
   const { partner, profile, user, updateStatus, refreshProfile } = useAuth()
   const { mode } = useMode()
+  const { locale } = useLocale()
+  const dateFnsLocale = locale === 'en' ? enUS : sv
   const [services, setServices] = useState<Service[]>([])
   const [activeOrders, setActiveOrders] = useState<Order[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -209,7 +212,7 @@ export function HomePage() {
           },
         }}>
           <Typography variant="caption" sx={{ opacity: 0.75, textTransform: 'capitalize', letterSpacing: '0.03em' }}>
-            {format(new Date(), 'EEEE d MMMM', { locale: sv })}
+            {format(new Date(), 'EEEE d MMMM', { locale: dateFnsLocale })}
           </Typography>
           <Typography variant="h5" fontWeight={800} letterSpacing="-0.03em" mt={0.3} mb={1.5}>
             {mode === 'snusk' ? t('greeting_snusk', { name: partner.name }) : t('greeting', { name: partner.name })}
@@ -343,11 +346,11 @@ export function HomePage() {
                           </Typography>
                         </Box>
                         <Typography fontWeight={700} fontSize="1rem" letterSpacing="-0.02em">
-                          {order.service?.title ?? 'Okänd tjänst'}
+                          {order.service?.title ?? t('unknown_service')}
                         </Typography>
                         {order.date && (
                           <Typography variant="body2" color="text.secondary" mt={0.3}>
-                            {format(new Date(order.date), 'EEEE d MMMM', { locale: sv })}
+                            {format(new Date(order.date), 'EEEE d MMMM', { locale: dateFnsLocale })}
                           </Typography>
                         )}
                         {order.response_note && (
@@ -487,7 +490,7 @@ export function HomePage() {
                         transition: 'all 0.12s ease',
                       }}>
                       <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        {isToday && !selected ? t('today_label') : format(d, 'EEE', { locale: sv })}
+                        {isToday && !selected ? t('today_label') : format(d, 'EEE', { locale: dateFnsLocale })}
                       </Typography>
                       <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>{format(d, 'd')}</Typography>
                     </Box>

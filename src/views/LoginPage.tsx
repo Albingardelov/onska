@@ -12,14 +12,14 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTranslations } from 'next-intl'
 import { supabase } from '../lib/supabase'
 
-const mockCards = [
-  { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0, blurred: false },
-  { emoji: '🔥', title: 'Du vet vad jag vill', sub: 'Ikväll?', accepted: false, rotate: '1.5deg', offset: 24, blurred: true },
-  { emoji: '🌙', title: 'Sova naken ikväll', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10, blurred: false },
-]
-
 export function LoginPage() {
   const t = useTranslations('login')
+
+  const mockCards = [
+    { emoji: '🕯️', title: 'En skön massage', sub: 'Imorgon kväll', accepted: true, rotate: '-2deg', offset: 0, blurred: false },
+    { emoji: '🔥', title: 'Du vet vad jag vill', sub: 'Ikväll?', accepted: false, rotate: '1.5deg', offset: 24, blurred: true },
+    { emoji: '🌙', title: 'Sova naken ikväll', sub: 'Ingen stress', accepted: true, rotate: '-0.8deg', offset: 10, blurred: false },
+  ]
   const { signIn, signUp } = useAuth()
   const [isRegister, setIsRegister] = useState(false)
   const [isForgot, setIsForgot] = useState(false)
@@ -249,7 +249,7 @@ export function LoginPage() {
                   border: `1px solid ${card.accepted ? 'rgba(46,155,95,0.35)' : 'rgba(255,255,255,0.18)'}`,
                   whiteSpace: 'nowrap',
                 }}>
-                  {card.accepted ? '✓ Accepterad' : 'Väntar…'}
+                  {card.accepted ? `✓ ${t('mock_accepted')}` : t('mock_pending')}
                 </Box>
               </Box>
             ))}
@@ -262,7 +262,7 @@ export function LoginPage() {
             fontSize: '0.76rem',
             letterSpacing: '0.04em',
           }}>
-            Privat och säkert — bara ni två.
+            {t('privacy_footer')}
           </Typography>
         </Box>
       </Box>

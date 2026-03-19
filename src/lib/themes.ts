@@ -11,7 +11,7 @@ export const fintTheme = createTheme({
     success: { main: '#2E9B5F' },
     divider: '#F0DDE3',
   },
-  shape: { borderRadius: 4 },
+  shape: { borderRadius: 8 },
   typography: {
     fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     h4: { fontFamily: 'var(--font-fraunces), Georgia, serif', fontWeight: 700, letterSpacing: '-0.03em' },
@@ -27,7 +27,7 @@ export const fintTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 8, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
+        root: { padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
         containedPrimary: { color: '#fff' },
       },
     },
@@ -37,7 +37,6 @@ export const fintTheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
           '& fieldset': { borderColor: '#F0DDE3' },
           '&:hover fieldset': { borderColor: '#CC2E6A' },
         },
@@ -56,6 +55,13 @@ export const fintTheme = createTheme({
     MuiChip: {
       styleOverrides: {
         root: { borderRadius: 8 },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': { color: '#1A1018' },
+        },
       },
     },
     MuiBottomNavigation: {
@@ -80,7 +86,7 @@ export const snuskTheme = createTheme({
     success: { main: '#4CAF7D' },
     divider: '#2A0A14',
   },
-  shape: { borderRadius: 4 },
+  shape: { borderRadius: 8 },
   typography: {
     fontFamily: 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
     h4: { fontFamily: 'var(--font-fraunces), Georgia, serif', fontWeight: 700, letterSpacing: '-0.03em' },
@@ -113,7 +119,7 @@ export const snuskTheme = createTheme({
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {
-        root: { borderRadius: 8, padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
+        root: { padding: '11px 22px', fontSize: '0.95rem', letterSpacing: '-0.01em' },
         outlinedPrimary: { color: '#F5E4E8' },
       },
     },
@@ -123,7 +129,6 @@ export const snuskTheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
           '& fieldset': { borderColor: '#2D1540' },
           '&:hover fieldset': { borderColor: '#C41230' },
         },

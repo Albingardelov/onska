@@ -17,6 +17,11 @@
     "services_snusk": "My fantasies",
     "aria_label": "Main navigation"
   },
+  "header": {
+    "settings": "Settings",
+    "sign_out": "Sign out",
+    "with_partner": "with {name}"
+  },
   "login": {
     "app_name": "Couply",
     "headline": "An app for",
@@ -40,6 +45,9 @@
     "forgot_button": "Send link",
     "forgot_success": "Check your email! We've sent a reset link.",
     "back_to_login": "Back to login",
+    "mock_accepted": "Accepted",
+    "mock_pending": "Pending…",
+    "privacy_footer": "Private and secure — just the two of you.",
     "reset_title": "New password",
     "reset_sub": "Choose a new password for your account.",
     "new_password_label": "New password",
@@ -118,7 +126,8 @@
     "notif_hint_title": "Don't miss anything",
     "notif_hint_body": "Enable notifications to see when {name} responds",
     "notif_enable": "Enable",
-    "mode_hint": "Switch mode with the button top right — Light for everyday wishes, Dark for more intimate ones."
+    "mode_hint": "Switch mode with the button top right — Light for everyday wishes, Dark for more intimate ones.",
+    "unknown_service": "Unknown service"
   },
   "orders": {
     "header": "Wishes",
