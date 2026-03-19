@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import confetti from 'canvas-confetti'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -72,6 +73,16 @@ export function OrdersPage() {
         body: JSON.stringify({ record: { to_user_id: order.from_user_id, from_user_id: order.to_user_id, service_id: order.service_id, mode: order.mode, status: 'accepted' } }),
       }).catch(() => {})
     }
+    // Celebration: haptic + confetti
+    if ('vibrate' in navigator) navigator.vibrate(20)
+    confetti({
+      particleCount: 80,
+      spread: 65,
+      origin: { y: 0.65 },
+      colors: mode === 'snusk'
+        ? ['#C41230', '#E84060', '#fff', '#F5E4E8']
+        : ['#CC2E6A', '#FFB3C1', '#fff', '#FF6B8A'],
+    })
     setAcceptingId(null); setResponseNote('')
   }
 
@@ -106,7 +117,7 @@ export function OrdersPage() {
     pending: 'warning', accepted: 'success', declined: 'secondary', completed: 'secondary',
   }
 
-  function renderOrder(order: Order, showDelete = false) {
+  function renderOrder(order: Order, showDelete = false, animIndex?: number) {
     const isAccepting = acceptingId === order.id
     const borderLeft = order.status === 'pending' ? 'warning.main'
       : order.status === 'accepted' ? 'success.main'
@@ -118,6 +129,9 @@ export function OrdersPage() {
         boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
         bgcolor: 'background.paper',
         position: 'relative',
+        ...(animIndex !== undefined && {
+          animation: `cardIn 0.32s cubic-bezier(0.4,0,0.2,1) ${animIndex * 55}ms both`,
+        }),
       }}>
         <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, bgcolor: borderLeft }} />
         <Box sx={{ p: 2.5, pl: 3 }}>
@@ -177,7 +191,7 @@ export function OrdersPage() {
               ) : (
                 <Box display="flex" gap={1} mt={1}>
                   <Button variant="outlined" color="error" size="small" fullWidth
-                    onClick={() => updateStatus(order.id, 'declined')}>{t('decline')}</Button>
+                    onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('decline')}</Button>
                   <Button variant="contained" color="success" size="small" fullWidth
                     startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => setAcceptingId(order.id)}>{t('accept')}</Button>
                 </Box>
@@ -188,7 +202,7 @@ export function OrdersPage() {
           {tab === 0 && order.status === 'accepted' && (
             <Box mt={1.5} display="flex" gap={1}>
               <Button variant="outlined" color="error" size="small"
-                onClick={() => updateStatus(order.id, 'declined')}>{t('change_mind_receiver')}</Button>
+                onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('change_mind_receiver')}</Button>
               <Button variant="outlined" color="secondary" size="small" fullWidth
                 startIcon={<Icon icon="mdi:archive-outline" />}
                 onClick={() => updateStatus(order.id, 'completed')}>{t('archive')}</Button>
@@ -198,12 +212,12 @@ export function OrdersPage() {
           {tab === 1 && order.status === 'accepted' && (
             <Button variant="outlined" color="error" size="small" fullWidth
               sx={{ mt: 1.5 }}
-              onClick={() => updateStatus(order.id, 'declined')}>{t('change_mind_sender')}</Button>
+              onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('change_mind_sender')}</Button>
           )}
           {tab === 1 && order.status === 'pending' && (
             <Button variant="outlined" color="error" size="small" fullWidth
               sx={{ mt: 1.5 }}
-              onClick={() => updateStatus(order.id, 'declined')}>{t('withdraw')}</Button>
+              onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('withdraw')}</Button>
           )}
         </Box>
       </Box>
@@ -264,7 +278,7 @@ export function OrdersPage() {
           </Box>
         ) : (
           <>
-            {active.map(o => renderOrder(o))}
+            {active.map((o, i) => renderOrder(o, false, i))}
 
             {weekKeys.length > 0 && (
               <Box mt={active.length > 0 ? 1 : 0}>

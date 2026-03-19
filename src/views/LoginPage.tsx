@@ -27,6 +27,7 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [errorKey, setErrorKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [forgotSent, setForgotSent] = useState(false)
 
@@ -35,7 +36,7 @@ export function LoginPage() {
     setError('')
     setLoading(true)
     const err = isRegister ? await signUp(email, password, name) : await signIn(email, password)
-    if (err) setError(err)
+    if (err) { setError(err); setErrorKey(k => k + 1) }
     setLoading(false)
   }
 
@@ -46,7 +47,7 @@ export function LoginPage() {
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     })
-    if (err) setError(err.message)
+    if (err) { setError(err.message); setErrorKey(k => k + 1) }
     else setForgotSent(true)
     setLoading(false)
   }
@@ -100,7 +101,7 @@ export function LoginPage() {
                 <Box component="form" onSubmit={handleForgot} display="flex" flexDirection="column" gap={2}>
                   <TextField label={t('email_label')} type="email" value={email}
                     onChange={e => setEmail(e.target.value)} required autoComplete="email" autoFocus />
-                  {error && <Alert severity="error">{error}</Alert>}
+                  {error && <Alert key={errorKey} severity="error" sx={{ animation: 'shake 0.4s ease' }}>{error}</Alert>}
                   <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}
                     sx={{ mt: 0.5, borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>
                     {loading ? '...' : t('forgot_button')}
@@ -127,7 +128,7 @@ export function LoginPage() {
                   slotProps={{ htmlInput: { minLength: 6 } }}
                   autoComplete={isRegister ? 'new-password' : 'current-password'} />
 
-                {error && <Alert severity="error">{error}</Alert>}
+                {error && <Alert key={errorKey} severity="error" sx={{ animation: 'shake 0.4s ease' }}>{error}</Alert>}
 
                 <Button type="submit" variant="contained" color="primary" size="large" disabled={loading}
                   sx={{ mt: 0.5, borderRadius: 2, py: 1.4, fontWeight: 700, fontSize: '1rem' }}>

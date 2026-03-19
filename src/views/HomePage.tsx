@@ -508,7 +508,7 @@ export function HomePage() {
           {selectedService && (
             <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
               startIcon={<Icon icon="mdi:send" />}
-              sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700 }}>
+              sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700, animation: 'heartbeat 1.1s ease 0.4s 1 both' }}>
               {ordering ? tc('sending') : mode === 'snusk' ? t('wish_button_snusk', { title: selectedService.title }) : t('wish_button', { title: selectedService.title })}
             </Button>
           )}
@@ -526,7 +526,7 @@ export function HomePage() {
               transition: 'opacity 0.8s ease',
               opacity: successFading ? 0 : 1,
             }}>
-              <Box component="span" sx={{ fontSize: 24, display: 'flex', flexShrink: 0 }}>
+              <Box component="span" sx={{ fontSize: 24, display: 'flex', flexShrink: 0, animation: 'heartPop 0.5s cubic-bezier(0.4,0,0.2,1) 0.1s 1 both' }}>
                 <Icon icon="mdi:heart" />
               </Box>
               <Box>
