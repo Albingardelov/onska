@@ -6,12 +6,15 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Skeleton from '@mui/material/Skeleton'
 import Snackbar from '@mui/material/Snackbar'
+import Chip from '@mui/material/Chip'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
 import { subscribeToPush } from '../lib/notifications'
-import type { Service, Order } from '../types'
+import type { Service, Order, Profile } from '../types'
+import { getStatusesForMode, isValidStatusKey } from '../lib/statuses'
+import type { StatusKey } from '../lib/statuses'
 import { format, addDays } from 'date-fns'
 import { sv } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
@@ -29,7 +32,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function HomePage() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
-  const { partner, profile, user } = useAuth()
+  const ts = useTranslations('statuses')
+  const { partner, profile, user, updateStatus } = useAuth()
   const { mode } = useMode()
   const [services, setServices] = useState<Service[]>([])
   const [activeOrders, setActiveOrders] = useState<Order[]>([])
@@ -44,6 +48,7 @@ export function HomePage() {
   const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
   const [activatingNotif, setActivatingNotif] = useState(false)
   const [showModeHint, setShowModeHint] = useState(false)
+  const [statusOpen, setStatusOpen] = useState(false)
   const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
   const [todayBlockedIds, setTodayBlockedIds] = useState<Set<string>>(new Set())
 
@@ -214,7 +219,65 @@ export function HomePage() {
               </Typography>
             </Box>
           )}
+
+          {isValidStatusKey(partner?.status) && (
+            <Box display="flex" alignItems="center" gap={0.8} mt={0.8}
+              sx={{ bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+              <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.8 }}>
+                <Icon icon="mdi:heart-pulse" />
+              </Box>
+              <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.85 }}>
+                {ts(partner!.status as StatusKey)}
+              </Typography>
+            </Box>
+          )}
         </Box>
+
+        {/* Own status */}
+        <Box px={2.5} pt={1.5} display="flex" alignItems="center" gap={1} flexWrap="wrap">
+          <Typography variant="caption" color="text.secondary">{ts('your_status')}:</Typography>
+          {isValidStatusKey(profile?.status) ? (
+            <>
+              <Chip
+                label={ts(profile!.status as StatusKey)}
+                size="small"
+                color="primary"
+                variant="outlined"
+                onClick={() => setStatusOpen(s => !s)}
+              />
+              <Chip
+                label={ts('clear_status')}
+                size="small"
+                variant="outlined"
+                onClick={() => updateStatus(null)}
+                sx={{ color: 'text.disabled', borderColor: 'divider' }}
+              />
+            </>
+          ) : (
+            <Chip
+              label={ts('set_status')}
+              size="small"
+              variant="outlined"
+              onClick={() => setStatusOpen(s => !s)}
+              sx={{ color: 'text.secondary', borderColor: 'divider' }}
+            />
+          )}
+        </Box>
+
+        {statusOpen && (
+          <Box px={2.5} pt={1} display="flex" gap={1} flexWrap="wrap">
+            {getStatusesForMode(mode).map(key => (
+              <Chip
+                key={key}
+                label={ts(key)}
+                size="small"
+                variant={profile?.status === key ? 'filled' : 'outlined'}
+                color={profile?.status === key ? 'primary' : 'default'}
+                onClick={() => { updateStatus(key); setStatusOpen(false) }}
+              />
+            ))}
+          </Box>
+        )}
 
         {/* Notification prompt */}
         {notifStatus === 'unknown' && (
