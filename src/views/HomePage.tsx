@@ -6,7 +6,6 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Skeleton from '@mui/material/Skeleton'
 import Snackbar from '@mui/material/Snackbar'
-import Chip from '@mui/material/Chip'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
@@ -51,7 +50,6 @@ export function HomePage() {
   const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
   const [activatingNotif, setActivatingNotif] = useState(false)
   const [showModeHint, setShowModeHint] = useState(false)
-  const [statusOpen, setStatusOpen] = useState(false)
   const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
   const [todayBlockedIds, setTodayBlockedIds] = useState<Set<string>>(new Set())
 
@@ -251,50 +249,47 @@ export function HomePage() {
         </Box>
 
         {/* Own status */}
-        <Box px={2.5} pt={1.5} display="flex" alignItems="center" gap={1} flexWrap="wrap">
-          <Typography variant="caption" color="text.secondary">{ts('your_status')}:</Typography>
-          {isValidStatusKey(profile?.status) ? (
-            <>
-              <Chip
-                label={ts(profile!.status as StatusKey)}
-                size="small"
-                color="primary"
-                variant="outlined"
-                onClick={() => setStatusOpen(s => !s)}
-              />
-              <Chip
-                label={ts('clear_status')}
-                size="small"
-                variant="outlined"
-                onClick={() => updateStatus(null)}
-                sx={{ color: 'text.disabled', borderColor: 'divider' }}
-              />
-            </>
-          ) : (
-            <Chip
-              label={ts('set_status')}
-              size="small"
-              variant="outlined"
-              onClick={() => setStatusOpen(s => !s)}
-              sx={{ color: 'text.secondary', borderColor: 'divider' }}
-            />
-          )}
-        </Box>
-
-        {statusOpen && (
-          <Box px={2.5} pt={1} display="flex" gap={1} flexWrap="wrap">
-            {getStatusesForMode(mode).map(key => (
-              <Chip
+        <Box px={2.5} pt={1.5} pb={0.5} display="flex" gap={0.75} flexWrap="wrap">
+          {getStatusesForMode(mode).map(key => {
+            const isActive = profile?.status === key
+            return (
+              <Box
                 key={key}
-                label={ts(key)}
-                size="small"
-                variant={profile?.status === key ? 'filled' : 'outlined'}
-                color={profile?.status === key ? 'primary' : 'default'}
-                onClick={() => { updateStatus(key); setStatusOpen(false) }}
-              />
-            ))}
-          </Box>
-        )}
+                component="button"
+                onClick={() => updateStatus(isActive ? null : key)}
+                sx={{
+                  border: '1.5px solid',
+                  borderColor: isActive ? 'primary.main' : 'divider',
+                  borderRadius: 10,
+                  px: 1.5,
+                  py: 0.6,
+                  cursor: 'pointer',
+                  bgcolor: isActive ? 'primary.main' : 'transparent',
+                  color: isActive ? 'primary.contrastText' : 'text.secondary',
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  fontFamily: 'inherit',
+                  letterSpacing: '0.01em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    color: isActive ? 'primary.contrastText' : 'primary.main',
+                  },
+                }}
+              >
+                {isActive && (
+                  <Box component="span" sx={{ fontSize: 11, display: 'flex', opacity: 0.9 }}>
+                    <Icon icon="mdi:check" />
+                  </Box>
+                )}
+                {ts(key)}
+              </Box>
+            )
+          })}
+        </Box>
 
         {/* Notification prompt */}
         {notifStatus === 'unknown' && (
