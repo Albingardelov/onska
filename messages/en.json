@@ -141,6 +141,7 @@
     "status_pending": "Pending",
     "status_accepted": "Interested",
     "status_declined": "Not now",
+    "status_missed": "Missed",
     "status_completed": "Done",
     "mode_light": "Light",
     "mode_dark": "Dark",

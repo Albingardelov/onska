@@ -141,6 +141,7 @@
     "status_pending": "Väntar",
     "status_accepted": "Intresserad",
     "status_declined": "Inte nu",
+    "status_missed": "Missad",
     "status_completed": "Klar",
     "mode_light": "Light",
     "mode_dark": "Dark",

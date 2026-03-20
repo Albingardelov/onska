@@ -156,7 +156,15 @@ export function OrdersPage() {
               <Box component="span" sx={{ fontSize: 14, color: 'text.disabled', display: 'inline-flex' }}>
                 <Icon icon={order.mode === 'fint' ? 'mdi:weather-sunny' : 'mdi:weather-night'} />
               </Box>
-              <Chip size="small" label={statusLabel[order.status]} color={statusColor[order.status]} />
+              <Chip
+                size="small"
+                label={
+                  order.status === 'declined' && order.expires_at && new Date(order.expires_at) < new Date()
+                    ? t('status_missed')
+                    : statusLabel[order.status]
+                }
+                color={statusColor[order.status]}
+              />
             </Box>
             <Box display="flex" alignItems="center" gap={0.5}>
               <Typography variant="caption" color="text.secondary">
