@@ -156,7 +156,7 @@
     "archive": "Archive",
     "change_mind_sender": "Change my mind",
     "withdraw": "Withdraw",
-    "expires_at_label": "Valid until",
+    "expires_at_label": "Requested at",
     "count_suffix": ""
   },
   "calendar": {

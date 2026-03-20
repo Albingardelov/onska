@@ -156,7 +156,7 @@
     "archive": "Arkivera",
     "change_mind_sender": "Ändra mig",
     "withdraw": "Dra tillbaka",
-    "expires_at_label": "Giltig till",
+    "expires_at_label": "Önskas kl.",
     "count_suffix": "st"
   },
   "calendar": {
