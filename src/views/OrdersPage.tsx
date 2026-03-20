@@ -168,7 +168,7 @@ export function OrdersPage() {
             </Box>
             <Box display="flex" alignItems="center" gap={0.5}>
               <Typography variant="caption" color="text.secondary">
-                {format(new Date(order.created_at), 'd MMM', { locale: sv })}
+                {format(new Date(order.created_at), 'd MMM HH:mm', { locale: sv })}
               </Typography>
               {showDelete && (
                 <IconButton size="small" onClick={() => deleteOrder(order.id)}
