@@ -55,9 +55,25 @@ export function OrdersPage() {
 
   async function loadOrders(silent = false) {
     if (!silent) setLoading(true)
-    const { data } = await supabase.from('orders').select('*, service:services(*)')
+    const { data: rawData } = await supabase.from('orders').select('*, service:services(*)')
       .eq(tab === 0 ? 'to_user_id' : 'from_user_id', profile!.id)
       .order('created_at', { ascending: false })
+    let data = rawData
+
+    if (tab === 0) {
+      const now = new Date()
+      const expired = (data ?? []).filter(
+        o => o.status === 'pending' && o.expires_at !== null && new Date(o.expires_at) < now
+      )
+      if (expired.length > 0) {
+        const ids = expired.map(o => o.id)
+        await supabase.from('orders').update({ status: 'declined' }).in('id', ids)
+        data = (data ?? []).map(o =>
+          ids.includes(o.id) ? { ...o, status: 'declined' as const } : o
+        )
+      }
+    }
+
     setOrders(data ?? [])
     setLoading(false)
   }
@@ -166,6 +182,16 @@ export function OrdersPage() {
             <Typography variant="body2" color="text.secondary" fontStyle="italic" mt={0.5}>
               &ldquo;{order.note}&rdquo;
             </Typography>
+          )}
+          {order.expires_at && order.status === 'pending' && (
+            <Chip
+              size="small"
+              icon={<Icon icon="mdi:clock-alert-outline" width={14} />}
+              label={`${t('expires_at_label')} ${format(new Date(order.expires_at), 'HH:mm')}`}
+              color="warning"
+              variant="outlined"
+              sx={{ mt: 1 }}
+            />
           )}
           {order.response_note && (
             <Chip size="small" label={`⏰ ${order.response_note}`} color="success" variant="outlined" sx={{ mt: 1 }} />
