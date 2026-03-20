@@ -191,7 +191,7 @@ export function OrdersPage() {
               &ldquo;{order.note}&rdquo;
             </Typography>
           )}
-          {order.expires_at && order.status === 'pending' && (
+          {order.expires_at && order.status === 'pending' && new Date(order.expires_at).getMinutes() === 0 && (
             <Chip
               size="small"
               icon={<Icon icon="mdi:clock-alert-outline" width={14} />}
