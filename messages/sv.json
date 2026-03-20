@@ -123,6 +123,7 @@
     "blocked_today": "Inte öppen för detta idag",
     "empty_hint": "Tryck på en dag för att ställa in din tillgänglighet",
     "date_any": "Valfri dag",
+    "pick_time": "Välj tid (valfritt)",
     "notif_hint_title": "Missa inget",
     "notif_hint_body": "Aktivera notiser för att se när {name} svarar",
     "notif_enable": "Aktivera",
@@ -155,6 +156,7 @@
     "archive": "Arkivera",
     "change_mind_sender": "Ändra mig",
     "withdraw": "Dra tillbaka",
+    "expires_at_label": "Giltig till",
     "count_suffix": "st"
   },
   "calendar": {

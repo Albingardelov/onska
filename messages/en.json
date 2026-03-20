@@ -123,6 +123,7 @@
     "blocked_today": "Not open for this today",
     "empty_hint": "Tap a day to set your availability",
     "date_any": "Any day",
+    "pick_time": "Pick a time (optional)",
     "notif_hint_title": "Don't miss anything",
     "notif_hint_body": "Enable notifications to see when {name} responds",
     "notif_enable": "Enable",
@@ -155,6 +156,7 @@
     "archive": "Archive",
     "change_mind_sender": "Change my mind",
     "withdraw": "Withdraw",
+    "expires_at_label": "Valid until",
     "count_suffix": ""
   },
   "calendar": {

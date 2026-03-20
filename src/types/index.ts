@@ -42,6 +42,7 @@ export interface Order {
   status: OrderStatus
   note: string | null
   response_note: string | null
+  expires_at: string | null
   mode: Mode
   created_at: string
   service?: Service
