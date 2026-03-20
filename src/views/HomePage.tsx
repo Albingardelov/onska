@@ -144,8 +144,8 @@ export function HomePage() {
       from_user_id: profile.id, to_user_id: partner.id,
       service_id: selectedService.id, date: selectedDate,
       status: 'pending', note: note || null, mode,
-      expires_at: selectedDate && selectedTime
-        ? new Date(`${selectedDate}T${selectedTime}:00`).toISOString()
+      expires_at: selectedDate
+        ? new Date(`${selectedDate}T${selectedTime ? `${selectedTime}:00` : '23:59:59'}`).toISOString()
         : null,
     })
     fetch('/api/send-notification', {
