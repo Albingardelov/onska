@@ -40,6 +40,7 @@ export function HomePage() {
   const [services, setServices] = useState<Service[]>([])
   const [activeOrders, setActiveOrders] = useState<Order[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(true)
@@ -143,6 +144,9 @@ export function HomePage() {
       from_user_id: profile.id, to_user_id: partner.id,
       service_id: selectedService.id, date: selectedDate,
       status: 'pending', note: note || null, mode,
+      expires_at: selectedDate && selectedTime
+        ? new Date(`${selectedDate}T${selectedTime}:00`).toISOString()
+        : null,
     })
     fetch('/api/send-notification', {
       method: 'POST',
@@ -150,7 +154,7 @@ export function HomePage() {
       body: JSON.stringify({ record: { to_user_id: partner.id, from_user_id: profile.id, service_id: selectedService.id, mode } }),
     }).catch(() => {})
     setSuccessTitle(title)
-    setSuccess(true); setSuccessFading(false); setSelectedService(null); setSelectedDate(null); setNote('')
+    setSuccess(true); setSuccessFading(false); setSelectedService(null); setSelectedDate(null); setSelectedTime(null); setNote('')
     setOrdering(false)
     setTimeout(() => setSuccessFading(true), 3200)
     setTimeout(() => { setSuccess(false); setSuccessFading(false) }, 4000)
@@ -455,7 +459,7 @@ export function HomePage() {
               <SectionLabel>{t('suggest_date')}</SectionLabel>
               <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
                 {/* No date / clear selection */}
-                <Box onClick={() => setSelectedDate(null)} sx={{
+                <Box onClick={() => { setSelectedDate(null); setSelectedTime(null) }} sx={{
                   flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
                   px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
                   border: '2px solid',
@@ -474,7 +478,7 @@ export function HomePage() {
                   const selected = selectedDate === dateStr
                   const isToday = dateStr === todayStr
                   return (
-                    <Box key={dateStr} onClick={() => setSelectedDate(prev => prev === dateStr ? null : dateStr)}
+                    <Box key={dateStr} onClick={() => { setSelectedDate(prev => { if (prev === dateStr) { setSelectedTime(null); return null } return dateStr }) }}
                       sx={{
                         flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
                         px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
@@ -488,6 +492,37 @@ export function HomePage() {
                         {isToday && !selected ? t('today_label') : format(d, 'EEE', { locale: dateFnsLocale })}
                       </Typography>
                       <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>{format(d, 'd')}</Typography>
+                    </Box>
+                  )
+                })}
+              </Box>
+            </Box>
+          )}
+
+          {selectedService && selectedDate && (
+            <Box>
+              <SectionLabel>{t('pick_time')}</SectionLabel>
+              <Box display="flex" gap={1} overflow="auto" pb={0.5}
+                sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
+                {['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'].map(time => {
+                  const isSelected = selectedTime === time
+                  const isPast = selectedDate === todayStr &&
+                    new Date(`${selectedDate}T${time}:00`) < new Date()
+                  return (
+                    <Box key={time}
+                      onClick={() => { if (!isPast) setSelectedTime(prev => prev === time ? null : time) }}
+                      sx={{
+                        flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        px: 1.5, py: 1.2, borderRadius: 2, minWidth: 60,
+                        border: '2px solid',
+                        borderColor: isSelected ? 'primary.main' : 'divider',
+                        bgcolor: isSelected ? 'primary.main' : 'background.paper',
+                        color: isPast ? 'text.disabled' : isSelected ? 'primary.contrastText' : 'text.primary',
+                        cursor: isPast ? 'default' : 'pointer',
+                        opacity: isPast ? 0.4 : 1,
+                        transition: 'all 0.12s ease',
+                      }}>
+                      <Typography fontWeight={700} fontSize="0.85rem">{time}</Typography>
                     </Box>
                   )
                 })}
