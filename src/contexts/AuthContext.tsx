@@ -20,6 +20,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null)
 
+const STATUS_LABELS_SV: Record<string, string> = {
+  behover_omtanke: 'Behöver omtanke',
+  vill_vara_nara: 'Vill vara nära',
+  lugn_kvall: 'Lugn kväll',
+  pa_bra_humor: 'På bra humor',
+  kanner_sig_vild: 'Känner sig vild',
+  nyfiken: 'Nyfiken',
+  laddad: 'Laddad',
+  behover_distraktion: 'Behöver distraktion',
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
@@ -104,6 +115,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.from('profiles').update({ status }).eq('id', user.id)
     if (!error) {
       setProfile(prev => prev ? { ...prev, status } : prev)
+      if (status && partner?.id) {
+        const label = STATUS_LABELS_SV[status] ?? status
+        fetch('/api/send-status-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id, partner_id: partner.id, status_label: label }),
+        }).catch(() => {})
+      }
     }
   }
 
