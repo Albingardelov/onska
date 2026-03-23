@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
   const { record } = body
   if (!record?.to_user_id) return NextResponse.json({ error: 'Missing data' }, { status: 400 })
 
+  const responseNote: string | null = record.response_note ?? null
+
   const [{ data: profile }, { data: service }, { data: sender }] = await Promise.all([
     supabase.from('profiles').select('push_subscription').eq('id', record.to_user_id).single(),
     supabase.from('services').select('title').eq('id', record.service_id).single(),
@@ -37,10 +39,10 @@ export async function POST(req: NextRequest) {
     await webpush.sendNotification(
       JSON.parse(profile.push_subscription),
       JSON.stringify({
-        title: isAccepted ? 'Ny önskan intressant!' : 'Ny önskan från din partner',
+        title: isAccepted ? 'Din önskan accepterades!' : 'Ny önskan från din partner',
         body: isAccepted
-          ? `${sender?.name ?? 'Din partner'} är intresserad av ${service?.title ?? 'din önskan'}`
-          : `${sender?.name ?? 'Din partner'} har delat en ny önskan`,
+          ? `${sender?.name ?? 'Din partner'} är inne på ${service?.title ?? 'din önskan'}${responseNote ? ` — ${responseNote}` : ''}`
+          : `${sender?.name ?? 'Din partner'} har skickat en ny önskan`,
         icon: isSnusk ? '/icon-dark.svg' : '/icon.svg',
         url: '/onskningar',
       })

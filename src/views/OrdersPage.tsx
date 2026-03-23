@@ -86,7 +86,7 @@ export function OrdersPage() {
       fetch('/api/send-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ record: { to_user_id: order.from_user_id, from_user_id: order.to_user_id, service_id: order.service_id, mode: order.mode, status: 'accepted' } }),
+        body: JSON.stringify({ record: { to_user_id: order.from_user_id, from_user_id: order.to_user_id, service_id: order.service_id, mode: order.mode, status: 'accepted', response_note: responseNote.trim() || null } }),
       }).catch(() => {})
     }
     // Celebration: haptic + confetti
