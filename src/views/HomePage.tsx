@@ -83,6 +83,12 @@ export function HomePage() {
   }, [selectedDate, partner])
 
   useEffect(() => {
+    if (selectedService && partnerBlockedIds.has(selectedService.id)) {
+      setSelectedService(null)
+    }
+  }, [partnerBlockedIds])
+
+  useEffect(() => {
     if (!partner?.id) return
     const channel = supabase
       .channel('partner-profile-updates')
@@ -138,6 +144,8 @@ export function HomePage() {
 
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return
+    const blockedIds = selectedDate ? partnerBlockedIds : todayBlockedIds
+    if (blockedIds.has(selectedService.id)) return
     setOrdering(true)
     const title = selectedService.title
     await supabase.from('orders').insert({
@@ -392,9 +400,12 @@ export function HomePage() {
                   const blockedToday = !selectedDate && todayBlockedIds.has(service.id)
                   const isBlocked = blockedForDate || blockedToday
                   return (
-                    <Box key={service.id} onClick={() => setSelectedService(selected ? null : service)}
+                    <Box key={service.id} onClick={() => {
+                        if (isBlocked) return
+                        setSelectedService(selected ? null : service)
+                      }}
                       sx={{
-                        p: 2.5, borderRadius: 3, cursor: 'pointer',
+                        p: 2.5, borderRadius: 3, cursor: isBlocked ? 'not-allowed' : 'pointer',
                         border: '2px solid',
                         borderColor: selected ? 'success.main' : 'divider',
                         ...(mode === 'snusk' && !selected
