@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import confetti from 'canvas-confetti'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -34,6 +34,14 @@ function weekKey(dateStr: string): string {
   return format(startOfWeek(new Date(dateStr), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 }
 
+function getExpiryUrgency(expiresAt: string): 'imminent' | 'soon' | null {
+  const diff = new Date(expiresAt).getTime() - Date.now()
+  if (diff <= 0) return null
+  if (diff < 2 * 60 * 60 * 1000) return 'imminent'  // < 2h
+  if (diff < 6 * 60 * 60 * 1000) return 'soon'       // < 6h
+  return null
+}
+
 export function OrdersPage() {
   const t = useTranslations('orders')
   const tc = useTranslations('common')
@@ -44,6 +52,7 @@ export function OrdersPage() {
   const [loading, setLoading] = useState(true)
   const [acceptingId, setAcceptingId] = useState<string | null>(null)
   const [responseNote, setResponseNote] = useState('')
+  const reminderSentRef = useRef(false)
 
   useEffect(() => {
     loadOrders()
@@ -76,6 +85,31 @@ export function OrdersPage() {
 
     setOrders(data ?? [])
     setLoading(false)
+
+    // Send one-time reminder push if there are imminent pending orders (tab 0 = incoming)
+    if (!reminderSentRef.current && tab === 0) {
+      const imminentPending = (data ?? []).filter(o =>
+        o.status === 'pending' &&
+        o.expires_at &&
+        getExpiryUrgency(o.expires_at) === 'imminent'
+      )
+      if (imminentPending.length > 0) {
+        reminderSentRef.current = true
+        fetch('/api/send-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            record: {
+              to_user_id: profile!.id,
+              from_user_id: profile!.id,
+              service_id: imminentPending[0].service_id,
+              mode: imminentPending[0].mode,
+              status: 'expiry_reminder',
+            }
+          }),
+        }).catch(() => {})
+      }
+    }
   }
 
   async function acceptOrder(id: string) {
@@ -191,7 +225,7 @@ export function OrdersPage() {
               &ldquo;{order.note}&rdquo;
             </Typography>
           )}
-          {order.expires_at && order.status === 'pending' && new Date(order.expires_at).getMinutes() === 0 && (
+          {order.expires_at && order.status === 'pending' && (
             <Chip
               size="small"
               icon={<Icon icon="mdi:clock-alert-outline" width={14} />}
@@ -201,6 +235,26 @@ export function OrdersPage() {
               sx={{ mt: 1 }}
             />
           )}
+          {order.expires_at && order.status === 'pending' && (() => {
+            const urgency = getExpiryUrgency(order.expires_at!)
+            if (!urgency) return null
+            const diff = new Date(order.expires_at!).getTime() - Date.now()
+            const hoursLeft = Math.floor(diff / (60 * 60 * 1000))
+            const minutesLeft = Math.floor((diff % (60 * 60 * 1000)) / 60000)
+            const label = hoursLeft > 0
+              ? `${hoursLeft}h ${minutesLeft}min kvar`
+              : `${minutesLeft} min kvar`
+            return (
+              <Typography
+                variant="caption"
+                color={urgency === 'imminent' ? 'error' : 'warning.main'}
+                fontWeight={700}
+                sx={{ display: 'block', mt: 0.5 }}
+              >
+                {label}
+              </Typography>
+            )
+          })()}
           {order.response_note && (
             <Chip size="small" label={`⏰ ${order.response_note}`} color="success" variant="outlined" sx={{ mt: 1 }} />
           )}

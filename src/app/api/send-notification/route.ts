@@ -33,16 +33,23 @@ export async function POST(req: NextRequest) {
   if (!profile?.push_subscription) return NextResponse.json({ message: 'No subscription' })
 
   const isAccepted = record.status === 'accepted'
+  const isExpiryReminder = record.status === 'expiry_reminder'
   const isSnusk = record.mode === 'snusk'
 
   try {
     await webpush.sendNotification(
       JSON.parse(profile.push_subscription),
       JSON.stringify({
-        title: isAccepted ? 'Din önskan accepterades!' : 'Ny önskan från din partner',
-        body: isAccepted
-          ? `${sender?.name ?? 'Din partner'} är inne på ${service?.title ?? 'din önskan'}${responseNote ? ` — ${responseNote}` : ''}`
-          : `${sender?.name ?? 'Din partner'} har skickat en ny önskan`,
+        title: isExpiryReminder
+          ? 'Svar snart!'
+          : isAccepted
+            ? 'Din önskan accepterades!'
+            : 'Ny önskan från din partner',
+        body: isExpiryReminder
+          ? `${service?.title ?? 'En önskan'} förfaller snart — svara nu`
+          : isAccepted
+            ? `${sender?.name ?? 'Din partner'} är inne på ${service?.title ?? 'din önskan'}${responseNote ? ` — ${responseNote}` : ''}`
+            : `${sender?.name ?? 'Din partner'} har skickat en ny önskan`,
         icon: isSnusk ? '/icon-dark.svg' : '/icon.svg',
         url: '/onskningar',
       })
