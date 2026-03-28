@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { subscribeToPush } from '../lib/notifications'
 
-type NotifStatus = 'unknown' | 'granted' | 'denied' | 'unsupported'
+export type NotifStatus = 'unknown' | 'granted' | 'denied' | 'unsupported'
 
 function readPermission(): NotifStatus {
+  if (typeof window === 'undefined') return 'unknown'
   if (!('Notification' in window)) return 'unsupported'
   if (Notification.permission === 'granted') return 'granted'
   if (Notification.permission === 'denied') return 'denied'
