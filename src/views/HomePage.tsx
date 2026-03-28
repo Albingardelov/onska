@@ -154,7 +154,7 @@ export function HomePage() {
     setTimeout(() => { setSuccess(false); setSuccessFading(false) }, 4000)
   }
 
-  if (!partner) {
+  if (!partner || !profile) {
     return (
       <Box flex={1} display="flex" flexDirection="column">
         <Header title={t('header')} />
@@ -182,7 +182,7 @@ export function HomePage() {
           dateFnsLocale={dateFnsLocale}
         />
 
-        <StatusPills mode={mode} profile={profile!} onUpdate={updateStatus} />
+        <StatusPills mode={mode} profile={profile} onUpdate={updateStatus} />
 
         {/* Notification prompt */}
         {notifStatus === 'unknown' && !profile?.push_subscription && (

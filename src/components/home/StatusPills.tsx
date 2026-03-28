@@ -9,7 +9,7 @@ import type { Mode, Profile } from '../../types'
 interface StatusPillsProps {
   mode: Mode
   profile: Profile
-  onUpdate: (key: StatusKey | null) => void
+  onUpdate: (key: string | null) => void
 }
 
 export function StatusPills({ mode, profile, onUpdate }: StatusPillsProps) {
