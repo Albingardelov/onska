@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -13,17 +13,33 @@ import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocale } from '../contexts/LocaleContext'
 import { supabase } from '../lib/supabase'
+import { subscribeToPush } from '../lib/notifications'
 import { useTranslations } from 'next-intl'
 
 export function SettingsPage() {
   const t = useTranslations('settings')
   const tc = useTranslations('common')
+  const ts = useTranslations('services')
   const { user, profile, signOut } = useAuth()
   const { locale, setLocale } = useLocale()
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState('')
+  const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
+  const [activatingNotif, setActivatingNotif] = useState(false)
+
+  useEffect(() => {
+    if (!('Notification' in window)) { setNotifStatus('unsupported'); return }
+    setNotifStatus(Notification.permission === 'granted' ? 'granted' : Notification.permission === 'denied' ? 'denied' : 'unknown')
+  }, [])
+
+  async function enableNotifications() {
+    setActivatingNotif(true)
+    await subscribeToPush(user!.id)
+    setNotifStatus(Notification.permission === 'granted' ? 'granted' : 'denied')
+    setActivatingNotif(false)
+  }
 
   async function exportData() {
     if (!user) return
@@ -117,6 +133,33 @@ export function SettingsPage() {
               🇬🇧 English
             </Button>
           </Box>
+        </Box>
+
+        <Divider />
+
+        {/* Notifications */}
+        <Box display="flex" flexDirection="column" gap={1.5}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <Box component="span" sx={{ fontSize: 20, color: 'primary.main', display: 'flex' }}>
+              <Icon icon="mdi:bell-outline" />
+            </Box>
+            <Typography variant="subtitle1" fontWeight={700}>Notiser</Typography>
+          </Box>
+          {notifStatus === 'granted' && (
+            <Alert severity="success" sx={{ borderRadius: 2 }}>{ts('notif_granted')}</Alert>
+          )}
+          {notifStatus === 'denied' && (
+            <Alert severity="warning" sx={{ borderRadius: 2 }}>{ts('notif_denied')}</Alert>
+          )}
+          {notifStatus === 'unsupported' && (
+            <Alert severity="info" sx={{ borderRadius: 2 }}>{ts('notif_unsupported')}</Alert>
+          )}
+          {notifStatus === 'unknown' && (
+            <Button variant="contained" startIcon={<Icon icon="mdi:bell-ring-outline" />}
+              onClick={enableNotifications} disabled={activatingNotif}>
+              {activatingNotif ? tc('activating') : ts('notif_enable')}
+            </Button>
+          )}
         </Box>
 
         <Divider />
