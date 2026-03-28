@@ -39,8 +39,6 @@ export function OrdersPage() {
   const [tab, setTab] = useState(0)
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [acceptingId, setAcceptingId] = useState<string | null>(null)
-  const [responseNote, setResponseNote] = useState('')
   const reminderSentRef = useRef(false)
 
   useEffect(() => {
@@ -101,15 +99,15 @@ export function OrdersPage() {
     }
   }
 
-  async function acceptOrder(id: string) {
-    await supabase.from('orders').update({ status: 'accepted', response_note: responseNote.trim() || null }).eq('id', id)
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'accepted', response_note: responseNote.trim() || null } : o))
+  async function acceptOrder(id: string, note: string) {
+    await supabase.from('orders').update({ status: 'accepted', response_note: note.trim() || null }).eq('id', id)
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'accepted', response_note: note.trim() || null } : o))
     const order = orders.find(o => o.id === id)
     if (order) {
       fetch('/api/send-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ record: { to_user_id: order.from_user_id, from_user_id: order.to_user_id, service_id: order.service_id, mode: order.mode, status: 'accepted', response_note: responseNote.trim() || null } }),
+        body: JSON.stringify({ record: { to_user_id: order.from_user_id, from_user_id: order.to_user_id, service_id: order.service_id, mode: order.mode, status: 'accepted', response_note: note.trim() || null } }),
       }).catch(() => {})
     }
     // Celebration: haptic + confetti
@@ -122,7 +120,6 @@ export function OrdersPage() {
         ? ['#C41230', '#E84060', '#fff', '#F5E4E8']
         : ['#CC2E6A', '#FFB3C1', '#fff', '#FF6B8A'],
     })
-    setAcceptingId(null); setResponseNote('')
   }
 
   async function updateStatus(id: string, status: Order['status']) {
@@ -205,14 +202,8 @@ export function OrdersPage() {
                 key={o.id}
                 order={o}
                 isIncoming={tab === 0}
-                acceptingId={acceptingId}
-                responseNote={responseNote}
                 onAccept={acceptOrder}
                 onUpdateStatus={updateStatus}
-                onDelete={deleteOrder}
-                onStartAccept={setAcceptingId}
-                onCancelAccept={() => { setAcceptingId(null); setResponseNote('') }}
-                onResponseNoteChange={setResponseNote}
                 animIndex={i}
               />
             ))}
@@ -245,14 +236,8 @@ export function OrdersPage() {
                           <OrderCard
                             order={o}
                             isIncoming={tab === 0}
-                            acceptingId={acceptingId}
-                            responseNote={responseNote}
                             onAccept={acceptOrder}
                             onUpdateStatus={updateStatus}
-                            onDelete={deleteOrder}
-                            onStartAccept={setAcceptingId}
-                            onCancelAccept={() => { setAcceptingId(null); setResponseNote('') }}
-                            onResponseNoteChange={setResponseNote}
                           />
                         </SwipeToDelete>
                       ))}

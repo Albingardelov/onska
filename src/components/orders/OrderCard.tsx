@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactElement } from 'react'
+import { ReactElement, useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -20,35 +20,28 @@ function getExpiryUrgency(expiresAt: string): 'imminent' | 'soon' | null {
   return null
 }
 
+function vibrate() { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]) }
+
 interface OrderCardProps {
   order: Order
   isIncoming: boolean
-  acceptingId: string | null
-  responseNote: string
-  onAccept: (id: string) => void
+  onAccept: (id: string, note: string) => void
   onUpdateStatus: (id: string, status: Order['status']) => void
-  onDelete: (id: string) => void
-  onStartAccept: (id: string) => void
-  onCancelAccept: () => void
-  onResponseNoteChange: (note: string) => void
   animIndex?: number
 }
 
 export function OrderCard({
   order,
   isIncoming,
-  acceptingId,
-  responseNote,
   onAccept,
   onUpdateStatus,
-  onDelete: _onDelete,
-  onStartAccept,
-  onCancelAccept,
-  onResponseNoteChange,
   animIndex,
 }: OrderCardProps): ReactElement {
   const t = useTranslations('orders')
   const tc = useTranslations('common')
+
+  const [isAccepting, setIsAccepting] = useState(false)
+  const [responseNote, setResponseNote] = useState('')
 
   const statusLabel: Record<Order['status'], string> = {
     pending: t('status_pending'),
@@ -60,10 +53,32 @@ export function OrderCard({
     pending: 'warning', accepted: 'success', declined: 'secondary', completed: 'secondary',
   }
 
-  const isAccepting = acceptingId === order.id
   const borderLeft = order.status === 'pending' ? 'warning.main'
     : order.status === 'accepted' ? 'success.main'
     : 'text.disabled'
+
+  let expiryCountdown: React.ReactNode = null
+  if (order.expires_at && order.status === 'pending') {
+    const urgency = getExpiryUrgency(order.expires_at)
+    if (urgency) {
+      const diff = new Date(order.expires_at).getTime() - Date.now()
+      const hoursLeft = Math.floor(diff / (60 * 60 * 1000))
+      const minutesLeft = Math.floor((diff % (60 * 60 * 1000)) / 60000)
+      const label = hoursLeft > 0
+        ? `${hoursLeft}h ${minutesLeft}min kvar`
+        : `${minutesLeft} min kvar`
+      expiryCountdown = (
+        <Typography
+          variant="caption"
+          color={urgency === 'imminent' ? 'error' : 'warning.main'}
+          fontWeight={700}
+          sx={{ display: 'block', mt: 0.5 }}
+        >
+          {label}
+        </Typography>
+      )
+    }
+  }
 
   return (
     <Box sx={{
@@ -110,6 +125,7 @@ export function OrderCard({
             &ldquo;{order.note}&rdquo;
           </Typography>
         )}
+        {/* Only show time chip when a specific hour was chosen (not the 23:59:59 "date only" sentinel) */}
         {order.expires_at && order.status === 'pending' && new Date(order.expires_at).getMinutes() === 0 && (
           <Chip
             size="small"
@@ -120,26 +136,7 @@ export function OrderCard({
             sx={{ mt: 1 }}
           />
         )}
-        {order.expires_at && order.status === 'pending' && (() => {
-          const urgency = getExpiryUrgency(order.expires_at!)
-          if (!urgency) return null
-          const diff = new Date(order.expires_at!).getTime() - Date.now()
-          const hoursLeft = Math.floor(diff / (60 * 60 * 1000))
-          const minutesLeft = Math.floor((diff % (60 * 60 * 1000)) / 60000)
-          const label = hoursLeft > 0
-            ? `${hoursLeft}h ${minutesLeft}min kvar`
-            : `${minutesLeft} min kvar`
-          return (
-            <Typography
-              variant="caption"
-              color={urgency === 'imminent' ? 'error' : 'warning.main'}
-              fontWeight={700}
-              sx={{ display: 'block', mt: 0.5 }}
-            >
-              {label}
-            </Typography>
-          )
-        })()}
+        {expiryCountdown}
         {order.response_note && (
           <Chip size="small" label={`⏰ ${order.response_note}`} color="success" variant="outlined" sx={{ mt: 1 }} />
         )}
@@ -150,23 +147,24 @@ export function OrderCard({
               <Box display="flex" flexDirection="column" gap={1.5}>
                 <TextField label={t('when_label')} size="small" autoFocus
                   placeholder={t('when_placeholder')}
-                  value={responseNote} onChange={e => onResponseNoteChange(e.target.value)} />
+                  value={responseNote} onChange={e => setResponseNote(e.target.value)} />
                 <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>
                   {t('consent_accept_hint')}
                 </Typography>
                 <Box display="flex" gap={1}>
                   <Button variant="outlined" color="inherit" size="small" fullWidth
-                    onClick={onCancelAccept}>{tc('cancel')}</Button>
+                    onClick={() => { setIsAccepting(false); setResponseNote('') }}>{tc('cancel')}</Button>
                   <Button variant="contained" color="success" size="small" fullWidth
-                    startIcon={<Icon icon="mdi:check" />} onClick={() => onAccept(order.id)}>{t('confirm')}</Button>
+                    startIcon={<Icon icon="mdi:check" />}
+                    onClick={() => { onAccept(order.id, responseNote); setIsAccepting(false); setResponseNote('') }}>{t('confirm')}</Button>
                 </Box>
               </Box>
             ) : (
               <Box display="flex" gap={1} mt={1}>
                 <Button variant="outlined" color="error" size="small" fullWidth
-                  onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); onUpdateStatus(order.id, 'declined') }}>{t('decline')}</Button>
+                  onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('decline')}</Button>
                 <Button variant="contained" color="success" size="small" fullWidth
-                  startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => onStartAccept(order.id)}>{t('accept')}</Button>
+                  startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => setIsAccepting(true)}>{t('accept')}</Button>
               </Box>
             )}
           </Box>
@@ -175,7 +173,7 @@ export function OrderCard({
         {isIncoming && order.status === 'accepted' && (
           <Box mt={1.5} display="flex" gap={1}>
             <Button variant="outlined" color="error" size="small"
-              onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_receiver')}</Button>
+              onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_receiver')}</Button>
             <Button variant="outlined" color="secondary" size="small" fullWidth
               startIcon={<Icon icon="mdi:archive-outline" />}
               onClick={() => onUpdateStatus(order.id, 'completed')}>{t('archive')}</Button>
@@ -185,12 +183,12 @@ export function OrderCard({
         {!isIncoming && order.status === 'accepted' && (
           <Button variant="outlined" color="error" size="small" fullWidth
             sx={{ mt: 1.5 }}
-            onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_sender')}</Button>
+            onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_sender')}</Button>
         )}
         {!isIncoming && order.status === 'pending' && (
           <Button variant="outlined" color="error" size="small" fullWidth
             sx={{ mt: 1.5 }}
-            onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); onUpdateStatus(order.id, 'declined') }}>{t('withdraw')}</Button>
+            onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('withdraw')}</Button>
         )}
       </Box>
     </Box>
