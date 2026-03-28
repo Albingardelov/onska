@@ -149,7 +149,16 @@ export function SettingsPage() {
             <Alert severity="success" sx={{ borderRadius: 2 }}>{ts('notif_granted')}</Alert>
           )}
           {notifStatus === 'denied' && (
-            <Alert severity="warning" sx={{ borderRadius: 2 }}>{ts('notif_denied')}</Alert>
+            <Alert severity="warning" sx={{ borderRadius: 2 }}>
+              <Typography variant="body2" fontWeight={600} gutterBottom>Notiser är blockerade</Typography>
+              <Typography variant="body2">Aktivera dem i webbläsarens inställningar:</Typography>
+              <Typography variant="body2" component="ol" sx={{ pl: 2, mt: 0.5, mb: 0 }}>
+                <li>Tryck på låsikonen i adressfältet</li>
+                <li>Välj <strong>Behörigheter</strong></li>
+                <li>Sätt <strong>Notiser</strong> till Tillåt</li>
+                <li>Ladda om sidan</li>
+              </Typography>
+            </Alert>
           )}
           {notifStatus === 'unsupported' && (
             <Alert severity="info" sx={{ borderRadius: 2 }}>{ts('notif_unsupported')}</Alert>
