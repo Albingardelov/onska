@@ -15,6 +15,8 @@ import { HeroBanner } from '../components/home/HeroBanner'
 import { StatusPills } from '../components/home/StatusPills'
 import { ServiceGrid } from '../components/home/ServiceGrid'
 import { SectionLabel } from '../components/home/SectionLabel'
+import { DatePicker } from '../components/home/DatePicker'
+import { TimePicker } from '../components/home/TimePicker'
 import { format, addDays } from 'date-fns'
 import { sv, enUS } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
@@ -267,75 +269,25 @@ export function HomePage() {
           {selectedService && (
             <Box>
               <SectionLabel>{t('suggest_date')}</SectionLabel>
-              <Box display="flex" gap={1} overflow="auto" pb={0.5} sx={{ scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-                {/* No date / clear selection */}
-                <Box onClick={() => { setSelectedDate(null); setSelectedTime(null) }} sx={{
-                  flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
-                  border: '2px solid',
-                  borderColor: selectedDate === null ? 'primary.main' : 'divider',
-                  bgcolor: selectedDate === null ? 'primary.main' : 'background.paper',
-                  color: selectedDate === null ? 'primary.contrastText' : 'text.secondary',
-                  transition: 'all 0.12s ease',
-                }}>
-                  <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {t('date_any')}
-                  </Typography>
-                  <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>–</Typography>
-                </Box>
-                {days.slice(0, 14).map(dateStr => {
-                  const d = new Date(dateStr)
-                  const selected = selectedDate === dateStr
-                  const isToday = dateStr === todayStr
-                  return (
-                    <Box key={dateStr} onClick={() => { setSelectedDate(prev => { if (prev === dateStr) { setSelectedTime(null); return null } return dateStr }) }}
-                      sx={{
-                        flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                        px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
-                        border: '2px solid',
-                        borderColor: selected ? 'primary.main' : isToday ? 'primary.main' : 'divider',
-                        bgcolor: selected ? 'primary.main' : 'background.paper',
-                        color: selected ? 'primary.contrastText' : 'text.primary',
-                        transition: 'all 0.12s ease',
-                      }}>
-                      <Typography variant="caption" sx={{ opacity: 0.7, fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        {isToday && !selected ? t('today_label') : format(d, 'EEE', { locale: dateFnsLocale })}
-                      </Typography>
-                      <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>{format(d, 'd')}</Typography>
-                    </Box>
-                  )
-                })}
-              </Box>
+              <DatePicker
+                days={days}
+                todayStr={todayStr}
+                selected={selectedDate}
+                onSelect={(date) => { setSelectedDate(date); if (!date) setSelectedTime(null) }}
+                dateFnsLocale={dateFnsLocale}
+              />
             </Box>
           )}
 
           {selectedService && selectedDate && (
             <Box>
               <SectionLabel>{t('pick_time')}</SectionLabel>
-              <Box display="flex" flexWrap="wrap" gap={0.75}>
-                {['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00'].map(time => {
-                  const isSelected = selectedTime === time
-                  const isPast = selectedDate === todayStr &&
-                    new Date(`${selectedDate}T${time}:00`) < new Date()
-                  return (
-                    <Box key={time}
-                      onClick={() => { if (!isPast) setSelectedTime(prev => prev === time ? null : time) }}
-                      sx={{
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        px: 1.2, py: 0.8, borderRadius: 1.5, minWidth: 52,
-                        border: '2px solid',
-                        borderColor: isSelected ? 'primary.main' : 'divider',
-                        bgcolor: isSelected ? 'primary.main' : 'background.paper',
-                        color: isPast ? 'text.disabled' : isSelected ? 'primary.contrastText' : 'text.primary',
-                        cursor: isPast ? 'default' : 'pointer',
-                        opacity: isPast ? 0.35 : 1,
-                        transition: 'all 0.12s ease',
-                      }}>
-                      <Typography fontWeight={700} fontSize="0.78rem" letterSpacing="0.01em">{time}</Typography>
-                    </Box>
-                  )
-                })}
-              </Box>
+              <TimePicker
+                selectedDate={selectedDate}
+                todayStr={todayStr}
+                selected={selectedTime}
+                onSelect={setSelectedTime}
+              />
             </Box>
           )}
 
