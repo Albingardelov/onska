@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -121,7 +121,7 @@ export function HomePage() {
     setPartnerBlockedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
   }
 
-  const days = Array.from({ length: 30 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
+  const days = useMemo(() => Array.from({ length: 14 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd')), [])
 
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return
@@ -252,7 +252,6 @@ export function HomePage() {
             </Box>
           )}
 
-          {/* Partner services */}
           <ServiceGrid
             services={services}
             loading={loading}
@@ -265,7 +264,6 @@ export function HomePage() {
             onSelect={setSelectedService}
           />
 
-          {/* Date picker */}
           {selectedService && (
             <Box>
               <SectionLabel>{t('suggest_date')}</SectionLabel>

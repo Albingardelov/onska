@@ -19,6 +19,7 @@ export function TimePicker({ selectedDate, todayStr, selected, onSelect }: TimeP
         return (
           <Box key={time}
             onClick={() => { if (!isPast) onSelect(isSelected ? null : time) }}
+            aria-disabled={isPast ? true : undefined}
             sx={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               px: 1.2, py: 0.8, borderRadius: 1.5, minWidth: 52,

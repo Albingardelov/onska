@@ -12,18 +12,18 @@ interface DatePickerProps {
   dateFnsLocale: Locale
 }
 
+const cellSx = (isSelected: boolean, isToday: boolean) => ({
+  flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center',
+  px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
+  border: '2px solid',
+  borderColor: isSelected || isToday ? 'primary.main' : 'divider',
+  bgcolor: isSelected ? 'primary.main' : 'background.paper',
+  color: isSelected ? 'primary.contrastText' : 'text.primary',
+  transition: 'all 0.12s ease',
+})
+
 export function DatePicker({ days, todayStr, selected, onSelect, dateFnsLocale }: DatePickerProps) {
   const t = useTranslations('home')
-
-  const cellSx = (isSelected: boolean, isToday: boolean) => ({
-    flexShrink: 0, display: 'flex', flexDirection: 'column' as const, alignItems: 'center',
-    px: 1.5, py: 1.2, borderRadius: 2, cursor: 'pointer', minWidth: 52,
-    border: '2px solid',
-    borderColor: isSelected ? 'primary.main' : isToday ? 'primary.main' : 'divider',
-    bgcolor: isSelected ? 'primary.main' : 'background.paper',
-    color: isSelected ? 'primary.contrastText' : 'text.primary',
-    transition: 'all 0.12s ease',
-  })
 
   return (
     <Box display="flex" gap={1} overflow="auto" pb={0.5}
@@ -38,7 +38,7 @@ export function DatePicker({ days, todayStr, selected, onSelect, dateFnsLocale }
         <Typography fontWeight={700} fontSize="1.1rem" lineHeight={1.3}>–</Typography>
       </Box>
 
-      {days.slice(0, 14).map(dateStr => {
+      {days.map(dateStr => {
         const isSelected = selected === dateStr
         const isToday = dateStr === todayStr
         return (
