@@ -1,11 +1,7 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import confetti from 'canvas-confetti'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import IconButton from '@mui/material/IconButton'
-import TextField from '@mui/material/TextField'
-import Chip from '@mui/material/Chip'
 import Skeleton from '@mui/material/Skeleton'
 import Tabs from '@mui/material/Tabs'
 import Tab from '@mui/material/Tab'
@@ -14,6 +10,7 @@ import AccordionSummary from '@mui/material/AccordionSummary'
 import AccordionDetails from '@mui/material/AccordionDetails'
 import { Header } from '../components/Header'
 import { SwipeToDelete } from '../components/SwipeToDelete'
+import { OrderCard } from '../components/orders/OrderCard'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
@@ -34,17 +31,9 @@ function weekKey(dateStr: string): string {
   return format(startOfWeek(new Date(dateStr), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 }
 
-function getExpiryUrgency(expiresAt: string): 'imminent' | 'soon' | null {
-  const diff = new Date(expiresAt).getTime() - Date.now()
-  if (diff <= 0) return null
-  if (diff < 2 * 60 * 60 * 1000) return 'imminent'  // < 2h
-  if (diff < 6 * 60 * 60 * 1000) return 'soon'       // < 6h
-  return null
-}
 
 export function OrdersPage() {
   const t = useTranslations('orders')
-  const tc = useTranslations('common')
   const { profile } = useAuth()
   const { mode } = useMode()
   const [tab, setTab] = useState(0)
@@ -88,11 +77,11 @@ export function OrdersPage() {
 
     // Send one-time reminder push if there are imminent pending orders (tab 0 = incoming)
     if (!reminderSentRef.current && tab === 0) {
-      const imminentPending = (data ?? []).filter(o =>
-        o.status === 'pending' &&
-        o.expires_at &&
-        getExpiryUrgency(o.expires_at) === 'imminent'
-      )
+      const imminentPending = (data ?? []).filter(o => {
+        if (o.status !== 'pending' || !o.expires_at) return false
+        const diff = new Date(o.expires_at).getTime() - Date.now()
+        return diff > 0 && diff < 2 * 60 * 60 * 1000
+      })
       if (imminentPending.length > 0) {
         reminderSentRef.current = true
         fetch('/api/send-notification', {
@@ -157,161 +146,6 @@ export function OrdersPage() {
   const weekKeys = Object.keys(historyByWeek).sort().reverse()
   const mostRecentWeek = weekKeys[0] ?? null
 
-  const statusLabel: Record<Order['status'], string> = {
-    pending: t('status_pending'),
-    accepted: t('status_accepted'),
-    declined: t('status_declined'),
-    completed: t('status_completed'),
-  }
-  const statusColor: Record<Order['status'], 'warning' | 'success' | 'error' | 'secondary'> = {
-    pending: 'warning', accepted: 'success', declined: 'secondary', completed: 'secondary',
-  }
-
-  function renderOrder(order: Order, showDelete = false, animIndex?: number) {
-    const isAccepting = acceptingId === order.id
-    const borderLeft = order.status === 'pending' ? 'warning.main'
-      : order.status === 'accepted' ? 'success.main'
-      : 'text.disabled'
-
-    return (
-      <Box key={order.id} sx={{
-        borderRadius: 2, overflow: 'hidden',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
-        bgcolor: 'background.paper',
-        position: 'relative',
-        ...(animIndex !== undefined && {
-          animation: `cardIn 0.32s cubic-bezier(0.4,0,0.2,1) ${animIndex * 55}ms both`,
-        }),
-      }}>
-        <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, bgcolor: borderLeft }} />
-        <Box sx={{ p: 2.5, pl: 3 }}>
-          <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-            <Box display="flex" gap={0.8} flexWrap="wrap" alignItems="center">
-              <Box component="span" sx={{ fontSize: 14, color: 'text.disabled', display: 'inline-flex' }}>
-                <Icon icon={order.mode === 'fint' ? 'mdi:weather-sunny' : 'mdi:weather-night'} />
-              </Box>
-              <Chip
-                size="small"
-                label={
-                  order.status === 'declined' && order.expires_at && new Date(order.expires_at) < new Date()
-                    ? t('status_missed')
-                    : statusLabel[order.status]
-                }
-                color={statusColor[order.status]}
-              />
-            </Box>
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <Typography variant="caption" color="text.secondary">
-                {format(new Date(order.created_at), 'd MMM HH:mm', { locale: sv })}
-              </Typography>
-              {showDelete && (
-                <IconButton size="small" onClick={() => deleteOrder(order.id)}
-                  aria-label={t('delete_aria')}
-                  sx={{ color: 'text.disabled', ml: 0.5, '&:hover': { color: 'text.secondary' } }}>
-                  <Icon icon="mdi:delete-outline" width={16} />
-                </IconButton>
-              )}
-            </Box>
-          </Box>
-
-          <Typography fontWeight={700} fontSize="1rem">{order.service?.title ?? t('unknown_wish')}</Typography>
-          {order.date && (
-            <Typography variant="body2" color="text.secondary">
-              {format(new Date(order.date), 'd MMMM yyyy', { locale: sv })}
-            </Typography>
-          )}
-          {order.note && (
-            <Typography variant="body2" color="text.secondary" fontStyle="italic" mt={0.5}>
-              &ldquo;{order.note}&rdquo;
-            </Typography>
-          )}
-          {order.expires_at && order.status === 'pending' && new Date(order.expires_at).getMinutes() === 0 && (
-            <Chip
-              size="small"
-              icon={<Icon icon="mdi:clock-alert-outline" width={14} />}
-              label={`${t('expires_at_label')} ${format(new Date(order.expires_at), 'HH:mm')}`}
-              color="warning"
-              variant="outlined"
-              sx={{ mt: 1 }}
-            />
-          )}
-          {order.expires_at && order.status === 'pending' && (() => {
-            const urgency = getExpiryUrgency(order.expires_at!)
-            if (!urgency) return null
-            const diff = new Date(order.expires_at!).getTime() - Date.now()
-            const hoursLeft = Math.floor(diff / (60 * 60 * 1000))
-            const minutesLeft = Math.floor((diff % (60 * 60 * 1000)) / 60000)
-            const label = hoursLeft > 0
-              ? `${hoursLeft}h ${minutesLeft}min kvar`
-              : `${minutesLeft} min kvar`
-            return (
-              <Typography
-                variant="caption"
-                color={urgency === 'imminent' ? 'error' : 'warning.main'}
-                fontWeight={700}
-                sx={{ display: 'block', mt: 0.5 }}
-              >
-                {label}
-              </Typography>
-            )
-          })()}
-          {order.response_note && (
-            <Chip size="small" label={`⏰ ${order.response_note}`} color="success" variant="outlined" sx={{ mt: 1 }} />
-          )}
-
-          {tab === 0 && order.status === 'pending' && (
-            <Box mt={2}>
-              {isAccepting ? (
-                <Box display="flex" flexDirection="column" gap={1.5}>
-                  <TextField label={t('when_label')} size="small" autoFocus
-                    placeholder={t('when_placeholder')}
-                    value={responseNote} onChange={e => setResponseNote(e.target.value)} />
-                  <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                    {t('consent_accept_hint')}
-                  </Typography>
-                  <Box display="flex" gap={1}>
-                    <Button variant="outlined" color="inherit" size="small" fullWidth
-                      onClick={() => { setAcceptingId(null); setResponseNote('') }}>{tc('cancel')}</Button>
-                    <Button variant="contained" color="success" size="small" fullWidth
-                      startIcon={<Icon icon="mdi:check" />} onClick={() => acceptOrder(order.id)}>{t('confirm')}</Button>
-                  </Box>
-                </Box>
-              ) : (
-                <Box display="flex" gap={1} mt={1}>
-                  <Button variant="outlined" color="error" size="small" fullWidth
-                    onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('decline')}</Button>
-                  <Button variant="contained" color="success" size="small" fullWidth
-                    startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => setAcceptingId(order.id)}>{t('accept')}</Button>
-                </Box>
-              )}
-            </Box>
-          )}
-
-          {tab === 0 && order.status === 'accepted' && (
-            <Box mt={1.5} display="flex" gap={1}>
-              <Button variant="outlined" color="error" size="small"
-                onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('change_mind_receiver')}</Button>
-              <Button variant="outlined" color="secondary" size="small" fullWidth
-                startIcon={<Icon icon="mdi:archive-outline" />}
-                onClick={() => updateStatus(order.id, 'completed')}>{t('archive')}</Button>
-            </Box>
-          )}
-
-          {tab === 1 && order.status === 'accepted' && (
-            <Button variant="outlined" color="error" size="small" fullWidth
-              sx={{ mt: 1.5 }}
-              onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('change_mind_sender')}</Button>
-          )}
-          {tab === 1 && order.status === 'pending' && (
-            <Button variant="outlined" color="error" size="small" fullWidth
-              sx={{ mt: 1.5 }}
-              onClick={() => { if ('vibrate' in navigator) navigator.vibrate([8, 80, 8]); updateStatus(order.id, 'declined') }}>{t('withdraw')}</Button>
-          )}
-        </Box>
-      </Box>
-    )
-  }
-
   return (
     <Box flex={1} display="flex" flexDirection="column">
       <Header title={t('header')} />
@@ -366,7 +200,22 @@ export function OrdersPage() {
           </Box>
         ) : (
           <>
-            {active.map((o, i) => renderOrder(o, false, i))}
+            {active.map((o, i) => (
+              <OrderCard
+                key={o.id}
+                order={o}
+                isIncoming={tab === 0}
+                acceptingId={acceptingId}
+                responseNote={responseNote}
+                onAccept={acceptOrder}
+                onUpdateStatus={updateStatus}
+                onDelete={deleteOrder}
+                onStartAccept={setAcceptingId}
+                onCancelAccept={() => { setAcceptingId(null); setResponseNote('') }}
+                onResponseNoteChange={setResponseNote}
+                animIndex={i}
+              />
+            ))}
 
             {weekKeys.length > 0 && (
               <Box mt={active.length > 0 ? 1 : 0}>
@@ -393,7 +242,18 @@ export function OrdersPage() {
                     <AccordionDetails sx={{ pt: 0, pb: 1.5, px: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
                       {historyByWeek[key].map(o => (
                         <SwipeToDelete key={o.id} onDelete={() => deleteOrder(o.id)}>
-                          {renderOrder(o, false)}
+                          <OrderCard
+                            order={o}
+                            isIncoming={tab === 0}
+                            acceptingId={acceptingId}
+                            responseNote={responseNote}
+                            onAccept={acceptOrder}
+                            onUpdateStatus={updateStatus}
+                            onDelete={deleteOrder}
+                            onStartAccept={setAcceptingId}
+                            onCancelAccept={() => { setAcceptingId(null); setResponseNote('') }}
+                            onResponseNoteChange={setResponseNote}
+                          />
                         </SwipeToDelete>
                       ))}
                     </AccordionDetails>
