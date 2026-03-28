@@ -151,13 +151,35 @@ export function SettingsPage() {
           {notifStatus === 'denied' && (
             <Alert severity="warning" sx={{ borderRadius: 2 }}>
               <Typography variant="body2" fontWeight={600} gutterBottom>Notiser är blockerade</Typography>
-              <Typography variant="body2">Aktivera dem i webbläsarens inställningar:</Typography>
-              <Typography variant="body2" component="ol" sx={{ pl: 2, mt: 0.5, mb: 0 }}>
-                <li>Tryck på låsikonen i adressfältet</li>
-                <li>Välj <strong>Behörigheter</strong></li>
-                <li>Sätt <strong>Notiser</strong> till Tillåt</li>
-                <li>Ladda om sidan</li>
-              </Typography>
+              {(() => {
+                const ua = navigator.userAgent
+                const isIOS = /iPad|iPhone|iPod/.test(ua)
+                const isAndroid = /Android/.test(ua)
+                if (isIOS) return (
+                  <Typography variant="body2" component="ol" sx={{ pl: 2, mt: 0.5, mb: 0 }}>
+                    <li>Öppna <strong>Inställningar</strong> på din iPhone</li>
+                    <li>Gå till <strong>Appar → Safari → Webbplatsinställningar</strong></li>
+                    <li>Tryck på <strong>Notiser</strong> och välj Tillåt</li>
+                    <li>Ladda om sidan</li>
+                  </Typography>
+                )
+                if (isAndroid) return (
+                  <Typography variant="body2" component="ol" sx={{ pl: 2, mt: 0.5, mb: 0 }}>
+                    <li>Tryck på ikonen i adressfältet (lås eller info)</li>
+                    <li>Välj <strong>Behörigheter</strong> eller <strong>Webbplatsinställningar</strong></li>
+                    <li>Sätt <strong>Notiser</strong> till Tillåt</li>
+                    <li>Ladda om sidan</li>
+                  </Typography>
+                )
+                return (
+                  <Typography variant="body2" component="ol" sx={{ pl: 2, mt: 0.5, mb: 0 }}>
+                    <li>Klicka på låsikonen i adressfältet</li>
+                    <li>Välj <strong>Webbplatsinställningar</strong> eller <strong>Behörigheter</strong></li>
+                    <li>Sätt <strong>Notiser</strong> till Tillåt</li>
+                    <li>Ladda om sidan</li>
+                  </Typography>
+                )
+              })()}
             </Alert>
           )}
           {notifStatus === 'unsupported' && (
