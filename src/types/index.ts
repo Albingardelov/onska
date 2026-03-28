@@ -7,6 +7,7 @@ export interface Profile {
   partner_id: string | null
   pairing_code: string
   status: string | null
+  push_subscription?: string | null
   created_at: string
 }
 
