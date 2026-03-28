@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/reset-statuses",
+      "schedule": "59 22 * * *"
+    },
+    {
+      "path": "/api/send-status-reminders",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}
