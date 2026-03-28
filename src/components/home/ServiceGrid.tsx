@@ -1,11 +1,10 @@
 'use client'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import Skeleton from '@mui/material/Skeleton'
 import { Icon } from '@iconify/react'
 import { useTranslations } from 'next-intl'
-import type { Service, Profile } from '../../types'
-import type { Mode } from '../../types'
+import { SectionLabel } from './SectionLabel'
+import type { Service, Profile, Mode } from '../../types'
 
 interface ServiceGridProps {
   services: Service[]
@@ -27,10 +26,9 @@ export function ServiceGrid({
 
   return (
     <Box>
-      <Typography variant="subtitle2" fontWeight={700} color="text.secondary"
-        sx={{ letterSpacing: '-0.01em', mb: 1.5, fontSize: '0.8rem', textTransform: 'uppercase' }}>
+      <SectionLabel>
         {mode === 'snusk' ? t('ideas_label_snusk', { name: partner.name }) : t('ideas_label', { name: partner.name })}
-      </Typography>
+      </SectionLabel>
 
       {loading ? (
         <Box display="flex" flexDirection="column" gap={1.5}>

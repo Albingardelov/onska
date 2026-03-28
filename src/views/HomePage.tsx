@@ -14,20 +14,13 @@ import type { Service, Order } from '../types'
 import { HeroBanner } from '../components/home/HeroBanner'
 import { StatusPills } from '../components/home/StatusPills'
 import { ServiceGrid } from '../components/home/ServiceGrid'
+import { SectionLabel } from '../components/home/SectionLabel'
 import { format, addDays } from 'date-fns'
 import { sv, enUS } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
 import { useTranslations } from 'next-intl'
 import { useLocale } from '../contexts/LocaleContext'
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <Typography variant="subtitle2" fontWeight={700} color="text.secondary"
-      sx={{ letterSpacing: '-0.01em', mb: 1.5, fontSize: '0.8rem', textTransform: 'uppercase' }}>
-      {children}
-    </Typography>
-  )
-}
 
 export function HomePage() {
   const t = useTranslations('home')
