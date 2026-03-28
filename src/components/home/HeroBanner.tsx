@@ -5,8 +5,7 @@ import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 import { isValidStatusKey } from '../../lib/statuses'
 import type { StatusKey } from '../../lib/statuses'
-import type { Profile } from '../../types'
-import type { Mode } from '../../types'
+import type { Profile, Mode } from '../../types'
 import type { Locale } from 'date-fns'
 
 interface HeroBannerProps {
