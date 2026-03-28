@@ -304,7 +304,7 @@ export function HomePage() {
         </Box>
 
         {/* Notification prompt */}
-        {notifStatus === 'unknown' && (
+        {notifStatus === 'unknown' && !profile?.push_subscription && (
           <Box sx={{
             mx: 2.5, mt: 1.5, p: 1.5, borderRadius: 2,
             bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider',
