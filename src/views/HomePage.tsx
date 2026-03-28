@@ -11,9 +11,9 @@ import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
 import { useNotificationPermission } from '../hooks/useNotificationPermission'
-import type { Service, Order, Profile } from '../types'
-import { getStatusesForMode } from '../lib/statuses'
+import type { Service, Order } from '../types'
 import { HeroBanner } from '../components/home/HeroBanner'
+import { StatusPills } from '../components/home/StatusPills'
 import { format, addDays } from 'date-fns'
 import { sv, enUS } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
@@ -32,7 +32,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function HomePage() {
   const t = useTranslations('home')
   const tc = useTranslations('common')
-  const ts = useTranslations('statuses')
   const { partner, profile, user, updateStatus, refreshProfile } = useAuth()
   const { mode } = useMode()
   const { locale } = useLocale()
@@ -183,48 +182,7 @@ export function HomePage() {
           dateFnsLocale={dateFnsLocale}
         />
 
-        {/* Own status */}
-        <Box px={2.5} pt={1.5} pb={0.5} display="flex" gap={0.75} flexWrap="wrap">
-          {getStatusesForMode(mode).map(key => {
-            const isActive = profile?.status === key
-            return (
-              <Box
-                key={key}
-                component="button"
-                onClick={() => updateStatus(isActive ? null : key)}
-                sx={{
-                  border: '1.5px solid',
-                  borderColor: isActive ? 'primary.main' : 'divider',
-                  borderRadius: 10,
-                  px: 1.5,
-                  py: 0.6,
-                  cursor: 'pointer',
-                  bgcolor: isActive ? 'primary.main' : 'transparent',
-                  color: isActive ? 'primary.contrastText' : 'text.secondary',
-                  fontSize: '0.72rem',
-                  fontWeight: 600,
-                  fontFamily: 'inherit',
-                  letterSpacing: '0.01em',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  transition: 'all 0.15s ease',
-                  '&:hover': {
-                    borderColor: 'primary.main',
-                    color: isActive ? 'primary.contrastText' : 'primary.main',
-                  },
-                }}
-              >
-                {isActive && (
-                  <Box component="span" sx={{ fontSize: 11, display: 'flex', opacity: 0.9 }}>
-                    <Icon icon="mdi:check" />
-                  </Box>
-                )}
-                {ts(key)}
-              </Box>
-            )
-          })}
-        </Box>
+        <StatusPills mode={mode} profile={profile!} onUpdate={updateStatus} />
 
         {/* Notification prompt */}
         {notifStatus === 'unknown' && !profile?.push_subscription && (
