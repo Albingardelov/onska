@@ -10,7 +10,7 @@ import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
-import { subscribeToPush } from '../lib/notifications'
+import { useNotificationPermission } from '../hooks/useNotificationPermission'
 import type { Service, Order, Profile } from '../types'
 import { getStatusesForMode, isValidStatusKey } from '../lib/statuses'
 import type { StatusKey } from '../lib/statuses'
@@ -48,16 +48,10 @@ export function HomePage() {
   const [success, setSuccess] = useState(false)
   const [successFading, setSuccessFading] = useState(false)
   const [successTitle, setSuccessTitle] = useState('')
-  const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
-  const [activatingNotif, setActivatingNotif] = useState(false)
+  const { notifStatus, activating: activatingNotif, enableNotifications } = useNotificationPermission(user?.id)
   const [showModeHint, setShowModeHint] = useState(false)
   const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
   const [todayBlockedIds, setTodayBlockedIds] = useState<Set<string>>(new Set())
-
-  useEffect(() => {
-    if (!('Notification' in window)) { setNotifStatus('unsupported'); return }
-    setNotifStatus(Notification.permission === 'granted' ? 'granted' : Notification.permission === 'denied' ? 'denied' : 'unknown')
-  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -134,13 +128,6 @@ export function HomePage() {
   }
 
   const days = Array.from({ length: 30 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
-
-  async function enableNotifications() {
-    setActivatingNotif(true)
-    await subscribeToPush(user!.id)
-    setNotifStatus(Notification.permission === 'granted' ? 'granted' : 'denied')
-    setActivatingNotif(false)
-  }
 
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return

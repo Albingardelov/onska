@@ -10,7 +10,7 @@ import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
 import { supabase } from '../lib/supabase'
-import { subscribeToPush } from '../lib/notifications'
+import { useNotificationPermission } from '../hooks/useNotificationPermission'
 import type { Service } from '../types'
 import { Icon } from '@iconify/react'
 import { useTranslations } from 'next-intl'
@@ -20,20 +20,7 @@ export function MyServicesPage() {
   const tc = useTranslations('common')
   const { profile, user } = useAuth()
   const { mode } = useMode()
-  const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
-  const [activating, setActivating] = useState(false)
-
-  useEffect(() => {
-    if (!('Notification' in window)) { setNotifStatus('unsupported'); return }
-    setNotifStatus(Notification.permission === 'granted' ? 'granted' : Notification.permission === 'denied' ? 'denied' : 'unknown')
-  }, [])
-
-  async function enableNotifications() {
-    setActivating(true)
-    await subscribeToPush(user!.id)
-    setNotifStatus(Notification.permission === 'granted' ? 'granted' : 'denied')
-    setActivating(false)
-  }
+  const { notifStatus, activating, enableNotifications } = useNotificationPermission(user?.id)
 
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)

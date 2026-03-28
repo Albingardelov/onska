@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
@@ -13,7 +13,7 @@ import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useLocale } from '../contexts/LocaleContext'
 import { supabase } from '../lib/supabase'
-import { subscribeToPush } from '../lib/notifications'
+import { useNotificationPermission } from '../hooks/useNotificationPermission'
 import { useTranslations } from 'next-intl'
 
 export function SettingsPage() {
@@ -26,20 +26,7 @@ export function SettingsPage() {
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState('')
-  const [notifStatus, setNotifStatus] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown')
-  const [activatingNotif, setActivatingNotif] = useState(false)
-
-  useEffect(() => {
-    if (!('Notification' in window)) { setNotifStatus('unsupported'); return }
-    setNotifStatus(Notification.permission === 'granted' ? 'granted' : Notification.permission === 'denied' ? 'denied' : 'unknown')
-  }, [])
-
-  async function enableNotifications() {
-    setActivatingNotif(true)
-    await subscribeToPush(user!.id)
-    setNotifStatus(Notification.permission === 'granted' ? 'granted' : 'denied')
-    setActivatingNotif(false)
-  }
+  const { notifStatus, activating: activatingNotif, enableNotifications } = useNotificationPermission(user?.id)
 
   async function exportData() {
     if (!user) return
