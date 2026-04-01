@@ -17,6 +17,7 @@ export function Navbar() {
   const { mode } = useMode()
   const { user } = useAuth()
   const [mySnuskOpenToday, setMySnuskOpenToday] = useState(0)
+  const [pendingOrderCount, setPendingOrderCount] = useState(0)
 
   useEffect(() => {
     if (mode !== 'snusk' || !user) { setMySnuskOpenToday(0); return }
@@ -27,6 +28,15 @@ export function Navbar() {
       .eq('date', today)
       .then(({ count }) => setMySnuskOpenToday(count ?? 0))
   }, [mode, user, pathname])
+
+  useEffect(() => {
+    if (!user) { setPendingOrderCount(0); return }
+    supabase.from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('to_user_id', user.id)
+      .eq('status', 'pending')
+      .then(({ count }) => setPendingOrderCount(count ?? 0))
+  }, [user, pathname])
 
   const isSnusk = mode === 'snusk'
 
@@ -103,6 +113,20 @@ export function Navbar() {
                 border: '1.5px solid',
                 borderColor: isSnusk ? 'rgba(12,2,6,0.92)' : 'rgba(255,255,255,0.92)',
               }} />
+            )}
+            {tab.to === '/onskningar' && pendingOrderCount > 0 && (
+              <Box sx={{
+                position: 'absolute', top: 4, right: 8,
+                minWidth: 16, height: 16, borderRadius: '8px',
+                bgcolor: 'error.main', color: '#fff',
+                fontSize: '0.6rem', fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                px: 0.4,
+                border: '1.5px solid',
+                borderColor: isSnusk ? 'rgba(12,2,6,0.92)' : 'rgba(255,255,255,0.92)',
+              }}>
+                {pendingOrderCount > 9 ? '9+' : pendingOrderCount}
+              </Box>
             )}
             <Typography sx={{
               fontSize: '0.58rem',

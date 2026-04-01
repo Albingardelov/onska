@@ -16,14 +16,12 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url = event.notification.data?.url ?? '/'
+  const url = new URL(event.notification.data?.url ?? '/', self.location.origin).href
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-      for (const client of clients) {
-        if ('focus' in client) {
-          client.navigate(url)
-          return client.focus()
-        }
+      const appClient = clients.find(c => c.url.startsWith(self.location.origin))
+      if (appClient) {
+        return appClient.navigate(url).then(c => c && c.focus())
       }
       return self.clients.openWindow(url)
     })
