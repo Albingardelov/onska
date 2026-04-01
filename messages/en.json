@@ -121,7 +121,7 @@
     "wish_sent_subtitle": "sent to {name}",
     "blocked_date": "Not open for this on that day",
     "blocked_today": "Not open for this today",
-    "snusk_open_none": "{name} is not feeling so adventurous today",
+    "snusk_open_none": "{name} is not feeling very adventurous today",
     "snusk_open_many": "There are {count} fantasies to explore with {name} today",
     "empty_hint": "Tap a day to set your availability",
     "date_any": "Any day",

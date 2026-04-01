@@ -121,7 +121,7 @@
     "wish_sent_subtitle": "skickad till {name}",
     "blocked_date": "Inte öppen för detta den dagen",
     "blocked_today": "Inte öppen för detta idag",
-    "snusk_open_none": "{name} är inte så fantasifull idag",
+    "snusk_open_none": "{name} känner sig inte så fantasifull idag",
     "snusk_open_many": "Det finns {count} fantasier att utforska med {name} idag",
     "empty_hint": "Tryck på en dag för att ställa in din tillgänglighet",
     "date_any": "Valfri dag",
