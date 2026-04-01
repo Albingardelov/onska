@@ -204,7 +204,6 @@ export function HomePage() {
           mode={mode}
           partner={partner}
           loading={loading}
-          blockedTodayCount={todayMarkedIds.size}
           openTodayCount={services.filter(s => todayMarkedIds.has(s.id)).length}
           myOpenTodayCount={myTodayOpenCount}
           dateFnsLocale={dateFnsLocale}
