@@ -3,6 +3,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import IconButton from '@mui/material/IconButton'
 import Switch from '@mui/material/Switch'
+import Button from '@mui/material/Button'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -17,7 +18,7 @@ export function CalendarPage() {
   const { profile } = useAuth()
   const [orders, setOrders] = useState<Order[]>([])
   const [myServices, setMyServices] = useState<Service[]>([])
-  const [blockedServiceIds, setBlockedServiceIds] = useState<Set<string>>(new Set())
+  const [markedServiceIds, setMarkedServiceIds] = useState<Set<string>>(new Set())
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [daysWithBlocked, setDaysWithBlocked] = useState<Set<string>>(new Set())
@@ -25,8 +26,8 @@ export function CalendarPage() {
   useEffect(() => { loadOrders(); loadDaysWithBlocked() }, [currentMonth])
   useEffect(() => { loadMyServices() }, [])
   useEffect(() => {
-    if (selectedDay) loadBlockedForDay(selectedDay)
-    else setBlockedServiceIds(new Set())
+    if (selectedDay) loadMarkedForDay(selectedDay)
+    else setMarkedServiceIds(new Set())
   }, [selectedDay])
 
   async function loadOrders() {
@@ -52,23 +53,55 @@ export function CalendarPage() {
     setMyServices(data ?? [])
   }
 
-  async function loadBlockedForDay(date: string) {
+  async function loadMarkedForDay(date: string) {
     const { data } = await supabase.from('service_availability').select('service_id')
       .eq('user_id', profile!.id).eq('date', date)
-    setBlockedServiceIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
+    setMarkedServiceIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
   }
 
   async function toggleService(serviceId: string) {
     if (!selectedDay) return
-    const isBlocked = blockedServiceIds.has(serviceId)
-    if (isBlocked) {
+    const isMarked = markedServiceIds.has(serviceId)
+    if (isMarked) {
       await supabase.from('service_availability').delete()
         .eq('user_id', profile!.id).eq('service_id', serviceId).eq('date', selectedDay)
-      setBlockedServiceIds(prev => { const s = new Set(prev); s.delete(serviceId); return s })
+      setMarkedServiceIds(prev => { const s = new Set(prev); s.delete(serviceId); return s })
     } else {
       await supabase.from('service_availability').insert({ user_id: profile!.id, service_id: serviceId, date: selectedDay })
-      setBlockedServiceIds(prev => new Set([...prev, serviceId]))
+      setMarkedServiceIds(prev => new Set([...prev, serviceId]))
     }
+    loadDaysWithBlocked()
+  }
+
+  async function openAll() {
+    if (!selectedDay) return
+    // Delete all rows for this day (removes all fint blocks and snusk opens)
+    await supabase.from('service_availability').delete()
+      .eq('user_id', profile!.id).eq('date', selectedDay)
+    // Insert rows for all snusk services (marks them open)
+    const snuskServices = myServices.filter(s => s.mode === 'snusk')
+    if (snuskServices.length > 0) {
+      await supabase.from('service_availability').insert(
+        snuskServices.map(s => ({ user_id: profile!.id, service_id: s.id, date: selectedDay }))
+      )
+    }
+    setMarkedServiceIds(new Set(snuskServices.map(s => s.id)))
+    loadDaysWithBlocked()
+  }
+
+  async function closeAll() {
+    if (!selectedDay) return
+    // Delete all rows for this day
+    await supabase.from('service_availability').delete()
+      .eq('user_id', profile!.id).eq('date', selectedDay)
+    // Insert rows for all fint services (marks them blocked)
+    const fintServices = myServices.filter(s => s.mode === 'fint')
+    if (fintServices.length > 0) {
+      await supabase.from('service_availability').insert(
+        fintServices.map(s => ({ user_id: profile!.id, service_id: s.id, date: selectedDay }))
+      )
+    }
+    setMarkedServiceIds(new Set(fintServices.map(s => s.id)))
     loadDaysWithBlocked()
   }
 
@@ -170,16 +203,26 @@ export function CalendarPage() {
             {myServices.length > 0 && (
               <Box mt={ordersByDate[selectedDay]?.length ? 1.5 : 0}>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, lineHeight: 1.5 }}>
-                  {t('open_hint')}
+                  {myServices.some(s => s.mode === 'snusk') ? t('open_hint_snusk') : t('open_hint_fint')}
                 </Typography>
+                <Box display="flex" gap={1} mb={1.5}>
+                  <Button size="small" variant="outlined" onClick={openAll} sx={{ fontSize: '0.72rem', py: 0.4 }}>
+                    {t('open_all')}
+                  </Button>
+                  <Button size="small" variant="outlined" onClick={closeAll} sx={{ fontSize: '0.72rem', py: 0.4 }}>
+                    {t('close_all')}
+                  </Button>
+                </Box>
                 {myServices.map(service => {
-                  const isBlocked = blockedServiceIds.has(service.id)
+                  const isAvailable = service.mode === 'snusk'
+                    ? markedServiceIds.has(service.id)
+                    : !markedServiceIds.has(service.id)
                   return (
                     <Box key={service.id} display="flex" alignItems="center" justifyContent="space-between" py={0.5}>
-                      <Typography variant="body2" sx={{ opacity: isBlocked ? 0.45 : 1, textDecoration: isBlocked ? 'line-through' : 'none' }}>
+                      <Typography variant="body2" sx={{ opacity: isAvailable ? 1 : 0.45, textDecoration: isAvailable ? 'none' : 'line-through' }}>
                         {service.title}
                       </Typography>
-                      <Switch size="small" checked={!isBlocked} onChange={() => toggleService(service.id)}
+                      <Switch size="small" checked={isAvailable} onChange={() => toggleService(service.id)}
                         color="primary" inputProps={{ 'aria-label': service.title }} />
                     </Box>
                   )
