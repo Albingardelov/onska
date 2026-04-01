@@ -138,7 +138,17 @@
     "cta_fint": "Wish for something",
     "cta_snusk": "Craving something?",
     "sheet_title": "Choose a gesture",
-    "sheet_title_snusk": "What are you craving?"
+    "sheet_title_snusk": "What are you craving?",
+    "thinking_of_you": "Thinking of you, {name}",
+    "thinking_sent": "Sent! 💛",
+    "todays_idea_label": "Maybe today?",
+    "todays_idea_cta": "Wish for it",
+    "todays_idea_cta_snusk": "Yes, I want that",
+    "no_plans_title": "Nothing planned yet",
+    "no_plans_sub": "Wishes {name} accepts will appear here",
+    "recent_moment_label": "Last time",
+    "recent_moment_you": "You wished for",
+    "recent_moment_partner": "{name} wished for"
   },
   "orders": {
     "header": "Wishes",

@@ -138,7 +138,17 @@
     "cta_fint": "Önska något",
     "cta_snusk": "Sugen på något?",
     "sheet_title": "Välj en omtanke",
-    "sheet_title_snusk": "Vad är du sugen på?"
+    "sheet_title_snusk": "Vad är du sugen på?",
+    "thinking_of_you": "Tänker på dig, {name}",
+    "thinking_sent": "Skickat! 💛",
+    "todays_idea_label": "Kanske idag?",
+    "todays_idea_cta": "Önska den",
+    "todays_idea_cta_snusk": "Ja, det vill jag",
+    "no_plans_title": "Inget planerat ännu",
+    "no_plans_sub": "Önskningar {name} accepterar dyker upp här",
+    "recent_moment_label": "Sist ni hade det",
+    "recent_moment_you": "Du önskade",
+    "recent_moment_partner": "{name} önskade"
   },
   "orders": {
     "header": "Önskningar",
