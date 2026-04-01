@@ -21,9 +21,9 @@ export function CalendarPage() {
   const [markedServiceIds, setMarkedServiceIds] = useState<Set<string>>(new Set())
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
-  const [daysWithBlocked, setDaysWithBlocked] = useState<Set<string>>(new Set())
+  const [daysWithSnuskOpen, setDaysWithSnuskOpen] = useState<Set<string>>(new Set())
 
-  useEffect(() => { loadOrders(); loadDaysWithBlocked() }, [currentMonth])
+  useEffect(() => { loadOrders(); loadDaysWithSnuskOpen() }, [currentMonth])
   useEffect(() => { loadMyServices() }, [])
   useEffect(() => {
     if (selectedDay) loadMarkedForDay(selectedDay)
@@ -39,17 +39,17 @@ export function CalendarPage() {
     setOrders(data ?? [])
   }
 
-  async function loadDaysWithBlocked() {
+  async function loadDaysWithSnuskOpen() {
     const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd')
     const end = format(endOfMonth(currentMonth), 'yyyy-MM-dd')
     const { data } = await supabase.from('service_availability').select('date')
       .eq('user_id', profile!.id).gte('date', start).lte('date', end)
-    setDaysWithBlocked(new Set((data ?? []).map((r: { date: string }) => r.date)))
+    setDaysWithSnuskOpen(new Set((data ?? []).map((r: { date: string }) => r.date)))
   }
 
   async function loadMyServices() {
     const { data } = await supabase.from('services').select('*')
-      .eq('user_id', profile!.id).eq('active', true).order('title', { ascending: true })
+      .eq('user_id', profile!.id).eq('active', true).eq('mode', 'snusk').order('title', { ascending: true })
     setMyServices(data ?? [])
   }
 
@@ -70,39 +70,28 @@ export function CalendarPage() {
       await supabase.from('service_availability').insert({ user_id: profile!.id, service_id: serviceId, date: selectedDay })
       setMarkedServiceIds(prev => new Set([...prev, serviceId]))
     }
-    loadDaysWithBlocked()
+    loadDaysWithSnuskOpen()
   }
 
   async function openAll() {
     if (!selectedDay) return
-    // Delete all rows for this day (removes all fint blocks and snusk opens)
     await supabase.from('service_availability').delete()
       .eq('user_id', profile!.id).eq('date', selectedDay)
-    // Insert rows for all snusk services (marks them open)
-    const snuskServices = myServices.filter(s => s.mode === 'snusk')
-    if (snuskServices.length > 0) {
+    if (myServices.length > 0) {
       await supabase.from('service_availability').insert(
-        snuskServices.map(s => ({ user_id: profile!.id, service_id: s.id, date: selectedDay }))
+        myServices.map(s => ({ user_id: profile!.id, service_id: s.id, date: selectedDay }))
       )
     }
-    setMarkedServiceIds(new Set(snuskServices.map(s => s.id)))
-    loadDaysWithBlocked()
+    setMarkedServiceIds(new Set(myServices.map(s => s.id)))
+    loadDaysWithSnuskOpen()
   }
 
   async function closeAll() {
     if (!selectedDay) return
-    // Delete all rows for this day
     await supabase.from('service_availability').delete()
       .eq('user_id', profile!.id).eq('date', selectedDay)
-    // Insert rows for all fint services (marks them blocked)
-    const fintServices = myServices.filter(s => s.mode === 'fint')
-    if (fintServices.length > 0) {
-      await supabase.from('service_availability').insert(
-        fintServices.map(s => ({ user_id: profile!.id, service_id: s.id, date: selectedDay }))
-      )
-    }
-    setMarkedServiceIds(new Set(fintServices.map(s => s.id)))
-    loadDaysWithBlocked()
+    setMarkedServiceIds(new Set())
+    loadDaysWithSnuskOpen()
   }
 
   const days = eachDayOfInterval({ start: startOfMonth(currentMonth), end: endOfMonth(currentMonth) })
@@ -140,7 +129,7 @@ export function CalendarPage() {
           {days.map(day => {
             const dateStr = format(day, 'yyyy-MM-dd')
             const hasOrders = !!ordersByDate[dateStr]?.length
-            const hasBlocked = daysWithBlocked.has(dateStr)
+            const hasBlocked = daysWithSnuskOpen.has(dateStr)
             const isSelected = selectedDay === dateStr
             const isPast = dateStr < today
             const isTodayDate = dateStr === today
@@ -203,7 +192,7 @@ export function CalendarPage() {
             {myServices.length > 0 && (
               <Box mt={ordersByDate[selectedDay]?.length ? 1.5 : 0}>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, lineHeight: 1.5 }}>
-                  {myServices.some(s => s.mode === 'snusk') ? t('open_hint_snusk') : t('open_hint_fint')}
+                  {t('open_hint_snusk')}
                 </Typography>
                 <Box display="flex" gap={1} mb={1.5}>
                   <Button size="small" variant="outlined" onClick={openAll} sx={{ fontSize: '0.72rem', py: 0.4 }}>
@@ -214,9 +203,7 @@ export function CalendarPage() {
                   </Button>
                 </Box>
                 {myServices.map(service => {
-                  const isAvailable = service.mode === 'snusk'
-                    ? markedServiceIds.has(service.id)
-                    : !markedServiceIds.has(service.id)
+                  const isAvailable = markedServiceIds.has(service.id)
                   return (
                     <Box key={service.id} display="flex" alignItems="center" justifyContent="space-between" py={0.5}>
                       <Typography variant="body2" sx={{ opacity: isAvailable ? 1 : 0.45, textDecoration: isAvailable ? 'none' : 'line-through' }}>

@@ -1,16 +1,32 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { Icon } from '@iconify/react'
+import { format } from 'date-fns'
 import { useTranslations } from 'next-intl'
 import { useMode } from '../contexts/ModeContext'
+import { useAuth } from '../contexts/AuthContext'
+import { supabase } from '../lib/supabase'
 
 export function Navbar() {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const { mode } = useMode()
+  const { user } = useAuth()
+  const [mySnuskOpenToday, setMySnuskOpenToday] = useState(0)
+
+  useEffect(() => {
+    if (mode !== 'snusk' || !user) { setMySnuskOpenToday(0); return }
+    const today = format(new Date(), 'yyyy-MM-dd')
+    supabase.from('service_availability')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('date', today)
+      .then(({ count }) => setMySnuskOpenToday(count ?? 0))
+  }, [mode, user, pathname])
 
   const isSnusk = mode === 'snusk'
 
@@ -63,6 +79,7 @@ export function Navbar() {
               py: '7px',
               borderRadius: '20px',
               textDecoration: 'none',
+              position: 'relative',
               bgcolor: active ? 'primary.main' : 'transparent',
               color: active ? 'primary.contrastText' : isSnusk ? '#BA7080' : 'text.secondary',
               transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
@@ -78,6 +95,15 @@ export function Navbar() {
             <Box sx={{ fontSize: 22, display: 'flex', lineHeight: 1 }}>
               <Icon icon={active ? tab.activeIcon : tab.icon} />
             </Box>
+            {tab.to === '/kalender' && isSnusk && mySnuskOpenToday === 0 && (
+              <Box sx={{
+                position: 'absolute', top: 6, right: 10,
+                width: 7, height: 7, borderRadius: '50%',
+                bgcolor: 'warning.main',
+                border: '1.5px solid',
+                borderColor: isSnusk ? 'rgba(12,2,6,0.92)' : 'rgba(255,255,255,0.92)',
+              }} />
+            )}
             <Typography sx={{
               fontSize: '0.58rem',
               fontWeight: active ? 700 : 500,
