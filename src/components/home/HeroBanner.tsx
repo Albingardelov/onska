@@ -13,10 +13,11 @@ interface HeroBannerProps {
   partner: Profile
   loading: boolean
   blockedTodayCount: number
+  openTodayCount: number
   dateFnsLocale: Locale
 }
 
-export function HeroBanner({ mode, partner, loading, blockedTodayCount, dateFnsLocale }: HeroBannerProps) {
+export function HeroBanner({ mode, partner, loading, blockedTodayCount, openTodayCount, dateFnsLocale }: HeroBannerProps) {
   const t = useTranslations('home')
   const ts = useTranslations('statuses')
 
@@ -49,19 +50,33 @@ export function HeroBanner({ mode, partner, loading, blockedTodayCount, dateFnsL
       </Typography>
 
       {!loading && (
-        <Box display="flex" alignItems="center" gap={0.8}
-          sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
-          <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}>
-            <Icon icon={blockedTodayCount === 0 ? 'mdi:check-circle-outline' : 'mdi:information-outline'} />
+        mode === 'snusk' ? (
+          <Box display="flex" alignItems="center" gap={0.8}
+            sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+            <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}>
+              <Icon icon={openTodayCount === 0 ? 'mdi:lock-outline' : 'mdi:check-circle-outline'} />
+            </Box>
+            <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
+              {openTodayCount === 0
+                ? t('snusk_open_none', { name: partner.name })
+                : t('snusk_open_many', { name: partner.name, count: openTodayCount })}
+            </Typography>
           </Box>
-          <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
-            {blockedTodayCount === 0
-              ? t('open_for_all', { name: partner.name })
-              : blockedTodayCount === 1
-                ? t('blocked_one', { name: partner.name })
-                : t('blocked_many', { name: partner.name, count: blockedTodayCount })}
-          </Typography>
-        </Box>
+        ) : (
+          <Box display="flex" alignItems="center" gap={0.8}
+            sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+            <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}>
+              <Icon icon={blockedTodayCount === 0 ? 'mdi:check-circle-outline' : 'mdi:information-outline'} />
+            </Box>
+            <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
+              {blockedTodayCount === 0
+                ? t('open_for_all', { name: partner.name })
+                : blockedTodayCount === 1
+                  ? t('blocked_one', { name: partner.name })
+                  : t('blocked_many', { name: partner.name, count: blockedTodayCount })}
+            </Typography>
+          </Box>
+        )
       )}
 
       {isValidStatusKey(partner.status) && (

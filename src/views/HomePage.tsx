@@ -44,8 +44,8 @@ export function HomePage() {
   const [successTitle, setSuccessTitle] = useState('')
   const { notifStatus, activating: activatingNotif, enableNotifications } = useNotificationPermission(user?.id)
   const [showModeHint, setShowModeHint] = useState(false)
-  const [partnerBlockedIds, setPartnerBlockedIds] = useState<Set<string>>(new Set())
-  const [todayBlockedIds, setTodayBlockedIds] = useState<Set<string>>(new Set())
+  const [partnerMarkedIds, setPartnerMarkedIds] = useState<Set<string>>(new Set())
+  const [todayMarkedIds, setTodayMarkedIds] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -58,23 +58,25 @@ export function HomePage() {
   useEffect(() => {
     if (!partner) return
     loadData()
-    loadTodayBlocked()
+    loadTodayMarked()
     const channel = supabase.channel('home-availability')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_availability' }, () => loadTodayBlocked())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_availability' }, () => loadTodayMarked())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [partner, mode])
 
   useEffect(() => {
-    if (selectedDate && partner) loadPartnerBlocked(selectedDate)
-    else setPartnerBlockedIds(new Set())
+    if (selectedDate && partner) loadPartnerMarked(selectedDate)
+    else setPartnerMarkedIds(new Set())
   }, [selectedDate, partner])
 
   useEffect(() => {
-    if (selectedService && partnerBlockedIds.has(selectedService.id)) {
-      setSelectedService(null)
-    }
-  }, [partnerBlockedIds])
+    if (!selectedService) return
+    const isBlocked = mode === 'snusk'
+      ? !partnerMarkedIds.has(selectedService.id)
+      : partnerMarkedIds.has(selectedService.id)
+    if (isBlocked) setSelectedService(null)
+  }, [partnerMarkedIds])
 
   useEffect(() => {
     if (!partner?.id) return
@@ -102,31 +104,34 @@ export function HomePage() {
     setLoading(false)
   }
 
-  async function loadTodayBlocked() {
+  async function loadTodayMarked() {
     const today = format(new Date(), 'yyyy-MM-dd')
     const { data } = await supabase
       .from('service_availability')
       .select('service_id')
       .eq('user_id', partner!.id)
       .eq('date', today)
-    setTodayBlockedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
+    setTodayMarkedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
   }
 
-  async function loadPartnerBlocked(date: string) {
+  async function loadPartnerMarked(date: string) {
     const { data } = await supabase
       .from('service_availability')
       .select('service_id')
       .eq('user_id', partner!.id)
       .eq('date', date)
-    setPartnerBlockedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
+    setPartnerMarkedIds(new Set((data ?? []).map((r: { service_id: string }) => r.service_id)))
   }
 
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd')), [])
 
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return
-    const blockedIds = selectedDate ? partnerBlockedIds : todayBlockedIds
-    if (blockedIds.has(selectedService.id)) return
+    const markedIds = selectedDate ? partnerMarkedIds : todayMarkedIds
+    const isBlocked = mode === 'snusk'
+      ? !markedIds.has(selectedService.id)
+      : markedIds.has(selectedService.id)
+    if (isBlocked) return
     setOrdering(true)
     const title = selectedService.title
     await supabase.from('orders').insert({
@@ -162,7 +167,6 @@ export function HomePage() {
 
   const upcomingOrders = activeOrders.filter(o => o.from_user_id === profile!.id)
   const todayStr = format(new Date(), 'yyyy-MM-dd')
-  const blockedTodayCount = todayBlockedIds.size
 
   return (
     <Box flex={1} display="flex" flexDirection="column">
@@ -173,7 +177,8 @@ export function HomePage() {
           mode={mode}
           partner={partner}
           loading={loading}
-          blockedTodayCount={blockedTodayCount}
+          blockedTodayCount={todayMarkedIds.size}
+          openTodayCount={services.filter(s => todayMarkedIds.has(s.id)).length}
           dateFnsLocale={dateFnsLocale}
         />
 
@@ -259,8 +264,8 @@ export function HomePage() {
             partner={partner}
             selectedService={selectedService}
             selectedDate={selectedDate}
-            partnerBlockedIds={partnerBlockedIds}
-            todayBlockedIds={todayBlockedIds}
+            partnerMarkedIds={partnerMarkedIds}
+            todayMarkedIds={todayMarkedIds}
             onSelect={setSelectedService}
           />
 

@@ -14,14 +14,14 @@ interface ServiceGridProps {
   partner: Profile
   selectedService: Service | null
   selectedDate: string | null
-  partnerBlockedIds: Set<string>
-  todayBlockedIds: Set<string>
+  partnerMarkedIds: Set<string>
+  todayMarkedIds: Set<string>
   onSelect: (service: Service | null) => void
 }
 
 export function ServiceGrid({
   services, loading, mode, partner, selectedService,
-  selectedDate, partnerBlockedIds, todayBlockedIds, onSelect,
+  selectedDate, partnerMarkedIds, todayMarkedIds, onSelect,
 }: ServiceGridProps) {
   const t = useTranslations('home')
 
@@ -48,9 +48,10 @@ export function ServiceGrid({
         <Box display="flex" flexDirection="column" gap={1.5}>
           {services.map((service, index) => {
             const selected = selectedService?.id === service.id
-            const blockedForDate = selectedDate ? partnerBlockedIds.has(service.id) : false
-            const blockedToday = !selectedDate && todayBlockedIds.has(service.id)
-            const isBlocked = blockedForDate || blockedToday
+            const markedIds = selectedDate ? partnerMarkedIds : todayMarkedIds
+            const isBlocked = mode === 'snusk'
+              ? !markedIds.has(service.id)
+              : markedIds.has(service.id)
             return (
               <Box key={service.id}
                 onClick={() => { if (!isBlocked) onSelect(selected ? null : service) }}
