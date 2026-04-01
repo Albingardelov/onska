@@ -22,6 +22,7 @@ export function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
   const [daysWithSnuskOpen, setDaysWithSnuskOpen] = useState<Set<string>>(new Set())
+  const [weekLoading, setWeekLoading] = useState(false)
 
   useEffect(() => { loadOrders(); loadDaysWithSnuskOpen() }, [currentMonth])
   useEffect(() => { loadMyServices() }, [])
@@ -71,6 +72,30 @@ export function CalendarPage() {
       setMarkedServiceIds(prev => new Set([...prev, serviceId]))
     }
     loadDaysWithSnuskOpen()
+  }
+
+  async function openWeek() {
+    if (!myServices.length) return
+    setWeekLoading(true)
+    const dates = Array.from({ length: 7 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
+    await supabase.from('service_availability').delete()
+      .eq('user_id', profile!.id).in('date', dates)
+    await supabase.from('service_availability').insert(
+      dates.flatMap(date => myServices.map(s => ({ user_id: profile!.id, service_id: s.id, date })))
+    )
+    if (selectedDay && dates.includes(selectedDay)) setMarkedServiceIds(new Set(myServices.map(s => s.id)))
+    await loadDaysWithSnuskOpen()
+    setWeekLoading(false)
+  }
+
+  async function closeWeek() {
+    setWeekLoading(true)
+    const dates = Array.from({ length: 7 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd'))
+    await supabase.from('service_availability').delete()
+      .eq('user_id', profile!.id).in('date', dates)
+    if (selectedDay && dates.includes(selectedDay)) setMarkedServiceIds(new Set())
+    await loadDaysWithSnuskOpen()
+    setWeekLoading(false)
   }
 
   async function openAll() {
@@ -167,6 +192,27 @@ export function CalendarPage() {
             </Box>
           ))}
         </Box>
+
+        {myServices.length > 0 && (
+          <Box display="flex" gap={1}>
+            <Button
+              size="small" variant="outlined" disabled={weekLoading}
+              onClick={openWeek}
+              startIcon={<Icon icon="mdi:calendar-check-outline" />}
+              sx={{ fontSize: '0.75rem', py: 0.6, flex: 1 }}
+            >
+              {t('open_week')}
+            </Button>
+            <Button
+              size="small" variant="outlined" disabled={weekLoading}
+              onClick={closeWeek}
+              startIcon={<Icon icon="mdi:calendar-remove-outline" />}
+              sx={{ fontSize: '0.75rem', py: 0.6, flex: 1 }}
+            >
+              {t('close_week')}
+            </Button>
+          </Box>
+        )}
 
         {selectedDay && (
           <Box sx={{

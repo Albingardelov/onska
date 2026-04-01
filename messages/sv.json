@@ -187,7 +187,9 @@
     "close_all": "Stäng alla",
     "no_ideas_yet": "Inga idéer att ställa in ännu.",
     "upcoming": "Planerat framöver",
-    "empty_hint": "Tryck på en dag för att ställa in din tillgänglighet"
+    "empty_hint": "Tryck på en dag för att ställa in din tillgänglighet",
+    "open_week": "Öppna 7 dagar",
+    "close_week": "Stäng 7 dagar"
   },
   "services": {
     "header": "Mina idéer",

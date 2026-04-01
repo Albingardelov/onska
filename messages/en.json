@@ -187,7 +187,9 @@
     "close_all": "Close all",
     "no_ideas_yet": "No ideas to configure yet.",
     "upcoming": "Upcoming plans",
-    "empty_hint": "Tap a day to set your availability"
+    "empty_hint": "Tap a day to set your availability",
+    "open_week": "Open 7 days",
+    "close_week": "Close 7 days"
   },
   "services": {
     "header": "My ideas",
