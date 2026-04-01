@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { Icon } from '@iconify/react'
 import { format } from 'date-fns'
+import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { isValidStatusKey } from '../../lib/statuses'
 import type { StatusKey } from '../../lib/statuses'
@@ -14,10 +15,11 @@ interface HeroBannerProps {
   loading: boolean
   blockedTodayCount: number
   openTodayCount: number
+  myOpenTodayCount: number
   dateFnsLocale: Locale
 }
 
-export function HeroBanner({ mode, partner, loading, blockedTodayCount, openTodayCount, dateFnsLocale }: HeroBannerProps) {
+export function HeroBanner({ mode, partner, loading, blockedTodayCount, openTodayCount, myOpenTodayCount, dateFnsLocale }: HeroBannerProps) {
   const t = useTranslations('home')
   const ts = useTranslations('statuses')
 
@@ -51,16 +53,44 @@ export function HeroBanner({ mode, partner, loading, blockedTodayCount, openToda
 
       {!loading && (
         mode === 'snusk' ? (
-          <Box display="flex" alignItems="center" gap={0.8}
-            sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
-            <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}>
-              <Icon icon={openTodayCount === 0 ? 'mdi:lock-outline' : 'mdi:check-circle-outline'} />
+          <Box display="flex" flexDirection="column" gap={0.6}>
+            <Box display="flex" alignItems="center" gap={0.8}
+              sx={{ bgcolor: 'rgba(255,255,255,0.15)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+              <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.9 }}>
+                <Icon icon={openTodayCount === 0 ? 'mdi:lock-outline' : 'mdi:check-circle-outline'} />
+              </Box>
+              <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
+                {openTodayCount === 0
+                  ? t('snusk_open_none', { name: partner.name })
+                  : t('snusk_open_many', { name: partner.name, count: openTodayCount })}
+              </Typography>
             </Box>
-            <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.9 }}>
-              {openTodayCount === 0
-                ? t('snusk_open_none', { name: partner.name })
-                : t('snusk_open_many', { name: partner.name, count: openTodayCount })}
-            </Typography>
+            {myOpenTodayCount === 0 ? (
+              <Link href="/kalender" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Box display="flex" alignItems="center" gap={0.8}
+                  sx={{ bgcolor: 'rgba(255,255,255,0.10)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content', cursor: 'pointer' }}>
+                  <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.7 }}>
+                    <Icon icon="mdi:lock-open-variant-outline" />
+                  </Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.7 }}>
+                    {t('my_snusk_open_none')}
+                  </Typography>
+                  <Box component="span" sx={{ fontSize: 12, display: 'flex', opacity: 0.5 }}>
+                    <Icon icon="mdi:arrow-right" />
+                  </Box>
+                </Box>
+              </Link>
+            ) : (
+              <Box display="flex" alignItems="center" gap={0.8}
+                sx={{ bgcolor: 'rgba(255,255,255,0.10)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
+                <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.7 }}>
+                  <Icon icon="mdi:check-circle-outline" />
+                </Box>
+                <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.7 }}>
+                  {t('my_snusk_open_many', { count: myOpenTodayCount })}
+                </Typography>
+              </Box>
+            )}
           </Box>
         ) : (
           <Box display="flex" alignItems="center" gap={0.8}

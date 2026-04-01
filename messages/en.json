@@ -130,7 +130,11 @@
     "notif_hint_body": "Enable notifications to see when {name} responds",
     "notif_enable": "Enable",
     "mode_hint": "Switch mode with the button top right — Light for everyday wishes, Dark for more intimate ones.",
-    "unknown_service": "Unknown service"
+    "unknown_service": "Unknown service",
+    "my_snusk_open_none": "You have nothing open today — tap to change",
+    "my_snusk_open_many": "You have {count} fantasies open today",
+    "snusk_optin_hint": "In dark mode, all fantasies are closed by default. Open them in the calendar for the days you're up for it.",
+    "snusk_optin_hint_cta": "Open calendar"
   },
   "orders": {
     "header": "Wishes",
@@ -166,7 +170,15 @@
     "header": "Calendar",
     "prev_month": "Previous month",
     "next_month": "Next month",
-    "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
+    ],
     "legend_planned": "Planned",
     "legend_blocked": "Customised day",
     "open_hint_fint": "What are you open to on this day? (everything is on by default)",

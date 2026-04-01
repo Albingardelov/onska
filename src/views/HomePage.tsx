@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Snackbar from '@mui/material/Snackbar'
+import Link from 'next/link'
 import { Header } from '../components/Header'
 import { useAuth } from '../contexts/AuthContext'
 import { useMode } from '../contexts/ModeContext'
@@ -44,8 +45,10 @@ export function HomePage() {
   const [successTitle, setSuccessTitle] = useState('')
   const { notifStatus, activating: activatingNotif, enableNotifications } = useNotificationPermission(user?.id)
   const [showModeHint, setShowModeHint] = useState(false)
+  const [showSnuskHint, setShowSnuskHint] = useState(false)
   const [partnerMarkedIds, setPartnerMarkedIds] = useState<Set<string>>(new Set())
   const [todayMarkedIds, setTodayMarkedIds] = useState<Set<string>>(new Set())
+  const [myTodayOpenCount, setMyTodayOpenCount] = useState(0)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -59,11 +62,24 @@ export function HomePage() {
     if (!partner) return
     loadData()
     loadTodayMarked()
+    loadMyTodayOpen()
     const channel = supabase.channel('home-availability')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_availability' }, () => loadTodayMarked())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'service_availability' }, () => {
+        loadTodayMarked()
+        loadMyTodayOpen()
+      })
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [partner, mode])
+
+  useEffect(() => {
+    if (mode !== 'snusk' || loading) return
+    if (typeof window === 'undefined') return
+    if (localStorage.getItem('snuskOptInHintSeen')) return
+    localStorage.setItem('snuskOptInHintSeen', '1')
+    const timer = setTimeout(() => setShowSnuskHint(true), 1500)
+    return () => clearTimeout(timer)
+  }, [mode, loading])
 
   useEffect(() => {
     if (selectedDate && partner) loadPartnerMarked(selectedDate)
@@ -102,6 +118,17 @@ export function HomePage() {
     setServices(servicesRes.data ?? [])
     setActiveOrders([...(inboxRes.data ?? []), ...(sentRes.data ?? [])])
     setLoading(false)
+  }
+
+  async function loadMyTodayOpen() {
+    if (!profile) return
+    const today = format(new Date(), 'yyyy-MM-dd')
+    const { count } = await supabase
+      .from('service_availability')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', profile.id)
+      .eq('date', today)
+    setMyTodayOpenCount(count ?? 0)
   }
 
   async function loadTodayMarked() {
@@ -179,6 +206,7 @@ export function HomePage() {
           loading={loading}
           blockedTodayCount={todayMarkedIds.size}
           openTodayCount={services.filter(s => todayMarkedIds.has(s.id)).length}
+          myOpenTodayCount={myTodayOpenCount}
           dateFnsLocale={dateFnsLocale}
         />
 
@@ -333,6 +361,40 @@ export function HomePage() {
           )}
         </Box>
       </Box>
+
+      {/* One-time snusk opt-in hint */}
+      <Snackbar
+        open={showSnuskHint}
+        onClose={() => setShowSnuskHint(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{ bottom: { xs: 80 } }}
+      >
+        <Box sx={{
+          display: 'flex', alignItems: 'flex-start', gap: 1.5,
+          px: 2, py: 1.5, borderRadius: 2,
+          bgcolor: 'background.paper',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)',
+          maxWidth: 320,
+        }}>
+          <Box component="span" sx={{ fontSize: 18, color: 'primary.main', display: 'flex', flexShrink: 0, mt: 0.2 }}>
+            <Icon icon="mdi:lock-outline" />
+          </Box>
+          <Box flex={1}>
+            <Typography variant="caption" color="text.secondary" lineHeight={1.6}>
+              {t('snusk_optin_hint')}
+            </Typography>
+            <Box display="flex" gap={1} mt={1}>
+              <Button size="small" variant="contained" component={Link} href="/kalender"
+                onClick={() => setShowSnuskHint(false)} sx={{ fontSize: '0.7rem', px: 1.5 }}>
+                {t('snusk_optin_hint_cta')}
+              </Button>
+              <Button size="small" onClick={() => setShowSnuskHint(false)} sx={{ fontSize: '0.7rem' }}>
+                OK
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Snackbar>
 
       {/* One-time mode hint */}
       <Snackbar
