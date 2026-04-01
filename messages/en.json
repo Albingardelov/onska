@@ -134,7 +134,11 @@
     "my_snusk_open_none": "You have nothing open today — tap to change",
     "my_snusk_open_many": "You have {count} fantasies open today",
     "snusk_optin_hint": "In dark mode, all fantasies are closed by default. Open them in the calendar for the days you're up for it.",
-    "snusk_optin_hint_cta": "Open calendar"
+    "snusk_optin_hint_cta": "Open calendar",
+    "cta_fint": "Wish for something",
+    "cta_snusk": "Craving something?",
+    "sheet_title": "Choose a gesture",
+    "sheet_title_snusk": "What are you craving?"
   },
   "orders": {
     "header": "Wishes",

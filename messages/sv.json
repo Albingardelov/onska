@@ -134,7 +134,11 @@
     "my_snusk_open_none": "Du har inget öppet idag — tryck för att ändra",
     "my_snusk_open_many": "Du har {count} fantasier öppna idag",
     "snusk_optin_hint": "I snusk-läget är alla fantasier stängda som standard. Öppna i kalendern för de dagar du är sugen.",
-    "snusk_optin_hint_cta": "Öppna kalendern"
+    "snusk_optin_hint_cta": "Öppna kalendern",
+    "cta_fint": "Önska något",
+    "cta_snusk": "Sugen på något?",
+    "sheet_title": "Välj en omtanke",
+    "sheet_title_snusk": "Vad är du sugen på?"
   },
   "orders": {
     "header": "Önskningar",

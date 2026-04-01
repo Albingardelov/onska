@@ -3,7 +3,6 @@ import { useEffect, useState, useMemo } from 'react'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
 import Snackbar from '@mui/material/Snackbar'
 import Link from 'next/link'
 import { Header } from '../components/Header'
@@ -14,10 +13,8 @@ import { useNotificationPermission } from '../hooks/useNotificationPermission'
 import type { Service, Order } from '../types'
 import { HeroBanner } from '../components/home/HeroBanner'
 import { StatusPills } from '../components/home/StatusPills'
-import { ServiceGrid } from '../components/home/ServiceGrid'
+import { BookingSheet } from '../components/home/BookingSheet'
 import { SectionLabel } from '../components/home/SectionLabel'
-import { DatePicker } from '../components/home/DatePicker'
-import { TimePicker } from '../components/home/TimePicker'
 import { format, addDays } from 'date-fns'
 import { sv, enUS } from 'date-fns/locale'
 import { Icon } from '@iconify/react'
@@ -27,7 +24,6 @@ import { useLocale } from '../contexts/LocaleContext'
 
 export function HomePage() {
   const t = useTranslations('home')
-  const tc = useTranslations('common')
   const { partner, profile, user, updateStatus, refreshProfile } = useAuth()
   const { mode } = useMode()
   const { locale } = useLocale()
@@ -43,6 +39,7 @@ export function HomePage() {
   const [success, setSuccess] = useState(false)
   const [successFading, setSuccessFading] = useState(false)
   const [successTitle, setSuccessTitle] = useState('')
+  const [sheetOpen, setSheetOpen] = useState(false)
   const { notifStatus, activating: activatingNotif, enableNotifications } = useNotificationPermission(user?.id)
   const [showModeHint, setShowModeHint] = useState(false)
   const [showSnuskHint, setShowSnuskHint] = useState(false)
@@ -152,6 +149,14 @@ export function HomePage() {
 
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => format(addDays(new Date(), i), 'yyyy-MM-dd')), [])
 
+  function handleSheetClose() {
+    setSheetOpen(false)
+    setSelectedService(null)
+    setSelectedDate(null)
+    setSelectedTime(null)
+    setNote('')
+  }
+
   async function placeOrder() {
     if (!selectedService || !profile || !partner) return
     const markedIds = selectedDate ? partnerMarkedIds : todayMarkedIds
@@ -175,8 +180,10 @@ export function HomePage() {
       body: JSON.stringify({ record: { to_user_id: partner.id, from_user_id: profile.id, service_id: selectedService.id, mode } }),
     }).catch(() => {})
     setSuccessTitle(title)
-    setSuccess(true); setSuccessFading(false); setSelectedService(null); setSelectedDate(null); setSelectedTime(null); setNote('')
     setOrdering(false)
+    handleSheetClose()
+    setSuccess(true)
+    setSuccessFading(false)
     setTimeout(() => setSuccessFading(true), 3200)
     setTimeout(() => { setSuccess(false); setSuccessFading(false) }, 4000)
   }
@@ -232,26 +239,60 @@ export function HomePage() {
           </Box>
         )}
 
+        {/* CTA */}
+        <Box sx={{ mx: 2.5, mt: 2.5 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            size="large"
+            onClick={() => setSheetOpen(true)}
+            startIcon={<Icon icon={mode === 'snusk' ? 'mdi:fire' : 'mdi:heart-outline'} />}
+            sx={{ py: 1.8, fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.01em', borderRadius: 3 }}
+          >
+            {mode === 'snusk' ? t('cta_snusk') : t('cta_fint')}
+          </Button>
+        </Box>
+
         <Box px={2.5} pt={3} display="flex" flexDirection="column" gap={3.5}>
 
-          {/* Kommande önskningar */}
+          {/* Success banner */}
+          {success && (
+            <Box sx={{
+              display: 'flex', alignItems: 'center', gap: 1.5,
+              p: 2, borderRadius: 2,
+              bgcolor: 'success.main', color: '#fff',
+              '@keyframes slideUp': {
+                from: { opacity: 0, transform: 'translateY(6px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+              animation: 'slideUp 0.25s cubic-bezier(0.4,0,0.2,1)',
+              transition: 'opacity 0.8s ease',
+              opacity: successFading ? 0 : 1,
+            }}>
+              <Box component="span" sx={{ fontSize: 24, display: 'flex', flexShrink: 0 }}>
+                <Icon icon="mdi:heart" />
+              </Box>
+              <Box>
+                <Typography fontWeight={700} fontSize="0.95rem">{t('wish_sent')}</Typography>
+                <Typography variant="caption" sx={{ opacity: 0.85 }}>
+                  {successTitle} — {t('wish_sent_subtitle', { name: partner.name })}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          {/* Planerade önskningar */}
           {upcomingOrders.length > 0 && (
             <Box>
               <SectionLabel>{t('planned_section')}</SectionLabel>
               <Box display="flex" flexDirection="column" gap={1.5}>
                 {upcomingOrders.map(order => (
                   <Box key={order.id} sx={{
-                    p: 2.5,
-                    borderRadius: 2,
-                    bgcolor: 'background.paper',
+                    p: 2.5, borderRadius: 2, bgcolor: 'background.paper',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(46,155,95,0.2)',
-                    position: 'relative',
-                    overflow: 'hidden',
+                    position: 'relative', overflow: 'hidden',
                   }}>
-                    <Box sx={{
-                      position: 'absolute', left: 0, top: 0, bottom: 0, width: 4,
-                      bgcolor: 'success.main',
-                    }} />
+                    <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, bgcolor: 'success.main' }} />
                     <Box display="flex" alignItems="flex-start" justifyContent="space-between" pl={0.5}>
                       <Box>
                         <Box display="flex" alignItems="center" gap={0.8} mb={0.5}>
@@ -283,83 +324,32 @@ export function HomePage() {
               </Box>
             </Box>
           )}
-
-          <ServiceGrid
-            services={services}
-            loading={loading}
-            mode={mode}
-            partner={partner}
-            selectedService={selectedService}
-            selectedDate={selectedDate}
-            partnerMarkedIds={partnerMarkedIds}
-            todayMarkedIds={todayMarkedIds}
-            onSelect={setSelectedService}
-          />
-
-          {selectedService && (
-            <Box>
-              <SectionLabel>{t('suggest_date')}</SectionLabel>
-              <DatePicker
-                days={days}
-                todayStr={todayStr}
-                selected={selectedDate}
-                onSelect={(date) => { setSelectedDate(date); if (!date) setSelectedTime(null) }}
-                dateFnsLocale={dateFnsLocale}
-              />
-            </Box>
-          )}
-
-          {selectedService && selectedDate && (
-            <Box>
-              <SectionLabel>{t('pick_time')}</SectionLabel>
-              <TimePicker
-                selectedDate={selectedDate}
-                todayStr={todayStr}
-                selected={selectedTime}
-                onSelect={setSelectedTime}
-              />
-            </Box>
-          )}
-
-          {selectedService && (
-            <TextField label={t('note_label')} value={note}
-              onChange={e => setNote(e.target.value)} placeholder={t('note_placeholder')} multiline rows={2} />
-          )}
-
-          {selectedService && (
-            <Button variant="contained" size="large" onClick={placeOrder} disabled={ordering}
-              startIcon={<Icon icon="mdi:send" />}
-              sx={{ py: 1.7, fontSize: '1rem', letterSpacing: '-0.01em', fontWeight: 700, animation: 'heartbeat 1.1s ease 0.4s 1 both' }}>
-              {ordering ? tc('sending') : mode === 'snusk' ? t('wish_button_snusk', { title: selectedService.title }) : t('wish_button', { title: selectedService.title })}
-            </Button>
-          )}
-
-          {success && (
-            <Box sx={{
-              display: 'flex', alignItems: 'center', gap: 1.5,
-              p: 2, borderRadius: 2,
-              bgcolor: 'success.main', color: '#fff',
-              '@keyframes slideUp': {
-                from: { opacity: 0, transform: 'translateY(6px)' },
-                to: { opacity: 1, transform: 'translateY(0)' },
-              },
-              animation: 'slideUp 0.25s cubic-bezier(0.4,0,0.2,1)',
-              transition: 'opacity 0.8s ease',
-              opacity: successFading ? 0 : 1,
-            }}>
-              <Box component="span" sx={{ fontSize: 24, display: 'flex', flexShrink: 0, animation: 'heartPop 0.5s cubic-bezier(0.4,0,0.2,1) 0.1s 1 both' }}>
-                <Icon icon="mdi:heart" />
-              </Box>
-              <Box>
-                <Typography fontWeight={700} fontSize="0.95rem">{t('wish_sent')}</Typography>
-                <Typography variant="caption" sx={{ opacity: 0.85 }}>
-                  {successTitle} — {t('wish_sent_subtitle', { name: partner.name })}
-                </Typography>
-              </Box>
-            </Box>
-          )}
         </Box>
       </Box>
+
+      <BookingSheet
+        open={sheetOpen}
+        onClose={handleSheetClose}
+        services={services}
+        loading={loading}
+        mode={mode}
+        partner={partner}
+        selectedService={selectedService}
+        selectedDate={selectedDate}
+        selectedTime={selectedTime}
+        note={note}
+        partnerMarkedIds={partnerMarkedIds}
+        todayMarkedIds={todayMarkedIds}
+        ordering={ordering}
+        days={days}
+        todayStr={todayStr}
+        dateFnsLocale={dateFnsLocale}
+        onSelectService={setSelectedService}
+        onSelectDate={setSelectedDate}
+        onSelectTime={setSelectedTime}
+        onNoteChange={setNote}
+        onSubmit={placeOrder}
+      />
 
       {/* One-time snusk opt-in hint */}
       <Snackbar
