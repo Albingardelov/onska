@@ -208,7 +208,7 @@ export function OrdersPage() {
                 {t('empty_title', { name: partner?.name ?? '...' })}
               </Typography>
               <Typography variant="body2" sx={{ opacity: 0.8, lineHeight: 1.6, mb: 2 }}>
-                {t('empty_body')}
+                {t('empty_body', { name: partner?.name ?? '...' })}
               </Typography>
               <Link href="/" style={{ textDecoration: 'none' }}>
                 <Button
