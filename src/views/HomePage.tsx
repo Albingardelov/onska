@@ -247,7 +247,7 @@ export function HomePage() {
     )
   }
 
-  const upcomingOrders = activeOrders.filter(o => o.from_user_id === profile!.id)
+  const upcomingOrders = activeOrders
   const todayStr = format(new Date(), 'yyyy-MM-dd')
 
   return (
