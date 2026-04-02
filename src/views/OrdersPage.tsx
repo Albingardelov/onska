@@ -2,7 +2,9 @@ import { useEffect, useState, useRef } from 'react'
 import confetti from 'canvas-confetti'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
 import Skeleton from '@mui/material/Skeleton'
+import Link from 'next/link'
 import { Header } from '../components/Header'
 import { SwipeToDelete } from '../components/SwipeToDelete'
 import { OrderCard } from '../components/orders/OrderCard'
@@ -19,7 +21,7 @@ type Filter = 'all' | 'incoming' | 'mine'
 
 export function OrdersPage() {
   const t = useTranslations('orders')
-  const { profile } = useAuth()
+  const { profile, partner } = useAuth()
   const { mode } = useMode()
   const [filter, setFilter] = useState<Filter>('all')
   const [orders, setOrders] = useState<Order[]>([])
@@ -179,12 +181,70 @@ export function OrdersPage() {
       <Box p={2.5} pt={1.5} display="flex" flexDirection="column" gap={1.5} maxWidth={560} width="100%" mx="auto">
         {loading ? (
           [1, 2, 3].map(i => <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 2 }} />)
-        ) : filtered.length === 0 ? (
+        ) : filtered.length === 0 && orders.length > 0 ? (
           <Box sx={{ p: 4, borderRadius: 2, border: '1.5px dashed', borderColor: 'divider', textAlign: 'center', mt: 1 }}>
-            <Box component="span" sx={{ fontSize: 36, display: 'flex', justifyContent: 'center', mb: 1.5, opacity: 0.2 }}>
-              <Icon icon="mdi:heart-outline" />
+            <Typography color="text.secondary" variant="body2">{t('no_wishes_filter')}</Typography>
+          </Box>
+        ) : orders.length === 0 ? (
+          <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Hero empty state */}
+            <Box sx={{
+              p: 3, borderRadius: 3, textAlign: 'center',
+              background: mode === 'snusk'
+                ? 'linear-gradient(145deg, #8B0A24 0%, #5C0618 55%, #3A020E 100%)'
+                : 'linear-gradient(145deg, #CC2E6A 0%, #A82158 55%, #8B1A49 100%)',
+              color: '#fff',
+              position: 'relative', overflow: 'hidden',
+              '&::before': {
+                content: '""', position: 'absolute',
+                top: -40, right: -40, width: 140, height: 140,
+                borderRadius: '50%', background: 'rgba(255,255,255,0.06)', pointerEvents: 'none',
+              },
+            }}>
+              <Box component="span" sx={{ fontSize: 44, display: 'flex', justifyContent: 'center', mb: 1.5, opacity: 0.9 }}>
+                <Icon icon="mdi:heart-outline" />
+              </Box>
+              <Typography fontWeight={800} fontSize="1.1rem" letterSpacing="-0.02em" mb={0.5}>
+                {t('empty_title', { name: partner?.name ?? '...' })}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8, lineHeight: 1.6, mb: 2 }}>
+                {t('empty_body')}
+              </Typography>
+              <Link href="/" style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  size="medium"
+                  startIcon={<Icon icon="mdi:heart-plus-outline" />}
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.2)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    backdropFilter: 'blur(4px)',
+                    '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
+                  }}
+                >
+                  {t('empty_cta')}
+                </Button>
+              </Link>
             </Box>
-            <Typography color="text.secondary" variant="body2">{t('no_wishes')}</Typography>
+
+            {/* How it works */}
+            {[
+              { icon: 'mdi:cursor-default-click-outline', label: t('howto_1') },
+              { icon: 'mdi:bell-outline', label: t('howto_2', { name: partner?.name ?? '...' }) },
+              { icon: 'mdi:check-circle-outline', label: t('howto_3') },
+            ].map((item, i) => (
+              <Box key={i} display="flex" alignItems="center" gap={1.5} px={0.5}>
+                <Box sx={{ width: 36, height: 36, borderRadius: 2, bgcolor: 'action.hover', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Box component="span" sx={{ fontSize: 18, color: 'primary.main', display: 'flex' }}>
+                    <Icon icon={item.icon} />
+                  </Box>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                  {item.label}
+                </Typography>
+              </Box>
+            ))}
           </Box>
         ) : (
           <>
@@ -207,13 +267,17 @@ export function OrdersPage() {
                 </Typography>
                 {monthKeys.map(month => (
                   <Box key={month} mb={2.5}>
-                    <Typography sx={{
-                      display: 'block', textAlign: 'center', mb: 1.5,
-                      color: 'text.disabled', fontSize: '0.68rem', letterSpacing: '0.08em',
-                      textTransform: 'uppercase', fontWeight: 600,
-                    }}>
-                      {month}
-                    </Typography>
+                    {/* Diary-style month separator */}
+                    <Box display="flex" alignItems="center" gap={1.5} mb={1.5}>
+                      <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+                      <Typography sx={{
+                        color: 'text.disabled', fontSize: '0.62rem', letterSpacing: '0.12em',
+                        textTransform: 'uppercase', fontWeight: 700, whiteSpace: 'nowrap',
+                      }}>
+                        {month}
+                      </Typography>
+                      <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+                    </Box>
                     <Box display="flex" flexDirection="column" gap={1}>
                       {memoriesByMonth[month].map(o => (
                         <SwipeToDelete key={o.id} onDelete={() => deleteOrder(o.id)}>

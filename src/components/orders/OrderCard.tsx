@@ -30,34 +30,39 @@ interface OrderCardProps {
   animIndex?: number
 }
 
-export function OrderCard({
-  order,
-  isIncoming,
-  onAccept,
-  onUpdateStatus,
-  animIndex,
-}: OrderCardProps): ReactElement {
+export function OrderCard({ order, isIncoming, onAccept, onUpdateStatus, animIndex }: OrderCardProps): ReactElement {
   const t = useTranslations('orders')
   const tc = useTranslations('common')
-
   const [isAccepting, setIsAccepting] = useState(false)
   const [responseNote, setResponseNote] = useState('')
 
-  const bgColor = order.status === 'accepted'
-    ? 'rgba(76,175,80,0.07)'
+  const isSnusk = order.mode === 'snusk'
+  const isActive = order.status === 'pending' || order.status === 'accepted'
+  const isMissed = order.status === 'declined' && order.expires_at && new Date(order.expires_at) < new Date()
+
+  // Card surface colors — work on both light (#FDF6F8) and dark (#080204) backgrounds
+  const bg = order.status === 'accepted'
+    ? isSnusk ? 'rgba(76,175,125,0.10)' : 'rgba(46,155,95,0.06)'
     : order.status === 'pending'
-      ? order.mode === 'snusk' ? 'rgba(139,10,36,0.09)' : 'rgba(204,46,106,0.07)'
+      ? isSnusk ? 'rgba(196,18,48,0.13)' : 'rgba(204,46,106,0.06)'
       : undefined
 
-  const statusLabel: Record<Order['status'], string> = {
-    pending: t('status_pending'),
-    accepted: t('status_accepted'),
-    declined: t('status_declined'),
-    completed: t('status_completed'),
-  }
-  const statusColor: Record<Order['status'], 'warning' | 'success' | 'error' | 'secondary'> = {
-    pending: 'warning', accepted: 'success', declined: 'secondary', completed: 'secondary',
-  }
+  const borderColorValue = order.status === 'accepted'
+    ? isSnusk ? 'rgba(76,175,125,0.22)' : 'rgba(46,155,95,0.20)'
+    : order.status === 'pending'
+      ? isSnusk ? 'rgba(196,18,48,0.28)' : 'rgba(204,46,106,0.18)'
+      : undefined
+
+  // Status indicator dot
+  const dotColor = order.status === 'pending' ? 'warning.main'
+    : order.status === 'accepted' ? 'success.main'
+    : 'text.disabled'
+
+  const statusText = isMissed ? t('status_missed')
+    : order.status === 'pending' ? t('status_pending')
+    : order.status === 'accepted' ? t('status_accepted')
+    : order.status === 'completed' ? t('status_completed')
+    : t('status_declined')
 
   let expiryCountdown: React.ReactNode = null
   if (order.expires_at && order.status === 'pending') {
@@ -68,12 +73,8 @@ export function OrderCard({
       const minutesLeft = Math.floor((diff % (60 * 60 * 1000)) / 60000)
       const label = hoursLeft > 0 ? `${hoursLeft}h ${minutesLeft}min kvar` : `${minutesLeft} min kvar`
       expiryCountdown = (
-        <Typography
-          variant="caption"
-          color={urgency === 'imminent' ? 'error' : 'warning.main'}
-          fontWeight={700}
-          sx={{ display: 'block', mt: 0.5 }}
-        >
+        <Typography variant="caption" color={urgency === 'imminent' ? 'error' : 'warning.main'}
+          fontWeight={700} sx={{ display: 'block', mt: 0.5 }}>
           {label}
         </Typography>
       )
@@ -82,10 +83,12 @@ export function OrderCard({
 
   return (
     <Box sx={{
-      borderRadius: 2,
+      borderRadius: 3,
       overflow: 'hidden',
-      boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.05)',
-      bgcolor: bgColor ?? 'background.paper',
+      bgcolor: bg ?? 'background.paper',
+      border: '1px solid',
+      borderColor: borderColorValue ?? 'divider',
+      transition: 'border-color 0.2s',
       '@keyframes cardIn': {
         from: { opacity: 0, transform: 'translateY(8px)' },
         to: { opacity: 1, transform: 'translateY(0)' },
@@ -96,105 +99,125 @@ export function OrderCard({
     }}>
       <Box sx={{ p: 2, px: 2.5 }}>
 
-        {/* Top row: mode icon + date */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.8}>
-          <Box component="span" sx={{ fontSize: 13, color: 'text.disabled', display: 'inline-flex' }}>
-            <Icon icon={order.mode === 'fint' ? 'mdi:weather-sunny' : 'mdi:weather-night'} />
+        {/* Meta row */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Box display="flex" alignItems="center" gap={0.7}>
+            <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: dotColor, flexShrink: 0 }} />
+            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+              {statusText}
+            </Typography>
           </Box>
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.72rem' }}>
             {format(new Date(order.created_at), 'd MMM HH:mm', { locale: sv })}
           </Typography>
         </Box>
 
-        {/* Title — leading element */}
-        <Typography fontWeight={800} fontSize="1.05rem" letterSpacing="-0.01em" mb={0.8}>
+        {/* Title — uses Fraunces for emotional weight */}
+        <Typography sx={{
+          fontFamily: 'var(--font-fraunces), Georgia, serif',
+          fontWeight: 700,
+          fontSize: '1.1rem',
+          letterSpacing: '-0.02em',
+          lineHeight: 1.3,
+          mb: 0.5,
+        }}>
           {order.service?.title ?? t('unknown_wish')}
         </Typography>
 
-        {/* Status + optional date suggestion */}
-        <Box display="flex" gap={0.8} flexWrap="wrap" alignItems="center" mb={order.note || expiryCountdown || order.response_note ? 0.8 : 0}>
+        {/* Date suggestion */}
+        {order.date && (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+            {format(new Date(order.date), 'd MMMM', { locale: sv })}
+          </Typography>
+        )}
+
+        {/* Time chip — only when a specific hour was chosen */}
+        {order.expires_at && order.status === 'pending' && new Date(order.expires_at).getMinutes() === 0 && (
           <Chip
             size="small"
-            label={
-              order.status === 'declined' && order.expires_at && new Date(order.expires_at) < new Date()
-                ? t('status_missed')
-                : statusLabel[order.status]
-            }
-            color={statusColor[order.status]}
+            icon={<Icon icon="mdi:clock-outline" width={13} />}
+            label={`${t('expires_at_label')} ${format(new Date(order.expires_at), 'HH:mm')}`}
+            color="warning"
+            variant="outlined"
+            sx={{ mb: 0.5 }}
           />
-          {order.date && (
-            <Typography variant="caption" color="text.secondary">
-              {format(new Date(order.date), 'd MMMM', { locale: sv })}
-            </Typography>
-          )}
-          {order.expires_at && order.status === 'pending' && new Date(order.expires_at).getMinutes() === 0 && (
-            <Chip
-              size="small"
-              icon={<Icon icon="mdi:clock-alert-outline" width={14} />}
-              label={`${t('expires_at_label')} ${format(new Date(order.expires_at), 'HH:mm')}`}
-              color="warning"
-              variant="outlined"
-            />
-          )}
-        </Box>
+        )}
 
+        {/* Note */}
         {order.note && (
-          <Typography variant="body2" color="text.secondary" fontStyle="italic" mb={0.5}>
+          <Typography variant="body2" color="text.secondary"
+            fontStyle="italic" sx={{ mt: 0.5, lineHeight: 1.5, opacity: 0.85 }}>
             &ldquo;{order.note}&rdquo;
           </Typography>
         )}
+
         {expiryCountdown}
+
         {order.response_note && (
-          <Chip size="small" label={`⏰ ${order.response_note}`} color="success" variant="outlined" sx={{ mt: 0.5 }} />
+          <Box display="flex" alignItems="center" gap={0.8} mt={1}
+            sx={{ bgcolor: 'rgba(76,175,125,0.08)', borderRadius: 2, px: 1.5, py: 0.6, width: 'fit-content' }}>
+            <Box component="span" sx={{ fontSize: 13, display: 'flex', color: 'success.main' }}>
+              <Icon icon="mdi:clock-outline" />
+            </Box>
+            <Typography variant="caption" color="success.main" fontWeight={600}>
+              {order.response_note}
+            </Typography>
+          </Box>
         )}
 
         {/* Actions */}
-        {isIncoming && order.status === 'pending' && (
+        {isActive && (
           <Box mt={2}>
-            {isAccepting ? (
-              <Box display="flex" flexDirection="column" gap={1.5}>
-                <TextField label={t('when_label')} size="small" autoFocus
-                  placeholder={t('when_placeholder')}
-                  value={responseNote} onChange={e => setResponseNote(e.target.value)} />
-                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>
-                  {t('consent_accept_hint')}
-                </Typography>
-                <Box display="flex" gap={1}>
-                  <Button variant="outlined" color="inherit" size="small" fullWidth
-                    onClick={() => { setIsAccepting(false); setResponseNote('') }}>{tc('cancel')}</Button>
-                  <Button variant="contained" color="success" size="small" fullWidth
-                    startIcon={<Icon icon="mdi:check" />}
-                    onClick={() => { onAccept(order.id, responseNote); setIsAccepting(false); setResponseNote('') }}>{t('confirm')}</Button>
+            {isIncoming && order.status === 'pending' && (
+              isAccepting ? (
+                <Box display="flex" flexDirection="column" gap={1.5}>
+                  <TextField label={t('when_label')} size="small" autoFocus
+                    placeholder={t('when_placeholder')}
+                    value={responseNote} onChange={e => setResponseNote(e.target.value)} />
+                  <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                    {t('consent_accept_hint')}
+                  </Typography>
+                  <Box display="flex" gap={1}>
+                    <Button variant="outlined" color="inherit" size="small" fullWidth
+                      onClick={() => { setIsAccepting(false); setResponseNote('') }}>{tc('cancel')}</Button>
+                    <Button variant="contained" color="success" size="small" fullWidth
+                      startIcon={<Icon icon="mdi:check" />}
+                      onClick={() => { onAccept(order.id, responseNote); setIsAccepting(false); setResponseNote('') }}>
+                      {t('confirm')}
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            ) : (
+              ) : (
+                <Box display="flex" gap={1}>
+                  <Button variant="outlined" color="error" size="small" fullWidth
+                    onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('decline')}</Button>
+                  <Button variant="contained" color="success" size="small" fullWidth
+                    startIcon={<Icon icon="mdi:heart-outline" />}
+                    onClick={() => setIsAccepting(true)}>{t('accept')}</Button>
+                </Box>
+              )
+            )}
+
+            {isIncoming && order.status === 'accepted' && (
               <Box display="flex" gap={1}>
-                <Button variant="outlined" color="error" size="small" fullWidth
-                  onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('decline')}</Button>
-                <Button variant="contained" color="success" size="small" fullWidth
-                  startIcon={<Icon icon="mdi:heart-outline" />} onClick={() => setIsAccepting(true)}>{t('accept')}</Button>
+                <Button variant="outlined" color="error" size="small"
+                  onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_receiver')}</Button>
+                <Button variant="outlined" color="secondary" size="small" fullWidth
+                  startIcon={<Icon icon="mdi:archive-outline" />}
+                  onClick={() => onUpdateStatus(order.id, 'completed')}>{t('archive')}</Button>
               </Box>
             )}
-          </Box>
-        )}
 
-        {isIncoming && order.status === 'accepted' && (
-          <Box mt={1.5} display="flex" gap={1}>
-            <Button variant="outlined" color="error" size="small"
-              onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_receiver')}</Button>
-            <Button variant="outlined" color="secondary" size="small" fullWidth
-              startIcon={<Icon icon="mdi:archive-outline" />}
-              onClick={() => onUpdateStatus(order.id, 'completed')}>{t('archive')}</Button>
-          </Box>
-        )}
+            {!isIncoming && order.status === 'accepted' && (
+              <Button variant="outlined" color="error" size="small" fullWidth
+                onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_sender')}</Button>
+            )}
 
-        {!isIncoming && order.status === 'accepted' && (
-          <Button variant="outlined" color="error" size="small" fullWidth sx={{ mt: 1.5 }}
-            onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('change_mind_sender')}</Button>
-        )}
-        {!isIncoming && order.status === 'pending' && (
-          <Button variant="outlined" color="error" size="small" fullWidth sx={{ mt: 1.5 }}
-            onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('withdraw')}</Button>
+            {!isIncoming && order.status === 'pending' && (
+              <Button variant="outlined" color="error" size="small" fullWidth
+                onClick={() => { vibrate(); onUpdateStatus(order.id, 'declined') }}>{t('withdraw')}</Button>
+            )}
+          </Box>
         )}
       </Box>
     </Box>
