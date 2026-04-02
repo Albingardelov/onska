@@ -466,15 +466,15 @@ export function HomePage() {
                 <Box sx={{ position: 'relative', zIndex: 1 }}>
                   <Box sx={{
                     width: 44, height: 44, mx: 'auto', mb: 1.5, borderRadius: '50%',
-                    bgcolor: mode === 'snusk' ? 'rgba(196,18,48,0.07)' : 'rgba(204,46,106,0.06)',
+                    bgcolor: mode === 'snusk' ? 'rgba(196,18,48,0.12)' : 'rgba(204,46,106,0.10)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Icon icon="mdi:calendar-heart" style={{ fontSize: 22, opacity: 0.4 }} />
+                    <Icon icon="mdi:calendar-heart" style={{ fontSize: 22, opacity: 0.65 }} />
                   </Box>
                   <Typography variant="body2" color="text.secondary" fontWeight={500} mb={0.3}>
                     {t('no_plans_title')}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ opacity: 0.55 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ opacity: 0.75 }}>
                     {t('no_plans_sub', { name: partner.name })}
                   </Typography>
                 </Box>
