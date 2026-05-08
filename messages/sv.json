@@ -254,6 +254,13 @@
     "nyfiken": "Nyfiken",
     "laddad": "Laddad",
     "behover_distraktion": "Behöver distraheras",
+    "custom_open": "Egen…",
+    "custom_placeholder": "Skriv din status…",
+    "custom_save": "Spara",
+    "custom_cancel": "Avbryt",
+    "custom_clear": "Rensa",
+    "custom_error_empty": "Skriv något först",
+    "custom_error_too_long": "För långt (max {max} tecken)",
     "set_status": "Sätt din status",
     "clear_status": "Rensa status",
     "your_status": "Din status"

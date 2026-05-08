@@ -254,6 +254,13 @@
     "nyfiken": "Curious",
     "laddad": "Charged up",
     "behover_distraktion": "Needs distraction",
+    "custom_open": "Custom…",
+    "custom_placeholder": "Write your status…",
+    "custom_save": "Save",
+    "custom_cancel": "Cancel",
+    "custom_clear": "Clear",
+    "custom_error_empty": "Write something first",
+    "custom_error_too_long": "Too long (max {max} characters)",
     "set_status": "Set your status",
     "clear_status": "Clear status",
     "your_status": "Your status"

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { subscribeToPush } from '../lib/notifications'
+import { getCustomStatusText, isValidStatusKey } from '../lib/statuses'
 import type { Profile } from '../types'
 
 interface AuthContextType {
@@ -116,7 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!error) {
       setProfile(prev => prev ? { ...prev, status } : prev)
       if (status && partner?.id) {
-        const label = STATUS_LABELS_SV[status] ?? status
+        const customText = getCustomStatusText(status)
+        const label = customText ?? (isValidStatusKey(status) ? (STATUS_LABELS_SV[status] ?? status) : status)
         fetch('/api/send-status-notification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

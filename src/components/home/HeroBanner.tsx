@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { isValidStatusKey } from '../../lib/statuses'
+import { getCustomStatusText, isValidStatusKey } from '../../lib/statuses'
 import type { StatusKey } from '../../lib/statuses'
 import type { Profile, Mode } from '../../types'
 import type { Locale } from 'date-fns'
@@ -21,6 +21,7 @@ interface HeroBannerProps {
 export function HeroBanner({ mode, partner, loading, openTodayCount, myOpenTodayCount, dateFnsLocale }: HeroBannerProps) {
   const t = useTranslations('home')
   const ts = useTranslations('statuses')
+  const partnerCustomStatus = getCustomStatusText(partner.status)
 
   return (
     <Box sx={{
@@ -94,14 +95,14 @@ export function HeroBanner({ mode, partner, loading, openTodayCount, myOpenToday
         ) : null
       )}
 
-      {isValidStatusKey(partner.status) && (
+      {(isValidStatusKey(partner.status) || !!partnerCustomStatus) && (
         <Box display="flex" alignItems="center" gap={0.8} mt={0.8}
           sx={{ bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 2, px: 1.5, py: 0.8, width: 'fit-content' }}>
           <Box component="span" sx={{ fontSize: 14, display: 'flex', opacity: 0.8 }}>
             <Icon icon="mdi:heart-pulse" />
           </Box>
           <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.85 }}>
-            {ts(partner.status as StatusKey)}
+            {isValidStatusKey(partner.status) ? ts(partner.status as StatusKey) : partnerCustomStatus}
           </Typography>
         </Box>
       )}
