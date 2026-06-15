@@ -50,7 +50,7 @@ export function ServiceGrid({
             const selected = selectedService?.id === service.id
             const markedIds = selectedDate ? partnerMarkedIds : todayMarkedIds
             const isBlocked = mode === 'snusk'
-              ? !markedIds.has(service.id)
+              ? !(partner.always_open || markedIds.has(service.id))
               : markedIds.has(service.id)
             return (
               <Box key={service.id}

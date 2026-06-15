@@ -17,6 +17,7 @@ interface AuthContextType {
   pairWithPartner: (code: string) => Promise<string | null>
   refreshProfile: () => Promise<void>
   updateStatus: (status: string | null) => Promise<void>
+  setAlwaysOpen: (value: boolean) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -128,6 +129,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  async function setAlwaysOpen(value: boolean) {
+    if (!user) return
+    const { error } = await supabase.from('profiles').update({ always_open: value }).eq('id', user.id)
+    if (!error) setProfile(prev => prev ? { ...prev, always_open: value } : prev)
+  }
+
   async function pairWithPartner(code: string) {
     const { data, error } = await supabase.rpc('pair_with_partner', { partner_code: code.toUpperCase() })
     if (error) return error.message
@@ -137,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, profile, partner, session, loading, signIn, signUp, signOut, pairWithPartner, refreshProfile, updateStatus }}>
+    <AuthContext.Provider value={{ user, profile, partner, session, loading, signIn, signUp, signOut, pairWithPartner, refreshProfile, updateStatus, setAlwaysOpen }}>
       {children}
     </AuthContext.Provider>
   )

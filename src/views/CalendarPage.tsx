@@ -15,7 +15,8 @@ import { useTranslations } from 'next-intl'
 
 export function CalendarPage() {
   const t = useTranslations('calendar')
-  const { profile } = useAuth()
+  const { profile, setAlwaysOpen } = useAuth()
+  const alwaysOpen = !!profile?.always_open
   const [orders, setOrders] = useState<Order[]>([])
   const [myServices, setMyServices] = useState<Service[]>([])
   const [markedServiceIds, setMarkedServiceIds] = useState<Set<string>>(new Set())
@@ -194,6 +195,28 @@ export function CalendarPage() {
         </Box>
 
         {myServices.length > 0 && (
+          <Box sx={{
+            p: 1.5, borderRadius: 2, bgcolor: 'background.paper',
+            border: '1px solid', borderColor: alwaysOpen ? 'primary.main' : 'divider',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5,
+          }}>
+            <Box display="flex" alignItems="center" gap={1.2} flex={1}>
+              <Box component="span" sx={{ fontSize: 20, color: alwaysOpen ? 'primary.main' : 'text.secondary', display: 'flex', flexShrink: 0 }}>
+                <Icon icon={alwaysOpen ? 'mdi:lock-open-variant' : 'mdi:lock-open-variant-outline'} />
+              </Box>
+              <Box>
+                <Typography variant="body2" fontWeight={700}>{t('always_open_label')}</Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, display: 'block' }}>
+                  {t('always_open_hint')}
+                </Typography>
+              </Box>
+            </Box>
+            <Switch checked={alwaysOpen} onChange={e => setAlwaysOpen(e.target.checked)}
+              color="primary" inputProps={{ 'aria-label': t('always_open_label') }} />
+          </Box>
+        )}
+
+        {myServices.length > 0 && !alwaysOpen && (
           <Box display="flex" gap={1}>
             <Button
               size="small" variant="outlined" disabled={weekLoading}
@@ -235,7 +258,17 @@ export function CalendarPage() {
                 <Typography variant="body2" fontWeight={600}>{o.service?.title ?? 'Önskan'}</Typography>
               </Box>
             ))}
-            {myServices.length > 0 && (
+            {myServices.length > 0 && alwaysOpen && (
+              <Box mt={ordersByDate[selectedDay]?.length ? 1.5 : 0} display="flex" alignItems="center" gap={1}>
+                <Box component="span" sx={{ fontSize: 16, color: 'primary.main', display: 'flex' }}>
+                  <Icon icon="mdi:lock-open-variant" />
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                  {t('always_open_day_note')}
+                </Typography>
+              </Box>
+            )}
+            {myServices.length > 0 && !alwaysOpen && (
               <Box mt={ordersByDate[selectedDay]?.length ? 1.5 : 0}>
                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, lineHeight: 1.5 }}>
                   {t('open_hint_snusk')}

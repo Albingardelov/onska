@@ -15,19 +15,20 @@ export function Navbar() {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const { mode } = useMode()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [mySnuskOpenToday, setMySnuskOpenToday] = useState(0)
   const [pendingOrderCount, setPendingOrderCount] = useState(0)
 
   useEffect(() => {
     if (mode !== 'snusk' || !user) { setMySnuskOpenToday(0); return }
+    if (profile?.always_open) { setMySnuskOpenToday(1); return }
     const today = format(new Date(), 'yyyy-MM-dd')
     supabase.from('service_availability')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('date', today)
       .then(({ count }) => setMySnuskOpenToday(count ?? 0))
-  }, [mode, user, pathname])
+  }, [mode, user, pathname, profile?.always_open])
 
   useEffect(() => {
     if (!user) { setPendingOrderCount(0); return }

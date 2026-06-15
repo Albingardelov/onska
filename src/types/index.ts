@@ -8,6 +8,7 @@ export interface Profile {
   pairing_code: string
   status: string | null
   push_subscription?: string | null
+  always_open?: boolean
   created_at: string
 }
 

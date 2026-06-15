@@ -96,7 +96,7 @@ export function HomePage() {
   useEffect(() => {
     if (!selectedService) return
     const isBlocked = mode === 'snusk'
-      ? !partnerMarkedIds.has(selectedService.id)
+      ? !(partner?.always_open || partnerMarkedIds.has(selectedService.id))
       : partnerMarkedIds.has(selectedService.id)
     if (isBlocked) setSelectedService(null)
   }, [partnerMarkedIds])
@@ -138,6 +138,16 @@ export function HomePage() {
 
   async function loadMyTodayOpen() {
     if (!profile) return
+    if (profile.always_open) {
+      const { count } = await supabase
+        .from('services')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', profile.id)
+        .eq('mode', 'snusk')
+        .eq('active', true)
+      setMyTodayOpenCount(count ?? 0)
+      return
+    }
     const today = format(new Date(), 'yyyy-MM-dd')
     const { count } = await supabase
       .from('service_availability')
@@ -171,12 +181,12 @@ export function HomePage() {
   const todayIdea = useMemo(() => {
     if (!services.length || !profile || loading) return null
     const candidates = mode === 'snusk'
-      ? services.filter(s => todayMarkedIds.has(s.id))
+      ? (partner?.always_open ? services : services.filter(s => todayMarkedIds.has(s.id)))
       : services
     if (!candidates.length) return null
     const seed = parseInt(format(new Date(), 'yyyyMMdd').slice(-5)) + profile.id.charCodeAt(0)
     return candidates[seed % candidates.length]
-  }, [services, profile, mode, todayMarkedIds, loading])
+  }, [services, profile, partner, mode, todayMarkedIds, loading])
 
   function handleSheetClose() {
     setSheetOpen(false)
@@ -208,7 +218,7 @@ export function HomePage() {
     if (!selectedService || !profile || !partner) return
     const markedIds = selectedDate ? partnerMarkedIds : todayMarkedIds
     const isBlocked = mode === 'snusk'
-      ? !markedIds.has(selectedService.id)
+      ? !(partner.always_open || markedIds.has(selectedService.id))
       : markedIds.has(selectedService.id)
     if (isBlocked) return
     setOrdering(true)
@@ -259,7 +269,7 @@ export function HomePage() {
           mode={mode}
           partner={partner}
           loading={loading}
-          openTodayCount={services.filter(s => todayMarkedIds.has(s.id)).length}
+          openTodayCount={partner.always_open ? services.length : services.filter(s => todayMarkedIds.has(s.id)).length}
           myOpenTodayCount={myTodayOpenCount}
           dateFnsLocale={dateFnsLocale}
         />

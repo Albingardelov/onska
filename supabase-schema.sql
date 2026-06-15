@@ -10,6 +10,7 @@ create table public.profiles (
   partner_id uuid references public.profiles(id),
   pairing_code text not null unique,
   status text default null,
+  always_open boolean not null default false,
   created_at timestamptz default now()
 );
 

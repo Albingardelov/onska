@@ -209,7 +209,10 @@
     "upcoming": "Upcoming plans",
     "empty_hint": "Tap a day to set your availability",
     "open_week": "Open 7 days",
-    "close_week": "Close 7 days"
+    "close_week": "Close 7 days",
+    "always_open_label": "Always open",
+    "always_open_hint": "All your fantasies always count as open — even new ones. No need to open them per day.",
+    "always_open_day_note": "All your fantasies are open (Always open is on)."
   },
   "services": {
     "header": "My ideas",
