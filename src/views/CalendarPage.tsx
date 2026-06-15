@@ -155,7 +155,7 @@ export function CalendarPage() {
           {days.map(day => {
             const dateStr = format(day, 'yyyy-MM-dd')
             const hasOrders = !!ordersByDate[dateStr]?.length
-            const hasBlocked = daysWithSnuskOpen.has(dateStr)
+            const hasBlocked = alwaysOpen ? dateStr >= today : daysWithSnuskOpen.has(dateStr)
             const isSelected = selectedDay === dateStr
             const isPast = dateStr < today
             const isTodayDate = dateStr === today
